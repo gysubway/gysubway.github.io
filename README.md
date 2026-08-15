@@ -186,7 +186,7 @@
         }
 
         /* ============================================================
-               注册模态框
+               模态框通用
                ============================================================ */
         .modal-overlay {
             display: none;
@@ -221,7 +221,7 @@
             border-radius: 24px;
             padding: 36px 32px 32px;
             width: 100%;
-            max-width: 460px;
+            max-width: 580px;
             box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
             max-height: 90vh;
             overflow-y: auto;
@@ -249,7 +249,8 @@
         }
 
         .modal-card input[type="text"],
-        .modal-card input[type="password"] {
+        .modal-card input[type="password"],
+        .modal-card input[type="number"] {
             width: 100%;
             padding: 12px 16px;
             font-size: 15px;
@@ -264,17 +265,6 @@
         .modal-card input:focus {
             border-color: #1a6e9e;
             background: #ffffff;
-        }
-
-        .modal-card .verify-question {
-            background: #eef4fa;
-            padding: 12px 16px;
-            border-radius: 10px;
-            font-size: 15px;
-            color: #0b2a4a;
-            margin-bottom: 10px;
-            border-left: 4px solid #1a6e9e;
-            font-weight: 500;
         }
 
         .modal-card .form-actions {
@@ -294,13 +284,22 @@
             transition: background 0.25s, transform 0.15s;
         }
 
-        .modal-card .btn-register {
+        .modal-card .btn-primary {
             background: linear-gradient(135deg, #1a6e9e, #0b4a72);
             color: #ffffff;
         }
 
-        .modal-card .btn-register:hover {
+        .modal-card .btn-primary:hover {
             background: linear-gradient(135deg, #1f7eb2, #0e5580);
+        }
+
+        .modal-card .btn-danger {
+            background: #d94a4a;
+            color: #ffffff;
+        }
+
+        .modal-card .btn-danger:hover {
+            background: #c0392b;
         }
 
         .modal-card .btn-cancel {
@@ -347,6 +346,20 @@
         }
 
         /* ============================================================
+               注册模态框 (单独样式)
+               ============================================================ */
+        .register-modal .verify-question {
+            background: #eef4fa;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 15px;
+            color: #0b2a4a;
+            margin-bottom: 10px;
+            border-left: 4px solid #1a6e9e;
+            font-weight: 500;
+        }
+
+        /* ============================================================
                首页
                ============================================================ */
         #homePage {
@@ -357,7 +370,6 @@
             flex-direction: column;
         }
 
-        /* ---- 顶部导航 ---- */
         .navbar {
             background: linear-gradient(135deg, #0b2a4a, #1a4a6e);
             padding: 0 40px;
@@ -450,7 +462,6 @@
             border-color: rgba(255, 255, 255, 0.45);
         }
 
-        /* ---- 行楷 红底白字 标语 ---- */
         .hero-banner {
             background: #c0392b;
             background: linear-gradient(135deg, #b71c1c, #c0392b);
@@ -471,7 +482,6 @@
             line-height: 1.2;
         }
 
-        /* ---- 首页主体 ---- */
         .home-main {
             flex: 1;
             padding: 28px 40px 20px;
@@ -480,7 +490,6 @@
             width: 100%;
         }
 
-        /* 欢迎横幅 */
         .welcome-banner {
             background: linear-gradient(135deg, #ffffff, #f5f9ff);
             border-radius: 20px;
@@ -529,7 +538,6 @@
             margin-right: 6px;
         }
 
-        /* ---- 卡片网格 ---- */
         .section-title {
             font-size: 18px;
             font-weight: 700;
@@ -553,7 +561,6 @@
             margin-bottom: 28px;
         }
 
-        /* ---- 线路卡片 ---- */
         .line-card {
             background: #ffffff;
             border-radius: 18px;
@@ -627,10 +634,10 @@
             margin: 0 2px;
         }
 
-        /* ---- 快捷功能 ---- */
+        /* 快捷功能 + 管理入口 */
         .quick-actions {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 16px;
             margin-bottom: 8px;
         }
@@ -675,7 +682,15 @@
             margin-top: 2px;
         }
 
-        /* ---- 底部 ---- */
+        .quick-action.admin-action {
+            border-color: #f1c40f;
+            background: #fef9e7;
+        }
+
+        .quick-action.admin-action:hover {
+            border-color: #d4ac0d;
+        }
+
         .home-footer {
             text-align: center;
             padding: 20px 20px 8px;
@@ -690,48 +705,199 @@
         }
 
         /* ============================================================
-               站车风采 模态框 (独立于注册模态框)
+               管理面板模态框 (内部表格等)
                ============================================================ */
-        .modal-scenery .scenery-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin: 16px 0 8px;
+        .admin-modal .modal-card {
+            max-width: 820px;
         }
 
-        .modal-scenery .scenery-item {
-            background: #f8fafc;
-            border-radius: 14px;
-            padding: 16px 14px;
-            border: 1px solid #eef2f7;
-            transition: background 0.2s;
+        .admin-modal .tab-bar {
+            display: flex;
+            gap: 4px;
+            border-bottom: 2px solid #e0e6ee;
+            margin-bottom: 24px;
         }
 
-        .modal-scenery .scenery-item:hover {
-            background: #eef4fa;
-        }
-
-        .modal-scenery .scenery-item .scenery-icon {
-            font-size: 28px;
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        .modal-scenery .scenery-item .scenery-name {
-            font-weight: 700;
+        .admin-modal .tab-bar .tab-btn {
+            padding: 10px 24px;
             font-size: 16px;
+            font-weight: 600;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: #5a6a7a;
+            border-bottom: 3px solid transparent;
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        .admin-modal .tab-bar .tab-btn.active {
+            color: #0b2a4a;
+            border-bottom-color: #1a6e9e;
+        }
+
+        .admin-modal .tab-bar .tab-btn:hover {
             color: #0b2a4a;
         }
 
-        .modal-scenery .scenery-item .scenery-desc {
-            font-size: 13px;
-            color: #5a6a7a;
-            margin-top: 2px;
-            line-height: 1.4;
+        .admin-modal .tab-content {
+            display: none;
         }
 
-        .modal-scenery .modal-card {
-            max-width: 580px;
+        .admin-modal .tab-content.active {
+            display: block;
+        }
+
+        .admin-modal .user-table-wrap {
+            overflow-x: auto;
+        }
+
+        .admin-modal table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .admin-modal table th {
+            background: #eef4fa;
+            color: #0b2a4a;
+            font-weight: 700;
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 2px solid #d0dae6;
+        }
+
+        .admin-modal table td {
+            padding: 10px 10px;
+            border-bottom: 1px solid #eef2f7;
+            vertical-align: middle;
+        }
+
+        .admin-modal table tr:hover td {
+            background: #f8fafc;
+        }
+
+        .admin-modal .table-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .admin-modal .table-actions button {
+            padding: 4px 12px;
+            font-size: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .admin-modal .btn-edit {
+            background: #d4e6f1;
+            color: #1a4a6e;
+        }
+        .admin-modal .btn-edit:hover {
+            background: #b0d0e6;
+        }
+        .admin-modal .btn-balance {
+            background: #fdebd0;
+            color: #a04000;
+        }
+        .admin-modal .btn-balance:hover {
+            background: #fad7a0;
+        }
+        .admin-modal .btn-delete {
+            background: #fadbd8;
+            color: #922b21;
+        }
+        .admin-modal .btn-delete:hover {
+            background: #f5b7b1;
+        }
+
+        .admin-modal .add-btn {
+            margin-top: 16px;
+            padding: 10px 20px;
+            background: #1a6e9e;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .admin-modal .add-btn:hover {
+            background: #0b4a72;
+        }
+
+        .admin-modal .scenery-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .admin-modal .scenery-item-admin {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 14px 18px;
+            border: 1px solid #eef2f7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .admin-modal .scenery-item-admin .info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .admin-modal .scenery-item-admin .info .icon {
+            font-size: 28px;
+        }
+
+        .admin-modal .scenery-item-admin .info .name {
+            font-weight: 700;
+            color: #0b2a4a;
+        }
+
+        .admin-modal .scenery-item-admin .info .desc {
+            color: #5a6a7a;
+            font-size: 13px;
+        }
+
+        .admin-modal .scenery-item-admin .actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .admin-modal .scenery-item-admin .actions button {
+            padding: 4px 14px;
+            font-size: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .admin-modal .scenery-item-admin .actions .btn-edit {
+            background: #d4e6f1;
+            color: #1a4a6e;
+        }
+        .admin-modal .scenery-item-admin .actions .btn-edit:hover {
+            background: #b0d0e6;
+        }
+        .admin-modal .scenery-item-admin .actions .btn-delete {
+            background: #fadbd8;
+            color: #922b21;
+        }
+        .admin-modal .scenery-item-admin .actions .btn-delete:hover {
+            background: #f5b7b1;
         }
 
         /* ============================================================
@@ -782,7 +948,7 @@
                 gap: 16px;
             }
             .quick-actions {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(2, 1fr);
             }
             .home-main {
                 padding: 20px 24px 16px;
@@ -810,8 +976,9 @@
                 width: 100%;
                 white-space: normal;
             }
-            .modal-scenery .scenery-grid {
-                grid-template-columns: 1fr 1fr;
+            .admin-modal .modal-card {
+                max-width: 95%;
+                padding: 24px 16px;
             }
         }
 
@@ -856,7 +1023,7 @@
                 padding: 16px 12px;
             }
             .quick-actions {
-                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-columns: 1fr 1fr;
                 gap: 10px;
             }
             .quick-action {
@@ -893,9 +1060,6 @@
             .modal-card {
                 padding: 24px 18px 20px;
             }
-            .modal-scenery .scenery-grid {
-                grid-template-columns: 1fr;
-            }
             .modal-card .form-actions {
                 flex-direction: column;
             }
@@ -904,20 +1068,24 @@
                 font-size: 14px;
                 white-space: normal;
             }
+            .admin-modal table th,
+            .admin-modal table td {
+                padding: 6px 4px;
+                font-size: 12px;
+            }
+            .admin-modal .table-actions button {
+                font-size: 10px;
+                padding: 2px 8px;
+            }
+            .admin-modal .scenery-item-admin {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .admin-modal .scenery-item-admin .info {
+                flex-wrap: wrap;
+            }
         }
 
-        @media (max-width: 420px) {
-            .quick-actions {
-                grid-template-columns: 1fr 1fr;
-            }
-            .quick-actions .quick-action:last-child {
-                grid-column: span 2;
-            }
-        }
-
-        /* ============================================================
-               工具类
-               ============================================================ */
         .text-muted {
             color: #8a9aaa;
             font-size: 13px;
@@ -935,6 +1103,12 @@
         }
         .gap-4 {
             gap: 4px;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .w-full {
+            width: 100%;
         }
     </style>
 </head>
@@ -979,7 +1153,7 @@
     <!-- ============================================================
     注 册 模 态 框
     ============================================================ -->
-    <div class="modal-overlay" id="registerModal">
+    <div class="modal-overlay register-modal" id="registerModal">
         <div class="modal-card">
             <div class="modal-title">📝 注册新账号</div>
 
@@ -1021,47 +1195,79 @@
     </div>
 
     <!-- ============================================================
-    站 车 风 采 模 态 框
+    管 理 面 板 模 态 框
     ============================================================ -->
-    <div class="modal-overlay modal-scenery" id="sceneryModal">
+    <div class="modal-overlay admin-modal" id="adminModal">
         <div class="modal-card">
-            <div class="modal-title">🚉 站车风采</div>
+            <div class="modal-title">⚙️ 管理面板</div>
 
-            <div class="scenery-grid">
-                <div class="scenery-item">
-                    <span class="scenery-icon">🏛️</span>
-                    <div class="scenery-name">固原站</div>
-                    <div class="scenery-desc">固原地铁1号线起点站，集交通、商业、文化于一体的综合枢纽，日均客流量超10万人次。</div>
-                </div>
-                <div class="scenery-item">
-                    <span class="scenery-icon">🏙️</span>
-                    <div class="scenery-name">人民广场站</div>
-                    <div class="scenery-desc">位于城市核心区，2号线与3号线换乘站，毗邻市政府与商业中心，是城市最繁忙的站点之一。</div>
-                </div>
-                <div class="scenery-item">
-                    <span class="scenery-icon">🌳</span>
-                    <div class="scenery-name">古雁岭站</div>
-                    <div class="scenery-desc">4号线站点，毗邻古雁岭生态公园，车站设计融入自然元素，被誉为"最美地铁站"。</div>
-                </div>
-                <div class="scenery-item">
-                    <span class="scenery-icon">🚄</span>
-                    <div class="scenery-name">CRH380 系列</div>
-                    <div class="scenery-desc">高速动车组，最高运营时速380km/h，中国高铁的标杆车型，安全、舒适、快捷。</div>
-                </div>
-                <div class="scenery-item">
-                    <span class="scenery-icon">🚇</span>
-                    <div class="scenery-name">固原地铁 A 型车</div>
-                    <div class="scenery-desc">6节编组，最高时速80km/h，采用永磁同步电机与节能空调，绿色环保，噪音更低。</div>
-                </div>
-                <div class="scenery-item">
-                    <span class="scenery-icon">🛤️</span>
-                    <div class="scenery-name">智慧运维系统</div>
-                    <div class="scenery-desc">基于大数据与AI的列车智能运维平台，实时监测车辆状态，保障运营安全可靠。</div>
-                </div>
+            <div class="tab-bar">
+                <button class="tab-btn active" data-tab="users">👥 用户管理</button>
+                <button class="tab-btn" data-tab="scenery">📸 站车风采</button>
             </div>
 
-            <div class="form-actions" style="margin-top: 12px;">
-                <button class="btn-cancel" id="closeSceneryBtn" style="flex:1;">关 闭</button>
+            <!-- 用户管理 -->
+            <div class="tab-content active" id="tabUsers">
+                <div class="user-table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>用户名</th>
+                                <th>余额</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                            <!-- 动态渲染 -->
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-muted mt-8">* 管理员可修改密码、余额，注销账号（不能注销自己）</p>
+            </div>
+
+            <!-- 站车风采管理 -->
+            <div class="tab-content" id="tabScenery">
+                <div class="scenery-list" id="sceneryAdminList">
+                    <!-- 动态渲染 -->
+                </div>
+                <button class="add-btn" id="addSceneryBtn">➕ 新增风采</button>
+            </div>
+
+            <div class="form-actions" style="margin-top: 20px;">
+                <button class="btn-cancel" id="closeAdminBtn" style="flex:1;">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    编 辑 风 采 模 态 框 (子模态)
+    ============================================================ -->
+    <div class="modal-overlay" id="editSceneryModal">
+        <div class="modal-card">
+            <div class="modal-title" id="editSceneryTitle">编辑风采</div>
+            <input type="hidden" id="editSceneryId" value="" />
+
+            <div class="form-group">
+                <label>图标 (Emoji)</label>
+                <input type="text" id="editSceneryIcon" placeholder="例如 🏛️" />
+            </div>
+            <div class="form-group">
+                <label>名称</label>
+                <input type="text" id="editSceneryName" placeholder="站点或车型名称" />
+            </div>
+            <div class="form-group">
+                <label>描述</label>
+                <input type="text" id="editSceneryDesc" placeholder="简要描述" />
+            </div>
+
+            <div class="modal-error" id="editSceneryError">
+                <span class="err-icon">⚠️</span>
+                <span id="editSceneryErrorMessage">错误信息</span>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn-cancel" id="closeEditSceneryBtn">取消</button>
+                <button class="btn-primary" id="saveSceneryBtn">保存</button>
             </div>
         </div>
     </div>
@@ -1123,7 +1329,7 @@
                 🎫 快捷功能
                 <span class="title-line"></span>
             </div>
-            <div class="quick-actions">
+            <div class="quick-actions" id="quickActions">
                 <div class="quick-action" data-action="ticket">
                     <span class="qa-icon">🎟️</span>
                     <div class="qa-label">购票</div>
@@ -1138,6 +1344,12 @@
                     <span class="qa-icon">📸</span>
                     <div class="qa-label">站车风采</div>
                     <div class="qa-desc">点击欣赏</div>
+                </div>
+                <!-- 管理员入口，默认隐藏，由JS控制显示 -->
+                <div class="quick-action admin-action" data-action="admin" id="adminEntry" style="display:none;">
+                    <span class="qa-icon">⚙️</span>
+                    <div class="qa-label">管理面板</div>
+                    <div class="qa-desc">管理员专用</div>
                 </div>
             </div>
 
@@ -1162,10 +1374,9 @@
             'use strict';
 
             // ============================================================
-            //  数据
+            //  数据常量
             // ============================================================
 
-            // ★★★ 虚拟地铁线网数据（用户可替换为自己的数据） ★★★
             const LINE_DATA = [{
                 id: 1,
                 name: '1号线',
@@ -1192,51 +1403,50 @@
                 stations: ['古雁岭', '新区医院', '实验中学', '万达广场', '行政中心', '固原南站']
             }];
 
-            // ★★★ 预设 admin 账号 ★★★
             const PRESET_USER = {
                 username: 'admin',
                 password: 'gysubway2026',
                 balance: 1000000
             };
 
-            // ★★★ 验证问题与答案 ★★★
             const VERIFY_QUESTION = '固局更高速度实验列车的车号是？';
             const VERIFY_ANSWER = 'CRH380CM-0304';
+
+            // 默认站车风采数据
+            const DEFAULT_SCENERY = [
+                { id: 1, icon: '🏛️', name: '固原站', desc: '固原地铁1号线起点站，集交通、商业、文化于一体的综合枢纽，日均客流量超10万人次。' },
+                { id: 2, icon: '🏙️', name: '人民广场站', desc: '位于城市核心区，2号线与3号线换乘站，毗邻市政府与商业中心，是城市最繁忙的站点之一。' },
+                { id: 3, icon: '🌳', name: '古雁岭站', desc: '4号线站点，毗邻古雁岭生态公园，车站设计融入自然元素，被誉为"最美地铁站"。' },
+                { id: 4, icon: '🚄', name: 'CRH380 系列', desc: '高速动车组，最高运营时速380km/h，中国高铁的标杆车型，安全、舒适、快捷。' },
+                { id: 5, icon: '🚇', name: '固原地铁 A 型车', desc: '6节编组，最高时速80km/h，采用永磁同步电机与节能空调，绿色环保，噪音更低。' },
+                { id: 6, icon: '🛤️', name: '智慧运维系统', desc: '基于大数据与AI的列车智能运维平台，实时监测车辆状态，保障运营安全可靠。' }
+            ];
 
             // ============================================================
             //  存储工具
             // ============================================================
 
-            const STORAGE_KEY = 'metro_users_data';
+            const USER_STORAGE_KEY = 'metro_users_data';
+            const SCENERY_STORAGE_KEY = 'metro_scenery_data';
 
             function loadUsers() {
                 try {
-                    const raw = localStorage.getItem(STORAGE_KEY);
+                    const raw = localStorage.getItem(USER_STORAGE_KEY);
                     if (raw) {
                         const data = JSON.parse(raw);
-                        // 确保 admin 存在
                         if (!data.admin) {
-                            data.admin = {
-                                password: PRESET_USER.password,
-                                balance: PRESET_USER.balance
-                            };
+                            data.admin = { password: PRESET_USER.password, balance: PRESET_USER.balance };
                         }
                         return data;
                     }
-                } catch (_) { /* ignore */ }
-                // 默认初始化
-                const defaultData = {
-                    admin: {
-                        password: PRESET_USER.password,
-                        balance: PRESET_USER.balance
-                    }
-                };
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultData));
+                } catch (_) {}
+                const defaultData = { admin: { password: PRESET_USER.password, balance: PRESET_USER.balance } };
+                localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(defaultData));
                 return defaultData;
             }
 
             function saveUsers(users) {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+                localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
             }
 
             function getUser(username) {
@@ -1252,20 +1462,49 @@
             function createUser(username, password) {
                 const users = loadUsers();
                 if (users[username]) return false;
-                users[username] = {
-                    password: password,
-                    balance: 0 // 新用户余额为 0
-                };
+                users[username] = { password: password, balance: 0 };
                 saveUsers(users);
                 return true;
             }
 
-            function updateBalance(username, amount) {
+            function updateUser(username, updates) {
                 const users = loadUsers();
                 if (!users[username]) return false;
-                users[username].balance = amount;
+                Object.assign(users[username], updates);
                 saveUsers(users);
                 return true;
+            }
+
+            function deleteUser(username) {
+                if (username === 'admin') return false;
+                const users = loadUsers();
+                if (!users[username]) return false;
+                delete users[username];
+                saveUsers(users);
+                return true;
+            }
+
+            // --- 站车风采 ---
+            function loadScenery() {
+                try {
+                    const raw = localStorage.getItem(SCENERY_STORAGE_KEY);
+                    if (raw) {
+                        const data = JSON.parse(raw);
+                        if (Array.isArray(data) && data.length) return data;
+                    }
+                } catch (_) {}
+                // 初始化默认数据
+                localStorage.setItem(SCENERY_STORAGE_KEY, JSON.stringify(DEFAULT_SCENERY));
+                return DEFAULT_SCENERY.slice();
+            }
+
+            function saveScenery(items) {
+                localStorage.setItem(SCENERY_STORAGE_KEY, JSON.stringify(items));
+            }
+
+            function getNextId(items) {
+                if (!items.length) return 1;
+                return Math.max(...items.map(i => i.id)) + 1;
             }
 
             // ============================================================
@@ -1286,8 +1525,10 @@
             const lineGrid = document.getElementById('lineGrid');
             const currentTimeEl = document.getElementById('currentTime');
             const currentDateEl = document.getElementById('currentDate');
+            const adminEntry = document.getElementById('adminEntry');
+            const quickActions = document.getElementById('quickActions');
 
-            // 注册模态框
+            // 注册
             const registerModal = document.getElementById('registerModal');
             const openRegisterBtn = document.getElementById('openRegisterBtn');
             const closeRegisterBtn = document.getElementById('closeRegisterBtn');
@@ -1301,12 +1542,35 @@
             const regSuccess = document.getElementById('regSuccess');
             const regSuccessMessage = document.getElementById('regSuccessMessage');
 
-            // 站车风采模态框
-            const sceneryModal = document.getElementById('sceneryModal');
-            const closeSceneryBtn = document.getElementById('closeSceneryBtn');
+            // 管理面板
+            const adminModal = document.getElementById('adminModal');
+            const closeAdminBtn = document.getElementById('closeAdminBtn');
+            const userTableBody = document.getElementById('userTableBody');
+            const sceneryAdminList = document.getElementById('sceneryAdminList');
+            const addSceneryBtn = document.getElementById('addSceneryBtn');
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = {
+                users: document.getElementById('tabUsers'),
+                scenery: document.getElementById('tabScenery')
+            };
+
+            // 编辑风采子模态框
+            const editSceneryModal = document.getElementById('editSceneryModal');
+            const closeEditSceneryBtn = document.getElementById('closeEditSceneryBtn');
+            const saveSceneryBtn = document.getElementById('saveSceneryBtn');
+            const editSceneryId = document.getElementById('editSceneryId');
+            const editSceneryIcon = document.getElementById('editSceneryIcon');
+            const editSceneryName = document.getElementById('editSceneryName');
+            const editSceneryDesc = document.getElementById('editSceneryDesc');
+            const editSceneryError = document.getElementById('editSceneryError');
+            const editSceneryErrorMessage = document.getElementById('editSceneryErrorMessage');
+            const editSceneryTitle = document.getElementById('editSceneryTitle');
 
             // Toast
             const toastContainer = document.getElementById('toastContainer');
+
+            // 当前登录用户
+            let currentUser = null;
 
             // ============================================================
             //  工具函数
@@ -1331,21 +1595,15 @@
                 return '¥' + Number(val).toFixed(2);
             }
 
-            // ============================================================
-            //  Toast 通知
-            // ============================================================
-
             function showToast(message, icon) {
                 icon = icon || 'ℹ️';
                 const toast = document.createElement('div');
                 toast.className = 'toast';
                 toast.innerHTML = `<span class="toast-icon">${icon}</span> ${message}`;
                 toastContainer.appendChild(toast);
-                // 触发动画
                 requestAnimationFrame(() => {
                     toast.classList.add('show');
                 });
-                // 自动消失
                 setTimeout(() => {
                     toast.classList.remove('show');
                     setTimeout(() => {
@@ -1355,7 +1613,7 @@
             }
 
             // ============================================================
-            //  渲染线路
+            //  渲染函数
             // ============================================================
 
             function renderLines() {
@@ -1364,7 +1622,6 @@
                 LINE_DATA.forEach(line => {
                     const card = document.createElement('div');
                     card.className = 'line-card';
-
                     const stationsHtml = line.stations.map((s, idx) => {
                         let arrow = '';
                         if (idx < line.stations.length - 1) {
@@ -1372,7 +1629,6 @@
                         }
                         return '<span class="station">' + s + arrow + '</span>';
                     }).join('');
-
                     card.innerHTML = `
                             <div class="line-header">
                                 <div class="line-color" style="background:${line.color};"></div>
@@ -1381,11 +1637,84 @@
                                     <span class="line-code">${line.code}</span>
                                 </span>
                             </div>
-                            <div class="line-stations">
-                                ${stationsHtml}
-                            </div>
+                            <div class="line-stations">${stationsHtml}</div>
                         `;
                     lineGrid.appendChild(card);
+                });
+            }
+
+            function renderUserTable() {
+                const users = loadUsers();
+                const usernames = Object.keys(users);
+                userTableBody.innerHTML = '';
+                usernames.forEach(uname => {
+                    const user = users[uname];
+                    const tr = document.createElement('tr');
+                    const balanceStr = formatBalance(user.balance);
+                    let actions = '';
+                    // 修改密码
+                    actions +=
+                        `<button class="btn-edit" data-username="${uname}" data-action="changePwd">改密码</button>`;
+                    // 修改余额
+                    actions +=
+                        `<button class="btn-balance" data-username="${uname}" data-action="changeBalance">改余额</button>`;
+                    // 注销（不能删自己）
+                    if (uname !== 'admin') {
+                        actions +=
+                            `<button class="btn-delete" data-username="${uname}" data-action="delete">注销</button>`;
+                    } else {
+                        actions += `<span style="color:#aaa;font-size:12px;">(管理员)</span>`;
+                    }
+                    tr.innerHTML = `
+                            <td><strong>${uname}</strong></td>
+                            <td>${balanceStr}</td>
+                            <td><div class="table-actions">${actions}</div></td>
+                        `;
+                    userTableBody.appendChild(tr);
+                });
+                // 绑定事件
+                userTableBody.querySelectorAll('[data-action]').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        const action = this.dataset.action;
+                        const username = this.dataset.username;
+                        handleUserAction(action, username);
+                    });
+                });
+            }
+
+            function renderSceneryAdmin() {
+                const items = loadScenery();
+                sceneryAdminList.innerHTML = '';
+                items.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'scenery-item-admin';
+                    div.innerHTML = `
+                            <div class="info">
+                                <span class="icon">${item.icon}</span>
+                                <span class="name">${item.name}</span>
+                                <span class="desc">${item.desc}</span>
+                            </div>
+                            <div class="actions">
+                                <button class="btn-edit" data-id="${item.id}">编辑</button>
+                                <button class="btn-delete" data-id="${item.id}">删除</button>
+                            </div>
+                        `;
+                    sceneryAdminList.appendChild(div);
+                });
+                // 绑定编辑/删除
+                sceneryAdminList.querySelectorAll('.btn-edit').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = parseInt(this.dataset.id);
+                        openEditScenery(id);
+                    });
+                });
+                sceneryAdminList.querySelectorAll('.btn-delete').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = parseInt(this.dataset.id);
+                        if (confirm('确定要删除这条风采吗？')) {
+                            deleteSceneryItem(id);
+                        }
+                    });
                 });
             }
 
@@ -1420,21 +1749,16 @@
 
             function handleLogin(e) {
                 e.preventDefault();
-
                 const username = loginUsername.value.trim();
                 const password = loginPassword.value.trim();
-
                 loginError.classList.remove('show');
-
                 if (!username || !password) {
                     errorMessage.textContent = '请输入账号和密码';
                     loginError.classList.add('show');
                     return;
                 }
-
                 const user = getUser(username);
                 if (user && user.password === password) {
-                    // 登录成功
                     loginSuccess(username);
                 } else {
                     errorMessage.textContent = '账号或密码错误，请重新输入';
@@ -1445,37 +1769,38 @@
             }
 
             function loginSuccess(username) {
-                // 保存会话
+                currentUser = username;
                 sessionStorage.setItem('metro_session_user', username);
-
-                // 切换页面
                 loginPage.style.display = 'none';
                 homePage.style.display = 'flex';
 
-                // 更新用户信息
                 const user = getUser(username);
                 displayUsername.textContent = username;
                 greetingUser.textContent = username;
                 if (user) {
                     displayBalance.textContent = formatBalance(user.balance);
-                } else {
-                    displayBalance.textContent = '¥0.00';
                 }
 
-                // 渲染线路
+                // 显示管理员入口
+                if (username === 'admin') {
+                    adminEntry.style.display = 'block';
+                } else {
+                    adminEntry.style.display = 'none';
+                }
+
                 renderLines();
-
-                // 启动时钟
                 startClock();
-
-                // 滚动到顶部
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-
-                // 显示欢迎 Toast
                 showToast('欢迎回来，' + username + '！', '👋');
+
+                // 如果当前是管理员，且管理面板打开状态，刷新数据
+                if (username === 'admin') {
+                    // 但面板未打开，无需操作
+                }
             }
 
             function handleLogout() {
+                currentUser = null;
                 sessionStorage.removeItem('metro_session_user');
                 stopClock();
                 homePage.style.display = 'none';
@@ -1483,12 +1808,15 @@
                 loginError.classList.remove('show');
                 loginPassword.value = '';
                 loginUsername.value = '';
-                // 清空注册表单
-                clearRegisterForm();
                 // 关闭所有模态框
-                registerModal.classList.remove('active');
-                sceneryModal.classList.remove('active');
+                closeAllModals();
                 showToast('已安全退出', '👋');
+            }
+
+            function closeAllModals() {
+                registerModal.classList.remove('active');
+                adminModal.classList.remove('active');
+                editSceneryModal.classList.remove('active');
             }
 
             // ============================================================
@@ -1520,11 +1848,9 @@
                 const confirm = regConfirm.value.trim();
                 const verify = regVerify.value.trim();
 
-                // 清除旧状态
                 regError.classList.remove('show');
                 regSuccess.classList.remove('show');
 
-                // 验证
                 if (!username || username.length < 2) {
                     regErrorMessage.textContent = '账号至少需要2个字符';
                     regError.classList.add('show');
@@ -1550,7 +1876,6 @@
                     regError.classList.add('show');
                     return;
                 }
-                // 验证答案（忽略大小写）
                 if (verify.trim().toUpperCase() !== VERIFY_ANSWER.toUpperCase()) {
                     regErrorMessage.textContent = '验证答案错误，请重新输入';
                     regError.classList.add('show');
@@ -1559,13 +1884,10 @@
                     return;
                 }
 
-                // 创建账号
                 const success = createUser(username, password);
                 if (success) {
                     regSuccessMessage.textContent = '🎉 注册成功！即将自动登录...';
                     regSuccess.classList.add('show');
-
-                    // 自动登录
                     setTimeout(() => {
                         closeRegisterModal();
                         loginSuccess(username);
@@ -1577,35 +1899,217 @@
             }
 
             // ============================================================
-            //  站车风采
+            //  管理面板 - 用户操作
             // ============================================================
 
-            function openSceneryModal() {
-                sceneryModal.classList.add('active');
-            }
-
-            function closeSceneryModal() {
-                sceneryModal.classList.remove('active');
-            }
-
-            // ============================================================
-            //  快捷功能处理
-            // ============================================================
-
-            function handleQuickAction(action) {
-                switch (action) {
-                    case 'ticket':
-                        showToast('购票功能开发中，敬请期待！', '🎟️');
-                        break;
-                    case 'line':
-                        showToast('线路查询功能开发中，敬请期待！', '🗺️');
-                        break;
-                    case 'scenery':
-                        openSceneryModal();
-                        break;
-                    default:
-                        showToast('功能开发中', '🔧');
+            function handleUserAction(action, username) {
+                if (action === 'changePwd') {
+                    const newPwd = prompt('请输入新密码（至少6个字符）：');
+                    if (newPwd === null) return;
+                    if (newPwd.length < 6) {
+                        showToast('密码至少6个字符', '⚠️');
+                        return;
+                    }
+                    const ok = updateUser(username, { password: newPwd });
+                    if (ok) {
+                        showToast(`用户 ${username} 密码已修改`, '✅');
+                        renderUserTable();
+                    } else {
+                        showToast('修改失败', '❌');
+                    }
+                } else if (action === 'changeBalance') {
+                    const input = prompt('请输入新的余额（数字）：');
+                    if (input === null) return;
+                    const val = parseFloat(input);
+                    if (isNaN(val) || val < 0) {
+                        showToast('请输入有效数字', '⚠️');
+                        return;
+                    }
+                    const ok = updateUser(username, { balance: val });
+                    if (ok) {
+                        showToast(`用户 ${username} 余额已更新`, '✅');
+                        renderUserTable();
+                        // 如果当前用户是自己，更新显示
+                        if (username === currentUser) {
+                            const user = getUser(username);
+                            displayBalance.textContent = formatBalance(user.balance);
+                        }
+                    } else {
+                        showToast('修改失败', '❌');
+                    }
+                } else if (action === 'delete') {
+                    if (username === 'admin') {
+                        showToast('不能注销管理员账号', '⚠️');
+                        return;
+                    }
+                    if (confirm(`确定要注销用户 ${username} 吗？此操作不可恢复！`)) {
+                        const ok = deleteUser(username);
+                        if (ok) {
+                            showToast(`用户 ${username} 已注销`, '🗑️');
+                            renderUserTable();
+                            // 如果注销的是当前登录用户（非admin），则自动退出
+                            if (username === currentUser) {
+                                handleLogout();
+                            }
+                        } else {
+                            showToast('注销失败', '❌');
+                        }
+                    }
                 }
+            }
+
+            // ============================================================
+            //  管理面板 - 站车风采操作
+            // ============================================================
+
+            function openEditScenery(id) {
+                const items = loadScenery();
+                let item = items.find(i => i.id === id);
+                if (!item) {
+                    // 新增模式
+                    editSceneryTitle.textContent = '➕ 新增风采';
+                    editSceneryId.value = '';
+                    editSceneryIcon.value = '';
+                    editSceneryName.value = '';
+                    editSceneryDesc.value = '';
+                } else {
+                    editSceneryTitle.textContent = '✏️ 编辑风采';
+                    editSceneryId.value = item.id;
+                    editSceneryIcon.value = item.icon || '';
+                    editSceneryName.value = item.name || '';
+                    editSceneryDesc.value = item.desc || '';
+                }
+                editSceneryError.classList.remove('show');
+                editSceneryModal.classList.add('active');
+            }
+
+            function closeEditScenery() {
+                editSceneryModal.classList.remove('active');
+                editSceneryError.classList.remove('show');
+            }
+
+            function saveSceneryItem() {
+                const id = editSceneryId.value.trim();
+                const icon = editSceneryIcon.value.trim();
+                const name = editSceneryName.value.trim();
+                const desc = editSceneryDesc.value.trim();
+
+                editSceneryError.classList.remove('show');
+
+                if (!name) {
+                    editSceneryErrorMessage.textContent = '名称不能为空';
+                    editSceneryError.classList.add('show');
+                    return;
+                }
+
+                let items = loadScenery();
+                if (id) {
+                    // 编辑
+                    const idx = items.findIndex(i => i.id === parseInt(id));
+                    if (idx !== -1) {
+                        items[idx] = { ...items[idx], icon, name, desc };
+                        saveScenery(items);
+                        showToast('风采已更新', '✅');
+                    } else {
+                        showToast('未找到该条目', '❌');
+                        return;
+                    }
+                } else {
+                    // 新增
+                    const newId = getNextId(items);
+                    items.push({ id: newId, icon, name, desc });
+                    saveScenery(items);
+                    showToast('新增风采成功', '✅');
+                }
+                closeEditScenery();
+                renderSceneryAdmin();
+                // 同时更新首页展示（站车风采模态框内容会实时读取数据）
+            }
+
+            function deleteSceneryItem(id) {
+                let items = loadScenery();
+                items = items.filter(i => i.id !== id);
+                saveScenery(items);
+                renderSceneryAdmin();
+                showToast('已删除', '🗑️');
+            }
+
+            // ============================================================
+            //  站车风采展示（普通用户点击）
+            // ============================================================
+
+            function openSceneryViewer() {
+                // 直接使用之前已有的站车风采模态框？但是那个是管理面板里的，为了不混淆，我们新建一个浏览模态框。
+                // 但之前有sceneryModal，但已删除，改用动态生成？简单起见，我们用管理面板的样式，但只读。
+                // 或者创建一个新的模态框。为了省事，我们复用管理面板的tab，但普通用户看不到管理面板。
+                // 我们新增一个简单的模态框用于展示。
+                // 但因为代码已定，我们快速实现一个轻量展示：直接弹窗显示列表，或者创建新模态框。
+                // 为保持一致性，我们创建一个新的模态框（可以复制sceneryAdminList的内容但只读）
+                // 实际上，我们可以使用一个模态框，但为了防止冲突，新建一个。
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay active';
+                modal.style.zIndex = '1000';
+                const items = loadScenery();
+                let html = `
+                        <div class="modal-card" style="max-width:600px;">
+                            <div class="modal-title">🚉 站车风采</div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;">
+                    `;
+                items.forEach(item => {
+                    html += `
+                            <div style="background:#f8fafc;border-radius:14px;padding:16px 14px;border:1px solid #eef2f7;">
+                                <span style="font-size:28px;display:block;margin-bottom:4px;">${item.icon}</span>
+                                <div style="font-weight:700;font-size:16px;color:#0b2a4a;">${item.name}</div>
+                                <div style="font-size:13px;color:#5a6a7a;margin-top:2px;line-height:1.4;">${item.desc}</div>
+                            </div>
+                        `;
+                });
+                html += `
+                            </div>
+                            <div class="form-actions">
+                                <button class="btn-cancel" id="closeSceneryViewerBtn" style="flex:1;">关闭</button>
+                            </div>
+                        </div>
+                    `;
+                modal.innerHTML = html;
+                document.body.appendChild(modal);
+                modal.querySelector('#closeSceneryViewerBtn').addEventListener('click', function() {
+                    modal.remove();
+                });
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) modal.remove();
+                });
+            }
+
+            // ============================================================
+            //  管理面板打开/关闭
+            // ============================================================
+
+            function openAdminPanel() {
+                if (currentUser !== 'admin') {
+                    showToast('权限不足', '⛔');
+                    return;
+                }
+                // 渲染数据
+                renderUserTable();
+                renderSceneryAdmin();
+                adminModal.classList.add('active');
+                // 默认选中用户tab
+                switchTab('users');
+            }
+
+            function closeAdminPanel() {
+                adminModal.classList.remove('active');
+            }
+
+            function switchTab(tabName) {
+                tabBtns.forEach(btn => {
+                    const t = btn.dataset.tab;
+                    btn.classList.toggle('active', t === tabName);
+                });
+                Object.keys(tabContents).forEach(key => {
+                    tabContents[key].classList.toggle('active', key === tabName);
+                });
             }
 
             // ============================================================
@@ -1615,7 +2119,7 @@
             function checkSession() {
                 const username = sessionStorage.getItem('metro_session_user');
                 if (username && userExists(username)) {
-                    // 自动登录
+                    currentUser = username;
                     loginPage.style.display = 'none';
                     homePage.style.display = 'flex';
                     const user = getUser(username);
@@ -1623,6 +2127,11 @@
                     greetingUser.textContent = username;
                     if (user) {
                         displayBalance.textContent = formatBalance(user.balance);
+                    }
+                    if (username === 'admin') {
+                        adminEntry.style.display = 'block';
+                    } else {
+                        adminEntry.style.display = 'none';
                     }
                     renderLines();
                     startClock();
@@ -1632,7 +2141,7 @@
             }
 
             // ============================================================
-            //  绑定事件
+            //  事件绑定
             // ============================================================
 
             // 登录
@@ -1646,36 +2155,56 @@
             // 登出
             logoutBtn.addEventListener('click', handleLogout);
 
-            // 注册模态框
+            // 注册
             openRegisterBtn.addEventListener('click', openRegisterModal);
             closeRegisterBtn.addEventListener('click', closeRegisterModal);
             registerBtn.addEventListener('click', handleRegister);
-            // 点击背景关闭注册模态框
             registerModal.addEventListener('click', function(e) {
                 if (e.target === this) closeRegisterModal();
             });
-            // 注册表单回车
             regVerify.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    registerBtn.click();
-                }
+                if (e.key === 'Enter') registerBtn.click();
             });
 
-            // 站车风采模态框
-            closeSceneryBtn.addEventListener('click', closeSceneryModal);
-            sceneryModal.addEventListener('click', function(e) {
-                if (e.target === this) closeSceneryModal();
-            });
-
-            // 快捷功能点击
-            document.querySelectorAll('.quick-action').forEach(el => {
+            // 快捷功能
+            document.querySelectorAll('.quick-action[data-action]').forEach(el => {
                 el.addEventListener('click', function() {
                     const action = this.dataset.action;
-                    if (action) handleQuickAction(action);
+                    if (action === 'ticket') {
+                        showToast('购票功能开发中，敬请期待！', '🎟️');
+                    } else if (action === 'line') {
+                        showToast('线路查询功能开发中，敬请期待！', '🗺️');
+                    } else if (action === 'scenery') {
+                        openSceneryViewer();
+                    } else if (action === 'admin') {
+                        openAdminPanel();
+                    }
                 });
             });
 
-            // 如果登录页的输入框获得焦点，清除错误
+            // 管理面板
+            closeAdminBtn.addEventListener('click', closeAdminPanel);
+            adminModal.addEventListener('click', function(e) {
+                if (e.target === this) closeAdminPanel();
+            });
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tab = this.dataset.tab;
+                    switchTab(tab);
+                });
+            });
+
+            // 编辑风采
+            addSceneryBtn.addEventListener('click', function() {
+                openEditScenery(null); // 新增
+            });
+            closeEditSceneryBtn.addEventListener('click', closeEditScenery);
+            saveSceneryBtn.addEventListener('click', saveSceneryItem);
+            editSceneryModal.addEventListener('click', function(e) {
+                if (e.target === this) closeEditScenery();
+            });
+
+            // 登录页输入框焦点清除错误
             loginUsername.addEventListener('focus', function() {
                 loginError.classList.remove('show');
             });
@@ -1688,31 +2217,26 @@
             // ============================================================
 
             (function init() {
-                // 确保预设 admin 账号存在
+                // 确保 admin 存在
                 const users = loadUsers();
                 if (!users.admin) {
-                    users.admin = {
-                        password: PRESET_USER.password,
-                        balance: PRESET_USER.balance
-                    };
+                    users.admin = { password: PRESET_USER.password, balance: PRESET_USER.balance };
                     saveUsers(users);
                 }
 
-                // 检查是否已有登录会话
-                const hasSession = checkSession();
+                // 确保站车风采存在
+                const scenery = loadScenery();
+                if (!scenery.length) {
+                    saveScenery(DEFAULT_SCENERY);
+                }
 
+                const hasSession = checkSession();
                 if (!hasSession) {
                     loginPage.style.display = 'flex';
                     homePage.style.display = 'none';
-                    // 清空输入框
                     loginUsername.value = '';
                     loginPassword.value = '';
                 }
-
-                // 预置验证问题（仅用于显示）
-                // 不显示在登录页
-
-                // 如果首页已显示，时钟已在 checkSession 中启动
             })();
 
         })();
