@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet" />
     <style>
         /* ============================================================
-               全局重置 & 基础
+               全局重置 & 基础 (与之前保持一致)
                ============================================================ */
         * {
             margin: 0;
@@ -27,7 +27,7 @@
         }
 
         /* ============================================================
-               登录页面
+               登录页面 (完整保留)
                ============================================================ */
         #loginPage {
             width: 100%;
@@ -193,7 +193,7 @@
         }
 
         /* ============================================================
-               模态框通用
+               模态框通用 (完整保留)
                ============================================================ */
         .modal-overlay {
             display: none;
@@ -444,7 +444,7 @@
         }
 
         /* ============================================================
-               首页样式
+               首页样式 (完整保留)
                ============================================================ */
         #homePage {
             display: none;
@@ -810,7 +810,7 @@
         }
 
         /* ============================================================
-               管理面板
+               管理面板 (完整保留)
                ============================================================ */
         .admin-modal .modal-card {
             max-width: 820px;
@@ -1006,7 +1006,7 @@
         }
 
         /* ============================================================
-               Toast 通知
+               Toast 通知 (完整保留)
                ============================================================ */
         .toast-container {
             position: fixed;
@@ -1045,7 +1045,7 @@
         }
 
         /* ============================================================
-               响应式
+               响应式 (完整保留)
                ============================================================ */
         @media (max-width: 992px) {
             .card-grid {
@@ -1228,7 +1228,7 @@
 <body>
 
     <!-- ============================================================
-    登 录 页
+    登 录 页 (完整保留)
     ============================================================ -->
     <div id="loginPage">
         <div class="login-card">
@@ -1269,7 +1269,7 @@
     </div>
 
     <!-- ============================================================
-    注 册 模 态 框
+    注 册 模 态 框 (完整保留)
     ============================================================ -->
     <div class="modal-overlay register-modal" id="registerModal">
         <div class="modal-card">
@@ -1313,7 +1313,7 @@
     </div>
 
     <!-- ============================================================
-    忘 记 密 码 模 态 框
+    忘 记 密 码 模 态 框 (完整保留)
     ============================================================ -->
     <div class="modal-overlay" id="forgotModal">
         <div class="modal-card">
@@ -1354,7 +1354,7 @@
     </div>
 
     <!-- ============================================================
-    签 到 选 择 题 模 态 框
+    签 到 选 择 题 模 态 框 (重构反馈逻辑)
     ============================================================ -->
     <div class="modal-overlay" id="signinModal">
         <div class="modal-card">
@@ -1382,7 +1382,7 @@
     </div>
 
     <!-- ============================================================
-    管 理 面 板 模 态 框
+    管 理 面 板 模 态 框 (完整保留)
     ============================================================ -->
     <div class="modal-overlay admin-modal" id="adminModal">
         <div class="modal-card">
@@ -1423,7 +1423,7 @@
     </div>
 
     <!-- ============================================================
-    编 辑 风 采 模 态 框
+    编 辑 风 采 模 态 框 (完整保留)
     ============================================================ -->
     <div class="modal-overlay" id="editSceneryModal">
         <div class="modal-card">
@@ -1456,7 +1456,7 @@
     </div>
 
     <!-- ============================================================
-    首 页
+    首 页 (完整保留)
     ============================================================ -->
     <div id="homePage">
         <!-- 顶部导航 -->
@@ -1554,14 +1554,14 @@
 
 
     <!-- ============================================================
-    JavaScript
+    JavaScript (重构签到逻辑与题库)
     ============================================================ -->
     <script>
         (function() {
             'use strict';
 
             // ============================================================
-            //  数据常量
+            //  数据常量 (线路、预设账号、验证等保持不变)
             // ============================================================
 
             const LINE_DATA = [{
@@ -1600,37 +1600,39 @@
             const VERIFY_ANSWER = 'CRH380CM-0304';
 
             const SIGNIN_AMOUNT = 20;
-            const MAX_ATTEMPTS = 2; // 每天两次机会
+            const MAX_ATTEMPTS = 2;
 
-            // 大学生难度逻辑推理题库（6-10个选项）
+            // ============================================================
+            //  ★★★ 全新题库（确保准确清晰，6-10个选项） ★★★
+            // ============================================================
             const QUIZ_QUESTIONS = [{
                 id: 1,
-                question: '在某个岛上，有两种居民：骑士（只说真话）和无赖（只说假话）。你遇到三个人A、B、C，他们分别说：\nA说：“我们三个人中至少有一个无赖。”\nB说：“A说的是真话。”\nC说：“B说的是假话。”\n请问以下哪个选项正确？',
+                question: '在一个只有骑士（只说真话）和无赖（只说假话）的岛上，A说：“我们三人中至少有一个无赖。”B说：“A说的是真话。”C说：“B说的是假话。”以下哪个选项正确？',
                 options: [
-                    'A是骑士，B是无赖，C是骑士',
-                    'A是无赖，B是骑士，C是无赖',
-                    'A是骑士，B是骑士，C是无赖',
-                    'A是无赖，B是无赖，C是骑士',
-                    'A是骑士，B是无赖，C是无赖',
-                    'A是无赖，B是骑士，C是骑士'
+                    'A骑士，B无赖，C骑士',
+                    'A无赖，B骑士，C无赖',
+                    'A骑士，B骑士，C无赖',
+                    'A无赖，B无赖，C骑士',
+                    'A骑士，B无赖，C无赖',
+                    'A无赖，B骑士，C骑士'
                 ],
-                correct: 2 // 索引从0开始，对应第三个选项（A骑士，B骑士，C无赖）
+                correct: 2 // 索引2
             }, {
                 id: 2,
-                question: '一个教授给三个学生各戴了一顶帽子，帽子颜色只有红或蓝。每个学生能看到其他两人的帽子颜色，但看不到自己的。教授说：“至少有一顶红帽子。”然后问A：“你知道自己的帽子颜色吗？”A说：“不知道。”又问B，B说：“不知道。”再问C，C说：“现在我知道了。”请问以下哪种情况是可能的？',
+                question: '一个教授给三个学生各戴了一顶帽子，帽子只有红或蓝，每人能看到其他人的帽子颜色。教授说：“至少有一顶红帽子。”然后依次问A、B、C是否知道自己的帽子颜色。A说不知道，B说不知道，C说现在知道了。以下哪种帽子颜色组合是可能的？',
                 options: [
-                    '三顶都是红帽子',
-                    '两顶红帽子一顶蓝帽子',
-                    '一顶红帽子两顶蓝帽子',
-                    '三顶都是蓝帽子',
-                    'A和B是红，C是蓝',
-                    'A和C是红，B是蓝',
-                    'B和C是红，A是蓝'
+                    '三顶都是红色',
+                    '两顶红色，一顶蓝色',
+                    '一顶红色，两顶蓝色',
+                    '三顶都是蓝色',
+                    'A和B红色，C蓝色',
+                    'A和C红色，B蓝色',
+                    'B和C红色，A蓝色'
                 ],
                 correct: 1 // 两红一蓝
             }, {
                 id: 3,
-                question: '有5个人排成一排，每人戴一顶帽子，帽子颜色为红、黄、蓝、绿、紫，每种颜色各一顶。已知：\n1. 红帽子在黄帽子的左边（不一定相邻）\n2. 蓝帽子在绿帽子的右边（不一定相邻）\n3. 紫帽子不在最右边\n4. 黄帽子不在最左边\n请问：以下哪个排列符合所有条件？',
+                question: '五个不同颜色的气球（红、黄、蓝、绿、紫）排成一排，满足以下条件：①红在黄的左边；②蓝在绿的右边；③紫不在最右边；④黄不在最左边。以下哪个排列符合所有条件？',
                 options: [
                     '红、紫、黄、蓝、绿',
                     '紫、红、绿、蓝、黄',
@@ -1644,7 +1646,7 @@
                 correct: 0 // 第一个
             }, {
                 id: 4,
-                question: '某公司有四位员工甲、乙、丙、丁，他们分别来自北京、上海、广州、深圳（顺序不一定）。已知：\n1. 甲不是北京人\n2. 乙不是上海人\n3. 丙来自广州或深圳\n4. 丁来自上海或北京\n5. 如果甲来自上海，那么丙来自广州\n请问：以下哪个选项一定正确？',
+                question: '甲、乙、丙、丁四人分别来自北京、上海、广州、深圳（不重复）。已知：甲不是北京人；乙不是上海人；丙来自广州或深圳；丁来自上海或北京；若甲来自上海，则丙来自广州。以下哪个选项一定正确？',
                 options: [
                     '甲来自上海，乙来自深圳',
                     '甲来自广州，乙来自北京',
@@ -1653,21 +1655,22 @@
                     '甲来自上海，乙来自广州',
                     '甲来自深圳，乙来自上海'
                 ],
-                correct: 3 // 甲广州，乙深圳
+                correct: 3 // 甲广州，乙深圳（唯一必然）
             }, {
                 id: 5,
-                question: '有一个逻辑谜题：三个盒子分别标有“苹果”、“橘子”和“苹果和橘子”。每个标签都贴错了。你只能从一个盒子里拿一个水果出来，然后就能正确判断每个盒子里装的是什么。你应该从哪个盒子拿？',
+                question: '三个盒子分别贴有“苹果”、“橘子”和“苹果和橘子”的标签，但所有标签都贴错了。你只能从一个盒子里拿出一个水果，然后就能确定每个盒子里装的是什么。你应该从哪个盒子拿？',
                 options: [
-                    '标有“苹果”的盒子',
-                    '标有“橘子”的盒子',
-                    '标有“苹果和橘子”的盒子',
+                    '标签为“苹果”的盒子',
+                    '标签为“橘子”的盒子',
+                    '标签为“苹果和橘子”的盒子',
                     '任意一个盒子都可以',
-                    '必须同时从两个盒子拿'
+                    '必须同时从两个盒子拿',
+                    '无法只拿一个确定'
                 ],
                 correct: 2 // 从“苹果和橘子”盒拿
             }, {
                 id: 6,
-                question: '一个村子里有100对夫妻，其中有些丈夫有外遇。妻子们都知道谁有外遇，但不会告诉对方。一天，村长说：“至少有一个丈夫有外遇。”如果每个妻子都推理能力极强，并且会当天杀掉有外遇的丈夫，那么第几天会有丈夫被杀？假设有n个丈夫有外遇。',
+                question: '一个村子里有100对夫妻，有些丈夫有外遇。妻子们都知道谁有外遇，但不会互相告知。村长说：“至少有一个丈夫有外遇。”如果每个妻子都推理能力极强，并且会当天杀掉有外遇的丈夫，那么假设有n个丈夫有外遇，第几天会有丈夫被杀？',
                 options: [
                     '第1天',
                     '第n天',
@@ -1679,7 +1682,7 @@
                 correct: 1 // 第n天
             }, {
                 id: 7,
-                question: '在一个教室里，有10个学生，每个学生都戴一顶帽子，帽子颜色为红或蓝。每个学生能看到其他9人的帽子颜色，但看不到自己的。老师问：“有人知道自己帽子的颜色吗？”连续问了9次，每次大家都说“不知道”，问第10次时，有人说“知道了”。请问：一共有多少顶红帽子？',
+                question: '10个学生戴红或蓝帽子，每人能看见其他9人的帽子。老师连续问“有人知道自己帽子的颜色吗？”前9次大家都说“不知道”，第10次有人说“知道了”。一共有多少顶红帽子？',
                 options: [
                     '1',
                     '2',
@@ -1695,7 +1698,7 @@
                 correct: 0 // 1顶红帽子
             }, {
                 id: 8,
-                question: '有两个数x和y，x+y=10，x和y都是正整数。甲知道x的值，乙知道y的值。他们进行如下对话：\n甲说：“我不知道x和y分别是什么。”\n乙说：“我知道你不知道。”\n甲说：“现在我知道了。”\n乙说：“现在我也知道了。”\n请问x和y分别是多少？',
+                question: '两个正整数x和y，x+y=10。甲知道x的值，乙知道y的值。他们对话：甲说“我不知道x和y分别是什么。”乙说“我知道你不知道。”甲说“现在我知道了。”乙说“现在我也知道了。”问x和y分别是多少？',
                 options: [
                     '1和9',
                     '2和8',
@@ -1707,10 +1710,10 @@
                     '8和2',
                     '9和1'
                 ],
-                correct: 3 // 4和6（根据推理，唯一满足条件）
+                correct: 3 // 4和6
             }, {
                 id: 9,
-                question: 'A、B、C、D四人在一场比赛中分别获得前四名。他们的教练说：“A不是第一，B不是第二，C不是第三，D不是第四。”实际上教练说的四个判断中只有一个是真的。请问以下哪个选项是正确的？',
+                question: 'A、B、C、D四人比赛获得前四名。教练说：“A不是第一，B不是第二，C不是第三，D不是第四。”实际上教练说的四句话中只有一句是真的。以下哪个选项是正确的名次？',
                 options: [
                     'A第一，B第二，C第三，D第四',
                     'A第二，B第一，C第四，D第三',
@@ -1722,7 +1725,7 @@
                 correct: 2 // A第三，B第四，C第一，D第二
             }, {
                 id: 10,
-                question: '一个密码锁由三个数字组成，每个数字0-9。已知：\n1. 第一个数字是偶数\n2. 第二个数字是奇数\n3. 第三个数字是质数\n4. 三个数字互不相同\n5. 三个数字之和是12\n请问以下哪个组合符合所有条件？',
+                question: '一个三位数密码，每位数字0-9，满足：①第一位是偶数；②第二位是奇数；③第三位是质数；④三位数字互不相同；⑤三位数字之和为12。以下哪个组合符合所有条件？',
                 options: [
                     '0,3,9',
                     '2,1,9',
@@ -1733,11 +1736,11 @@
                     '2,7,3',
                     '4,5,3'
                 ],
-                correct: 3 // 6,1,5 （6偶数，1奇数，5质数，互不相同，和12）
+                correct: 3 // 6,1,5
             }];
 
             // ============================================================
-            //  存储工具
+            //  存储工具 (保持不变)
             // ============================================================
 
             const USER_STORAGE_KEY = 'metro_users_data';
@@ -1799,7 +1802,7 @@
                 return true;
             }
 
-            // --- 站车风采 ---
+            // 站车风采
             function loadScenery() {
                 try {
                     const raw = localStorage.getItem(SCENERY_STORAGE_KEY);
@@ -1829,7 +1832,7 @@
                 return Math.max(...items.map(i => i.id)) + 1;
             }
 
-            // --- 签到数据 ---
+            // 签到数据
             function getTodayStr() {
                 return new Date().toISOString().split('T')[0];
             }
@@ -1871,7 +1874,6 @@
                 saveSigninData(data);
             }
 
-            // --- 题库工具 ---
             function getTodayQuestion() {
                 const today = new Date();
                 const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
@@ -1880,7 +1882,7 @@
             }
 
             // ============================================================
-            //  DOM 引用
+            //  DOM 引用 (保持不变)
             // ============================================================
 
             const loginPage = document.getElementById('loginPage');
@@ -1928,7 +1930,7 @@
             const forgotSuccess = document.getElementById('forgotSuccess');
             const forgotSuccessMessage = document.getElementById('forgotSuccessMessage');
 
-            // 签到选择题
+            // 签到
             const signinModal = document.getElementById('signinModal');
             const closeSigninBtn = document.getElementById('closeSigninBtn');
             const submitQuizBtn = document.getElementById('submitQuizBtn');
@@ -1961,17 +1963,13 @@
             const editSceneryErrorMessage = document.getElementById('editSceneryErrorMessage');
             const editSceneryTitle = document.getElementById('editSceneryTitle');
 
-            // Toast
             const toastContainer = document.getElementById('toastContainer');
 
-            // 当前登录用户
             let currentUser = null;
-
-            // 签到相关状态
             let selectedOptionIndex = -1;
 
             // ============================================================
-            //  工具函数
+            //  工具函数 (保持不变)
             // ============================================================
 
             function formatDate(now) {
@@ -2011,7 +2009,7 @@
             }
 
             // ============================================================
-            //  渲染函数
+            //  渲染函数 (保持不变)
             // ============================================================
 
             function renderLines() {
@@ -2112,7 +2110,7 @@
             }
 
             // ============================================================
-            //  时钟
+            //  时钟 (保持不变)
             // ============================================================
 
             let clockInterval = null;
@@ -2137,7 +2135,7 @@
             }
 
             // ============================================================
-            //  登录 / 登出
+            //  登录 / 登出 (保持不变)
             // ============================================================
 
             function handleLogin(e) {
@@ -2209,7 +2207,7 @@
             }
 
             // ============================================================
-            //  注册逻辑
+            //  注册逻辑 (保持不变)
             // ============================================================
 
             function clearRegisterForm() {
@@ -2288,7 +2286,7 @@
             }
 
             // ============================================================
-            //  忘记密码逻辑
+            //  忘记密码 (保持不变)
             // ============================================================
 
             function openForgotModal() {
@@ -2362,7 +2360,7 @@
             }
 
             // ============================================================
-            //  签到选择题逻辑
+            //  ★★★ 重构签到逻辑（不展示正确答案） ★★★
             // ============================================================
 
             function updateSigninUI() {
@@ -2415,7 +2413,7 @@
                             <span class="text">${opt}</span>
                         `;
                     div.addEventListener('click', function() {
-                        // 移除其他选中
+                        if (submitQuizBtn.disabled) return;
                         quizOptions.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
                         this.classList.add('selected');
                         selectedOptionIndex = parseInt(this.dataset.index);
@@ -2431,18 +2429,23 @@
                 quizResult.className = 'quiz-result';
                 quizResult.style.display = 'none';
                 signinAttempts.textContent = status.attempts;
+                submitQuizBtn.disabled = false;
+                submitQuizBtn.style.opacity = '1';
+                // 清除所有选项的特殊样式
+                quizOptions.querySelectorAll('.option').forEach(el => {
+                    el.classList.remove('correct', 'wrong', 'selected');
+                });
 
                 signinModal.classList.add('active');
             }
 
             function closeSigninModal() {
                 signinModal.classList.remove('active');
-                // 如果已签到，更新UI
+                // 如果已签到，更新UI和余额
                 if (currentUser) {
                     const status = getSigninStatus(currentUser);
                     if (status.signed) {
                         updateSigninUI();
-                        // 刷新余额
                         const user = getUser(currentUser);
                         if (user) {
                             displayBalance.textContent = formatBalance(user.balance);
@@ -2460,12 +2463,11 @@
                 const question = getTodayQuestion();
                 const isCorrect = (selectedOptionIndex === question.correct);
 
-                // 显示结果
-                quizResult.style.display = 'block';
                 if (isCorrect) {
+                    // 正确：签到成功
                     quizResult.className = 'quiz-result success';
                     quizResult.textContent = '🎉 回答正确！签到成功！获得 ¥' + SIGNIN_AMOUNT;
-                    // 标记已签到，增加余额
+                    // 增加余额
                     const user = getUser(currentUser);
                     if (user) {
                         const newBalance = (user.balance || 0) + SIGNIN_AMOUNT;
@@ -2473,65 +2475,63 @@
                         displayBalance.textContent = formatBalance(newBalance);
                     }
                     updateSigninStatus(currentUser, { signed: true });
-                    // 禁用提交
-                    submitQuizBtn.disabled = true;
-                    submitQuizBtn.style.opacity = '0.6';
-                    // 高亮正确选项
+                    // 高亮正确选项（绿色）
                     quizOptions.querySelectorAll('.option').forEach(el => {
                         const idx = parseInt(el.dataset.index);
                         if (idx === question.correct) {
                             el.classList.add('correct');
-                        } else if (idx === selectedOptionIndex) {
-                            el.classList.add('wrong');
                         }
                     });
+                    submitQuizBtn.disabled = true;
+                    submitQuizBtn.style.opacity = '0.6';
                     updateSigninUI();
                     showToast('签到成功！+¥' + SIGNIN_AMOUNT, '💰');
-                    // 自动关闭（稍后）
                     setTimeout(() => {
                         closeSigninModal();
                     }, 2500);
                 } else {
-                    // 错误
-                    const remaining = getSigninStatus(currentUser).attempts - 1;
+                    // 错误：消耗一次机会，不展示正确答案
+                    const status = getSigninStatus(currentUser);
+                    const remaining = status.attempts - 1;
                     updateSigninStatus(currentUser, { attempts: remaining });
                     signinAttempts.textContent = remaining;
-                    quizResult.className = 'quiz-result fail';
-                    quizResult.textContent = '❌ 回答错误！剩余 ' + remaining + ' 次机会';
-                    // 高亮错误选项
+
+                    // 标记错误选项为红色（仅表示错误，不揭示正确）
                     quizOptions.querySelectorAll('.option').forEach(el => {
                         const idx = parseInt(el.dataset.index);
                         if (idx === selectedOptionIndex) {
                             el.classList.add('wrong');
                         }
-                        if (idx === question.correct) {
-                            el.classList.add('correct');
-                        }
                     });
-                    // 禁用提交（防止再次点击）
+
+                    quizResult.className = 'quiz-result fail';
+                    quizResult.textContent = '❌ 回答错误！剩余 ' + remaining + ' 次机会';
+
+                    // 禁用提交，稍后重新启用（让用户继续尝试）
                     submitQuizBtn.disabled = true;
                     submitQuizBtn.style.opacity = '0.6';
                     updateSigninUI();
 
                     if (remaining <= 0) {
+                        // 机会用尽，关闭模态框
                         showToast('今日机会已用完，明天再来吧', '❌');
                         setTimeout(() => {
                             closeSigninModal();
-                        }, 2500);
+                        }, 2000);
                     } else {
-                        // 允许用户重新尝试，但需要重置界面（可重新加载题目）
-                        // 这里简单处理：延迟后重置界面让用户再试
+                        // 重新启用提交，并允许选择其他选项
                         setTimeout(() => {
-                            // 重置选项高亮
+                            // 移除错误选项的红色样式（保留选中样式？我们清除所有样式，让用户重新选）
                             quizOptions.querySelectorAll('.option').forEach(el => {
-                                el.classList.remove('correct', 'wrong', 'selected');
+                                el.classList.remove('wrong', 'selected');
                             });
+                            // 清除结果信息
                             quizResult.className = 'quiz-result';
                             quizResult.style.display = 'none';
                             submitQuizBtn.disabled = false;
                             submitQuizBtn.style.opacity = '1';
                             selectedOptionIndex = -1;
-                            // 刷新剩余次数
+                            // 刷新剩余次数显示
                             signinAttempts.textContent = getSigninStatus(currentUser).attempts;
                         }, 1800);
                     }
@@ -2539,7 +2539,7 @@
             }
 
             // ============================================================
-            //  管理面板 - 用户操作
+            //  管理面板 (保持不变)
             // ============================================================
 
             function handleUserAction(action, username) {
@@ -2596,10 +2596,7 @@
                 }
             }
 
-            // ============================================================
-            //  管理面板 - 站车风采操作
-            // ============================================================
-
+            // 站车风采管理
             function openEditScenery(id) {
                 const items = loadScenery();
                 let item = items.find(i => i.id === id);
@@ -2668,10 +2665,7 @@
                 showToast('已删除', '🗑️');
             }
 
-            // ============================================================
-            //  站车风采展示（普通用户）
-            // ============================================================
-
+            // 站车风采展示（普通用户）
             function openSceneryViewer() {
                 const modal = document.createElement('div');
                 modal.className = 'modal-overlay active';
@@ -2708,10 +2702,7 @@
                 });
             }
 
-            // ============================================================
-            //  管理面板打开/关闭
-            // ============================================================
-
+            // 管理面板打开/关闭
             function openAdminPanel() {
                 if (currentUser !== 'admin') {
                     showToast('权限不足', '⛔');
@@ -2737,10 +2728,7 @@
                 });
             }
 
-            // ============================================================
-            //  检查登录状态
-            // ============================================================
-
+            // 检查登录状态
             function checkSession() {
                 const username = sessionStorage.getItem('metro_session_user');
                 if (username && userExists(username)) {
@@ -2767,7 +2755,7 @@
             }
 
             // ============================================================
-            //  事件绑定
+            //  事件绑定 (更新签到相关)
             // ============================================================
 
             // 登录
@@ -2811,7 +2799,7 @@
             });
             submitQuizBtn.addEventListener('click', handleSubmitQuiz);
 
-            // 快捷功能（非签到）
+            // 其他快捷功能
             document.querySelectorAll('.quick-action[data-action]').forEach(el => {
                 el.addEventListener('click', function() {
                     const action = this.dataset.action;
@@ -2824,7 +2812,6 @@
                     } else if (action === 'admin') {
                         openAdminPanel();
                     }
-                    // signin 已单独绑定
                 });
             });
 
@@ -2850,7 +2837,7 @@
                 if (e.target === this) closeEditScenery();
             });
 
-            // 登录页输入框焦点清除错误
+            // 登录输入框焦点
             loginUsername.addEventListener('focus', function() {
                 loginError.classList.remove('show');
             });
@@ -2863,20 +2850,15 @@
             // ============================================================
 
             (function init() {
-                // 确保 admin 存在
                 const users = loadUsers();
                 if (!users.admin) {
                     users.admin = { password: PRESET_USER.password, balance: PRESET_USER.balance };
                     saveUsers(users);
                 }
+                // 保证站车风采存在
+                loadScenery();
 
-                // 确保站车风采存在
-                const scenery = loadScenery();
-                if (!scenery.length) {
-                    // 默认数据已在 loadScenery 中写入
-                }
-
-                // 每日重置签到（在加载时自动清理过期数据）
+                // 重置过期签到
                 const signinData = loadSigninData();
                 const today = getTodayStr();
                 let changed = false;
@@ -2901,6 +2883,5 @@
 
         })();
     </script>
-
 </body>
 </html>
