@@ -1024,68 +1024,80 @@
                     quizOptions.appendChild(btn);
                 });
             }
+function handleQuizAnswer(idx) {
+    if (!quizActive) return;
+    const status = getUserQuizStatus(currentUser);
+    if (status.signed || status.attempts <= 0) return;
+    const dq = getDailyQuestionForToday();
+    if (!dq) { showToast('题目加载失败', '⚠️'); return; }
+    const q = dq.question;
+    const correct = idx === q.answer;
 
-            function handleQuizAnswer(idx) {
-                if (!quizActive) return;
-                const status = getUserQuizStatus(currentUser);
-                if (status.signed || status.attempts <= 0) return;
-                const dq = getDailyQuestionForToday();
-                if (!dq) { showToast('题目加载失败', '⚠️'); return; }
-                const q = dq.question;
-                const correct = idx === q.answer;
-                document.querySelectorAll('.opt-btn').forEach(b => b.classList.add('disabled'));
-                const btns = document.querySelectorAll('.opt-btn');
-                btns.forEach((b, i) => {
-                    if (i === q.answer) b.classList.add('correct');
-                    if (i === idx && !correct) b.classList.add('wrong');
+    // 禁用所有选项
+    document.querySelectorAll('.opt-btn').forEach(b => b.classList.add('disabled'));
+    const btns = document.querySelectorAll('.opt-btn');
+
+    // 答错时：只将选中的选项标红，不显示正确选项
+    btns.forEach((b, i) => {
+        if (i === idx && !correct) {
+            b.classList.add('wrong');
+        }
+        // 答对时，正确选项会在后面的 correct 分支中标绿
+    });
+
+    const newAttempts = status.attempts - 1;
+
+    if (correct) {
+        // 答对：显示正确选项绿色，签到成功
+        btns.forEach((b, i) => {
+            if (i === q.answer) b.classList.add('correct');
+        });
+        const user = getUser(currentUser);
+        const newBalance = (user.balance || 0) + SIGNIN_AMOUNT;
+        updateUser(currentUser, { balance: newBalance });
+        updateUserQuizStatus(currentUser, { signed: true, attempts: newAttempts });
+        addSigninHistory(currentUser, getTodayStr());
+        displayBalance.textContent = formatBalance(newBalance);
+        quizStatusMsg.textContent = '🎉 回答正确！签到成功！';
+        quizResult.className = 'quiz-result-box success';
+        quizResult.style.display = 'block';
+        quizResult.textContent = '✅ 恭喜获得 ¥' + SIGNIN_AMOUNT + '！';
+        quizActive = false;
+        showToast('签到成功！获得 ¥' + SIGNIN_AMOUNT, '💰');
+        updateSigninUI();
+        const u2 = getUser(currentUser);
+        if (u2) displayBalance.textContent = formatBalance(u2.balance);
+        return;
+    } else {
+        // 答错：只显示选中的错误为红色，不显示正确答案
+        updateUserQuizStatus(currentUser, { attempts: newAttempts });
+        const remaining = newAttempts;
+        quizAttempts.textContent = remaining;
+        if (remaining <= 0) {
+            quizStatusMsg.textContent = '❌ 机会已用完，签到失败';
+            quizResult.className = 'quiz-result-box fail';
+            quizResult.style.display = 'block';
+            quizResult.textContent = '💔 两次机会均未答对，明天再来吧！';
+            quizActive = false;
+            updateSigninUI();
+        } else {
+            quizStatusMsg.textContent = '❌ 回答错误，剩余 ' + remaining + ' 次机会';
+            quizResult.className = 'quiz-result-box info';
+            quizResult.style.display = 'block';
+            quizResult.textContent = '再想想，还有 ' + remaining + ' 次机会！';
+            // 1.5 秒后重新启用选项，并清除所有标记（包括红色）
+            setTimeout(() => {
+                document.querySelectorAll('.opt-btn').forEach(b => {
+                    b.classList.remove('disabled', 'correct', 'wrong');
                 });
-                const newAttempts = status.attempts - 1;
-                if (correct) {
-                    const user = getUser(currentUser);
-                    const newBalance = (user.balance || 0) + SIGNIN_AMOUNT;
-                    updateUser(currentUser, { balance: newBalance });
-                    updateUserQuizStatus(currentUser, { signed: true, attempts: newAttempts });
-                    addSigninHistory(currentUser, getTodayStr());
-                    displayBalance.textContent = formatBalance(newBalance);
-                    quizStatusMsg.textContent = '🎉 回答正确！签到成功！';
-                    quizResult.className = 'quiz-result-box success';
-                    quizResult.style.display = 'block';
-                    quizResult.textContent = '✅ 恭喜获得 ¥' + SIGNIN_AMOUNT + '！';
-                    quizActive = false;
-                    showToast('签到成功！获得 ¥' + SIGNIN_AMOUNT, '💰');
-                    updateSigninUI();
-                    const u2 = getUser(currentUser);
-                    if (u2) displayBalance.textContent = formatBalance(u2.balance);
-                    return;
-                } else {
-                    updateUserQuizStatus(currentUser, { attempts: newAttempts });
-                    const remaining = newAttempts;
-                    quizAttempts.textContent = remaining;
-                    if (remaining <= 0) {
-                        quizStatusMsg.textContent = '❌ 机会已用完，签到失败';
-                        quizResult.className = 'quiz-result-box fail';
-                        quizResult.style.display = 'block';
-                        quizResult.textContent = '💔 两次机会均未答对，明天再来吧！';
-                        quizActive = false;
-                        updateSigninUI();
-                    } else {
-                        quizStatusMsg.textContent = '❌ 回答错误，剩余 ' + remaining + ' 次机会';
-                        quizResult.className = 'quiz-result-box info';
-                        quizResult.style.display = 'block';
-                        quizResult.textContent = '再想想，还有 ' + remaining + ' 次机会！';
-                        setTimeout(() => {
-                            document.querySelectorAll('.opt-btn').forEach(b => {
-                                b.classList.remove('disabled', 'correct', 'wrong');
-                            });
-                            quizResult.style.display = 'none';
-                            quizStatusMsg.textContent = '请重新选择';
-                            quizActive = true;
-                        }, 1500);
-                    }
-                    updateSigninUI();
-                }
-            }
-
+                quizResult.style.display = 'none';
+                quizStatusMsg.textContent = '请重新选择';
+                quizActive = true;
+            }, 1500);
+        }
+        updateSigninUI();
+    }
+}
             function closeQuizModal() { quizModal.classList.remove('active');
                 quizActive = false; if (currentUser) updateSigninUI(); }
 
