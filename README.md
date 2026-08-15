@@ -185,6 +185,20 @@
             color: #0b4a72;
         }
 
+        .login-footer .forgot-link {
+            display: inline-block;
+            margin-top: 4px;
+            color: #7a8a9e;
+            font-size: 13px;
+            cursor: pointer;
+            transition: color 0.2s;
+            text-decoration: underline;
+        }
+
+        .login-footer .forgot-link:hover {
+            color: #1a6e9e;
+        }
+
         /* ============================================================
                模态框通用
                ============================================================ */
@@ -346,7 +360,7 @@
         }
 
         /* ============================================================
-               注册模态框 (单独样式)
+               注册模态框
                ============================================================ */
         .register-modal .verify-question {
             background: #eef4fa;
@@ -634,10 +648,10 @@
             margin: 0 2px;
         }
 
-        /* 快捷功能 + 管理入口 */
+        /* 快捷功能 */
         .quick-actions {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 16px;
             margin-bottom: 8px;
         }
@@ -691,6 +705,27 @@
             border-color: #d4ac0d;
         }
 
+        .quick-action.signin-action {
+            border-color: #2ecc71;
+            background: #eafaf1;
+        }
+
+        .quick-action.signin-action:hover {
+            border-color: #1e8449;
+        }
+
+        .quick-action.signin-action.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            filter: grayscale(0.3);
+        }
+
+        .quick-action.signin-action.disabled:hover {
+            transform: none;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            border-color: #eef2f7;
+        }
+
         .home-footer {
             text-align: center;
             padding: 20px 20px 8px;
@@ -705,7 +740,188 @@
         }
 
         /* ============================================================
-               管理面板模态框 (内部表格等)
+               签到游戏模态框 (Longcat风格)
+               ============================================================ */
+        .game-modal .modal-card {
+            max-width: 640px;
+        }
+
+        .game-modal .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            padding: 8px 0;
+        }
+
+        .game-modal .game-stats {
+            display: flex;
+            gap: 24px;
+            font-size: 15px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .game-modal .game-stats span {
+            background: #eef4fa;
+            padding: 4px 16px;
+            border-radius: 20px;
+        }
+
+        .game-modal .game-stats .stat-attempts {
+            color: #d94a4a;
+        }
+
+        .game-modal .game-stats .stat-status {
+            color: #1a6e9e;
+        }
+
+        .game-modal .game-board {
+            display: grid;
+            gap: 2px;
+            background: #2c3e50;
+            padding: 4px;
+            border-radius: 8px;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .game-modal .game-board .cell {
+            width: 40px;
+            height: 40px;
+            background: #ecf0f1;
+            border-radius: 2px;
+            transition: background 0.15s;
+        }
+
+        .game-modal .game-board .cell.empty {
+            background: #ecf0f1;
+        }
+
+        .game-modal .game-board .cell.filled {
+            background: #f39c12;
+        }
+
+        .game-modal .game-board .cell.head {
+            background: #e74c3c;
+            border-radius: 50%;
+        }
+
+        .game-modal .game-board .cell.tail {
+            background: #e67e22;
+        }
+
+        .game-modal .game-board .cell.obstacle {
+            background: #34495e;
+        }
+
+        .game-modal .game-controls {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .game-modal .game-controls button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            min-width: 80px;
+        }
+
+        .game-modal .game-controls .btn-direction {
+            background: #dce3ec;
+            color: #1a2a3a;
+            font-size: 20px;
+            padding: 10px 18px;
+            min-width: 60px;
+        }
+
+        .game-modal .game-controls .btn-direction:hover {
+            background: #b0c4d8;
+        }
+
+        .game-modal .game-controls .btn-direction:active {
+            transform: scale(0.95);
+        }
+
+        .game-modal .game-controls .btn-reset {
+            background: #e74c3c;
+            color: #fff;
+        }
+
+        .game-modal .game-controls .btn-reset:hover {
+            background: #c0392b;
+        }
+
+        .game-modal .game-result {
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 18px;
+            text-align: center;
+            display: none;
+        }
+
+        .game-modal .game-result.success {
+            display: block;
+            background: #d5f5e3;
+            color: #1a7a4a;
+        }
+
+        .game-modal .game-result.fail {
+            display: block;
+            background: #fadbd8;
+            color: #922b21;
+        }
+
+        .game-modal .game-result.info {
+            display: block;
+            background: #d4e6f1;
+            color: #1a4a6e;
+        }
+
+        /* 移动端适配游戏 */
+        @media (max-width: 600px) {
+            .game-modal .game-board .cell {
+                width: 28px;
+                height: 28px;
+            }
+            .game-modal .game-controls .btn-direction {
+                padding: 8px 14px;
+                font-size: 16px;
+                min-width: 48px;
+            }
+            .game-modal .modal-card {
+                padding: 20px 12px;
+            }
+            .game-modal .game-stats {
+                font-size: 13px;
+                gap: 12px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .game-modal .game-board .cell {
+                width: 22px;
+                height: 22px;
+            }
+            .game-modal .game-controls .btn-direction {
+                padding: 6px 10px;
+                font-size: 14px;
+                min-width: 40px;
+            }
+        }
+
+        /* ============================================================
+               管理面板模态框
                ============================================================ */
         .admin-modal .modal-card {
             max-width: 820px;
@@ -948,7 +1164,7 @@
                 gap: 16px;
             }
             .quick-actions {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(3, 1fr);
             }
             .home-main {
                 padding: 20px 24px 16px;
@@ -1023,7 +1239,7 @@
                 padding: 16px 12px;
             }
             .quick-actions {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: 1fr 1fr 1fr;
                 gap: 10px;
             }
             .quick-action {
@@ -1144,8 +1360,13 @@
             </form>
 
             <div class="login-footer">
-                <span>还没有账号？</span>
-                <span class="register-link" id="openRegisterBtn">立即注册</span>
+                <div>
+                    <span>还没有账号？</span>
+                    <span class="register-link" id="openRegisterBtn">立即注册</span>
+                </div>
+                <div>
+                    <span class="forgot-link" id="openForgotBtn">🔑 忘记密码？</span>
+                </div>
             </div>
         </div>
     </div>
@@ -1189,7 +1410,83 @@
 
             <div class="form-actions">
                 <button class="btn-cancel" id="closeRegisterBtn">取消</button>
-                <button class="btn-register" id="registerBtn">注 册</button>
+                <button class="btn-primary" id="registerBtn">注 册</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    忘 记 密 码 模 态 框
+    ============================================================ -->
+    <div class="modal-overlay" id="forgotModal">
+        <div class="modal-card">
+            <div class="modal-title">🔑 重置密码</div>
+
+            <div class="form-group">
+                <label for="forgotUsername">账号</label>
+                <input type="text" id="forgotUsername" placeholder="请输入您的账号" />
+            </div>
+
+            <div class="form-group">
+                <label>身份验证</label>
+                <div class="verify-question" style="background:#eef4fa;padding:12px 16px;border-radius:10px;font-size:15px;color:#0b2a4a;margin-bottom:10px;border-left:4px solid #1a6e9e;font-weight:500;">
+                    ❓ 固局更高速度实验列车的车号是？
+                </div>
+                <input type="text" id="forgotVerify" placeholder="请输入答案" />
+            </div>
+
+            <div class="form-group">
+                <label for="forgotNewPassword">新密码</label>
+                <input type="password" id="forgotNewPassword" placeholder="请设置新密码（至少6个字符）" />
+            </div>
+
+            <div class="modal-error" id="forgotError">
+                <span class="err-icon">⚠️</span>
+                <span id="forgotErrorMessage">错误信息</span>
+            </div>
+            <div class="modal-success" id="forgotSuccess">
+                <span>✅</span>
+                <span id="forgotSuccessMessage">密码已重置！</span>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn-cancel" id="closeForgotBtn">取消</button>
+                <button class="btn-primary" id="forgotBtn">重置密码</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    签 到 游 戏 模 态 框 (Longcat风格)
+    ============================================================ -->
+    <div class="modal-overlay game-modal" id="gameModal">
+        <div class="modal-card">
+            <div class="modal-title">🐱 每日签到 · Longcat</div>
+
+            <div class="game-container">
+                <div class="game-stats">
+                    <span>🎯 第 <span id="gameLevel">1</span> 关</span>
+                    <span class="stat-attempts">💪 剩余挑战: <span id="gameAttempts">3</span></span>
+                    <span class="stat-status" id="gameStatus">▶ 进行中</span>
+                </div>
+
+                <div class="game-board" id="gameBoard">
+                    <!-- 由JS动态生成 -->
+                </div>
+
+                <div class="game-controls">
+                    <button class="btn-direction" data-dir="up">⬆</button>
+                    <button class="btn-direction" data-dir="left">⬅</button>
+                    <button class="btn-direction" data-dir="down">⬇</button>
+                    <button class="btn-direction" data-dir="right">➡</button>
+                    <button class="btn-reset" id="gameResetBtn">🔄 重来</button>
+                </div>
+
+                <div class="game-result" id="gameResult"></div>
+
+                <div class="form-actions" style="margin-top:8px;">
+                    <button class="btn-cancel" id="closeGameBtn">关闭</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1206,7 +1503,6 @@
                 <button class="tab-btn" data-tab="scenery">📸 站车风采</button>
             </div>
 
-            <!-- 用户管理 -->
             <div class="tab-content active" id="tabUsers">
                 <div class="user-table-wrap">
                     <table>
@@ -1218,29 +1514,26 @@
                             </tr>
                         </thead>
                         <tbody id="userTableBody">
-                            <!-- 动态渲染 -->
                         </tbody>
                     </table>
                 </div>
                 <p class="text-muted mt-8">* 管理员可修改密码、余额，注销账号（不能注销自己）</p>
             </div>
 
-            <!-- 站车风采管理 -->
             <div class="tab-content" id="tabScenery">
                 <div class="scenery-list" id="sceneryAdminList">
-                    <!-- 动态渲染 -->
                 </div>
                 <button class="add-btn" id="addSceneryBtn">➕ 新增风采</button>
             </div>
 
-            <div class="form-actions" style="margin-top: 20px;">
+            <div class="form-actions" style="margin-top:20px;">
                 <button class="btn-cancel" id="closeAdminBtn" style="flex:1;">关闭</button>
             </div>
         </div>
     </div>
 
     <!-- ============================================================
-    编 辑 风 采 模 态 框 (子模态)
+    编 辑 风 采 模 态 框
     ============================================================ -->
     <div class="modal-overlay" id="editSceneryModal">
         <div class="modal-card">
@@ -1345,7 +1638,11 @@
                     <div class="qa-label">站车风采</div>
                     <div class="qa-desc">点击欣赏</div>
                 </div>
-                <!-- 管理员入口，默认隐藏，由JS控制显示 -->
+                <div class="quick-action signin-action" data-action="signin" id="signinEntry">
+                    <span class="qa-icon">✅</span>
+                    <div class="qa-label">每日签到</div>
+                    <div class="qa-desc" id="signinDesc">签到得 ¥20</div>
+                </div>
                 <div class="quick-action admin-action" data-action="admin" id="adminEntry" style="display:none;">
                     <span class="qa-icon">⚙️</span>
                     <div class="qa-label">管理面板</div>
@@ -1412,7 +1709,9 @@
             const VERIFY_QUESTION = '固局更高速度实验列车的车号是？';
             const VERIFY_ANSWER = 'CRH380CM-0304';
 
-            // 默认站车风采数据
+            const SIGNIN_AMOUNT = 20;
+            const MAX_ATTEMPTS = 3;
+
             const DEFAULT_SCENERY = [
                 { id: 1, icon: '🏛️', name: '固原站', desc: '固原地铁1号线起点站，集交通、商业、文化于一体的综合枢纽，日均客流量超10万人次。' },
                 { id: 2, icon: '🏙️', name: '人民广场站', desc: '位于城市核心区，2号线与3号线换乘站，毗邻市政府与商业中心，是城市最繁忙的站点之一。' },
@@ -1428,6 +1727,7 @@
 
             const USER_STORAGE_KEY = 'metro_users_data';
             const SCENERY_STORAGE_KEY = 'metro_scenery_data';
+            const SIGNIN_STORAGE_KEY = 'metro_signin_data';
 
             function loadUsers() {
                 try {
@@ -1493,7 +1793,6 @@
                         if (Array.isArray(data) && data.length) return data;
                     }
                 } catch (_) {}
-                // 初始化默认数据
                 localStorage.setItem(SCENERY_STORAGE_KEY, JSON.stringify(DEFAULT_SCENERY));
                 return DEFAULT_SCENERY.slice();
             }
@@ -1505,6 +1804,51 @@
             function getNextId(items) {
                 if (!items.length) return 1;
                 return Math.max(...items.map(i => i.id)) + 1;
+            }
+
+            // --- 签到数据 ---
+            function getTodayStr() {
+                return new Date().toISOString().split('T')[0];
+            }
+
+            function loadSigninData() {
+                try {
+                    const raw = localStorage.getItem(SIGNIN_STORAGE_KEY);
+                    if (raw) {
+                        return JSON.parse(raw);
+                    }
+                } catch (_) {}
+                return {};
+            }
+
+            function saveSigninData(data) {
+                localStorage.setItem(SIGNIN_STORAGE_KEY, JSON.stringify(data));
+            }
+
+            function getSigninStatus(username) {
+                const data = loadSigninData();
+                const today = getTodayStr();
+                const userData = data[username] || {};
+                if (userData.date !== today) {
+                    // 新的一天，重置
+                    return { date: today, attempts: MAX_ATTEMPTS, signed: false, level: 1 };
+                }
+                return { date: today, attempts: userData.attempts || MAX_ATTEMPTS, signed: userData.signed || false,
+                    level: userData.level || 1 };
+            }
+
+            function updateSigninStatus(username, updates) {
+                const data = loadSigninData();
+                const today = getTodayStr();
+                if (!data[username]) {
+                    data[username] = { date: today, attempts: MAX_ATTEMPTS, signed: false, level: 1 };
+                }
+                // 如果日期不是今天，重置
+                if (data[username].date !== today) {
+                    data[username] = { date: today, attempts: MAX_ATTEMPTS, signed: false, level: 1 };
+                }
+                Object.assign(data[username], updates);
+                saveSigninData(data);
             }
 
             // ============================================================
@@ -1526,7 +1870,8 @@
             const currentTimeEl = document.getElementById('currentTime');
             const currentDateEl = document.getElementById('currentDate');
             const adminEntry = document.getElementById('adminEntry');
-            const quickActions = document.getElementById('quickActions');
+            const signinEntry = document.getElementById('signinEntry');
+            const signinDesc = document.getElementById('signinDesc');
 
             // 注册
             const registerModal = document.getElementById('registerModal');
@@ -1542,6 +1887,29 @@
             const regSuccess = document.getElementById('regSuccess');
             const regSuccessMessage = document.getElementById('regSuccessMessage');
 
+            // 忘记密码
+            const forgotModal = document.getElementById('forgotModal');
+            const openForgotBtn = document.getElementById('openForgotBtn');
+            const closeForgotBtn = document.getElementById('closeForgotBtn');
+            const forgotBtn = document.getElementById('forgotBtn');
+            const forgotUsername = document.getElementById('forgotUsername');
+            const forgotVerify = document.getElementById('forgotVerify');
+            const forgotNewPassword = document.getElementById('forgotNewPassword');
+            const forgotError = document.getElementById('forgotError');
+            const forgotErrorMessage = document.getElementById('forgotErrorMessage');
+            const forgotSuccess = document.getElementById('forgotSuccess');
+            const forgotSuccessMessage = document.getElementById('forgotSuccessMessage');
+
+            // 游戏
+            const gameModal = document.getElementById('gameModal');
+            const gameBoard = document.getElementById('gameBoard');
+            const gameLevel = document.getElementById('gameLevel');
+            const gameAttempts = document.getElementById('gameAttempts');
+            const gameStatus = document.getElementById('gameStatus');
+            const gameResult = document.getElementById('gameResult');
+            const closeGameBtn = document.getElementById('closeGameBtn');
+            const gameResetBtn = document.getElementById('gameResetBtn');
+
             // 管理面板
             const adminModal = document.getElementById('adminModal');
             const closeAdminBtn = document.getElementById('closeAdminBtn');
@@ -1554,7 +1922,7 @@
                 scenery: document.getElementById('tabScenery')
             };
 
-            // 编辑风采子模态框
+            // 编辑风采
             const editSceneryModal = document.getElementById('editSceneryModal');
             const closeEditSceneryBtn = document.getElementById('closeEditSceneryBtn');
             const saveSceneryBtn = document.getElementById('saveSceneryBtn');
@@ -1571,6 +1939,22 @@
 
             // 当前登录用户
             let currentUser = null;
+
+            // 游戏状态
+            let gameState = {
+                grid: [],
+                snake: [],
+                direction: 'right',
+                nextDirection: 'right',
+                food: null,
+                gameOver: false,
+                level: 1,
+                attempts: MAX_ATTEMPTS,
+                signed: false,
+                size: 8,
+                won: false,
+                isPlaying: false
+            };
 
             // ============================================================
             //  工具函数
@@ -1652,13 +2036,10 @@
                     const tr = document.createElement('tr');
                     const balanceStr = formatBalance(user.balance);
                     let actions = '';
-                    // 修改密码
                     actions +=
                         `<button class="btn-edit" data-username="${uname}" data-action="changePwd">改密码</button>`;
-                    // 修改余额
                     actions +=
                         `<button class="btn-balance" data-username="${uname}" data-action="changeBalance">改余额</button>`;
-                    // 注销（不能删自己）
                     if (uname !== 'admin') {
                         actions +=
                             `<button class="btn-delete" data-username="${uname}" data-action="delete">注销</button>`;
@@ -1672,7 +2053,6 @@
                         `;
                     userTableBody.appendChild(tr);
                 });
-                // 绑定事件
                 userTableBody.querySelectorAll('[data-action]').forEach(btn => {
                     btn.addEventListener('click', function(e) {
                         const action = this.dataset.action;
@@ -1701,7 +2081,6 @@
                         `;
                     sceneryAdminList.appendChild(div);
                 });
-                // 绑定编辑/删除
                 sceneryAdminList.querySelectorAll('.btn-edit').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const id = parseInt(this.dataset.id);
@@ -1781,22 +2160,20 @@
                     displayBalance.textContent = formatBalance(user.balance);
                 }
 
-                // 显示管理员入口
+                // 管理员入口
                 if (username === 'admin') {
                     adminEntry.style.display = 'block';
                 } else {
                     adminEntry.style.display = 'none';
                 }
 
+                // 更新签到状态
+                updateSigninUI();
+
                 renderLines();
                 startClock();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 showToast('欢迎回来，' + username + '！', '👋');
-
-                // 如果当前是管理员，且管理面板打开状态，刷新数据
-                if (username === 'admin') {
-                    // 但面板未打开，无需操作
-                }
             }
 
             function handleLogout() {
@@ -1808,7 +2185,6 @@
                 loginError.classList.remove('show');
                 loginPassword.value = '';
                 loginUsername.value = '';
-                // 关闭所有模态框
                 closeAllModals();
                 showToast('已安全退出', '👋');
             }
@@ -1817,6 +2193,8 @@
                 registerModal.classList.remove('active');
                 adminModal.classList.remove('active');
                 editSceneryModal.classList.remove('active');
+                forgotModal.classList.remove('active');
+                gameModal.classList.remove('active');
             }
 
             // ============================================================
@@ -1899,6 +2277,456 @@
             }
 
             // ============================================================
+            //  忘记密码逻辑
+            // ============================================================
+
+            function openForgotModal() {
+                forgotUsername.value = '';
+                forgotVerify.value = '';
+                forgotNewPassword.value = '';
+                forgotError.classList.remove('show');
+                forgotSuccess.classList.remove('show');
+                forgotModal.classList.add('active');
+            }
+
+            function closeForgotModal() {
+                forgotModal.classList.remove('active');
+                forgotError.classList.remove('show');
+                forgotSuccess.classList.remove('show');
+            }
+
+            function handleForgot() {
+                const username = forgotUsername.value.trim();
+                const verify = forgotVerify.value.trim();
+                const newPwd = forgotNewPassword.value.trim();
+
+                forgotError.classList.remove('show');
+                forgotSuccess.classList.remove('show');
+
+                if (!username) {
+                    forgotErrorMessage.textContent = '请输入账号';
+                    forgotError.classList.add('show');
+                    return;
+                }
+                if (!userExists(username)) {
+                    forgotErrorMessage.textContent = '该账号不存在';
+                    forgotError.classList.add('show');
+                    return;
+                }
+                if (username === 'admin') {
+                    forgotErrorMessage.textContent = '管理员账号请通过其他方式重置';
+                    forgotError.classList.add('show');
+                    return;
+                }
+                if (!verify) {
+                    forgotErrorMessage.textContent = '请回答验证问题';
+                    forgotError.classList.add('show');
+                    return;
+                }
+                if (verify.trim().toUpperCase() !== VERIFY_ANSWER.toUpperCase()) {
+                    forgotErrorMessage.textContent = '验证答案错误，请重新输入';
+                    forgotError.classList.add('show');
+                    forgotVerify.value = '';
+                    forgotVerify.focus();
+                    return;
+                }
+                if (!newPwd || newPwd.length < 6) {
+                    forgotErrorMessage.textContent = '新密码至少需要6个字符';
+                    forgotError.classList.add('show');
+                    return;
+                }
+
+                const ok = updateUser(username, { password: newPwd });
+                if (ok) {
+                    forgotSuccessMessage.textContent = '✅ 密码已重置，请使用新密码登录';
+                    forgotSuccess.classList.add('show');
+                    setTimeout(() => {
+                        closeForgotModal();
+                        showToast('密码已重置，请重新登录', '🔑');
+                    }, 1500);
+                } else {
+                    forgotErrorMessage.textContent = '重置失败，请稍后重试';
+                    forgotError.classList.add('show');
+                }
+            }
+
+            // ============================================================
+            //  签到 + Longcat 游戏
+            // ============================================================
+
+            function updateSigninUI() {
+                if (!currentUser || currentUser === 'admin') {
+                    signinEntry.style.display = 'none';
+                    return;
+                }
+                signinEntry.style.display = 'block';
+                const status = getSigninStatus(currentUser);
+                if (status.signed) {
+                    signinDesc.textContent = '✅ 今日已签到';
+                    signinEntry.classList.add('disabled');
+                } else if (status.attempts <= 0) {
+                    signinDesc.textContent = '❌ 今日机会已用完';
+                    signinEntry.classList.add('disabled');
+                } else {
+                    signinDesc.textContent = `🎮 剩余 ${status.attempts} 次机会`;
+                    signinEntry.classList.remove('disabled');
+                }
+            }
+
+            function openGameModal() {
+                if (!currentUser || currentUser === 'admin') {
+                    showToast('普通用户专享', 'ℹ️');
+                    return;
+                }
+                const status = getSigninStatus(currentUser);
+                if (status.signed) {
+                    showToast('今日已签到，明天再来吧！', '✅');
+                    return;
+                }
+                if (status.attempts <= 0) {
+                    showToast('今日挑战机会已用完，明天再来！', '❌');
+                    return;
+                }
+
+                // 初始化游戏
+                gameState.level = status.level || 1;
+                gameState.attempts = status.attempts;
+                gameState.signed = false;
+                gameState.won = false;
+                gameState.isPlaying = true;
+                gameState.size = Math.min(6 + gameState.level, 12);
+                gameResult.className = 'game-result';
+                gameResult.style.display = 'none';
+
+                gameModal.classList.add('active');
+                initGame();
+                renderGame();
+                updateGameUI();
+            }
+
+            function closeGameModal() {
+                gameModal.classList.remove('active');
+                gameState.isPlaying = false;
+                // 如果已签到，更新UI
+                if (gameState.signed) {
+                    updateSigninUI();
+                    // 刷新余额显示
+                    const user = getUser(currentUser);
+                    if (user) {
+                        displayBalance.textContent = formatBalance(user.balance);
+                    }
+                }
+            }
+
+            function initGame() {
+                const size = gameState.size;
+                const grid = [];
+                for (let i = 0; i < size; i++) {
+                    grid.push(new Array(size).fill(0));
+                }
+
+                // 蛇：初始在中间偏左，长度3
+                const mid = Math.floor(size / 2);
+                const snake = [
+                    [mid, mid - 1],
+                    [mid, mid],
+                    [mid, mid + 1]
+                ];
+                // 标记蛇身
+                snake.forEach((pos, idx) => {
+                    grid[pos[0]][pos[1]] = idx === snake.length - 1 ? 2 : 1; // 2=head, 1=body
+                });
+
+                // 食物
+                let food = null;
+                let attempts = 0;
+                while (!food && attempts < 100) {
+                    const r = Math.floor(Math.random() * size);
+                    const c = Math.floor(Math.random() * size);
+                    if (grid[r][c] === 0) {
+                        food = [r, c];
+                        grid[r][c] = 3;
+                        break;
+                    }
+                    attempts++;
+                }
+                if (!food) {
+                    // 如果找不到位置，扩大搜索
+                    for (let r = 0; r < size; r++) {
+                        for (let c = 0; c < size; c++) {
+                            if (grid[r][c] === 0) {
+                                food = [r, c];
+                                grid[r][c] = 3;
+                                break;
+                            }
+                        }
+                        if (food) break;
+                    }
+                }
+
+                gameState.grid = grid;
+                gameState.snake = snake;
+                gameState.direction = 'right';
+                gameState.nextDirection = 'right';
+                gameState.food = food;
+                gameState.gameOver = false;
+                gameState.won = false;
+            }
+
+            function renderGame() {
+                const size = gameState.size;
+                const grid = gameState.grid;
+                gameBoard.innerHTML = '';
+                gameBoard.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+                gameBoard.style.gridTemplateRows = `repeat(${size}, 1fr)`;
+
+                for (let r = 0; r < size; r++) {
+                    for (let c = 0; c < size; c++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+                        const val = grid[r][c];
+                        if (val === 0) cell.classList.add('empty');
+                        else if (val === 1) cell.classList.add('filled');
+                        else if (val === 2) cell.classList.add('head');
+                        else if (val === 3) cell.classList.add('obstacle');
+                        cell.dataset.r = r;
+                        cell.dataset.c = c;
+                        gameBoard.appendChild(cell);
+                    }
+                }
+            }
+
+            function updateGameUI() {
+                gameLevel.textContent = gameState.level;
+                gameAttempts.textContent = gameState.attempts;
+                if (gameState.gameOver) {
+                    gameStatus.textContent = '💀 游戏结束';
+                } else if (gameState.won) {
+                    gameStatus.textContent = '🎉 通关！';
+                } else {
+                    gameStatus.textContent = '▶ 进行中';
+                }
+            }
+
+            function showGameResult(message, type) {
+                gameResult.textContent = message;
+                gameResult.className = 'game-result ' + type;
+                gameResult.style.display = 'block';
+            }
+
+            function moveSnake() {
+                if (gameState.gameOver || gameState.won || !gameState.isPlaying) return;
+
+                const dir = gameState.nextDirection;
+                gameState.direction = dir;
+
+                const head = gameState.snake[gameState.snake.length - 1];
+                let newHead = [...head];
+                const size = gameState.size;
+
+                switch (dir) {
+                    case 'up':
+                        newHead[0]--;
+                        break;
+                    case 'down':
+                        newHead[0]++;
+                        break;
+                    case 'left':
+                        newHead[1]--;
+                        break;
+                    case 'right':
+                        newHead[1]++;
+                        break;
+                }
+
+                // 检查是否吃到食物
+                const food = gameState.food;
+                const ateFood = food && newHead[0] === food[0] && newHead[1] === food[1];
+
+                // 检查是否撞墙
+                if (newHead[0] < 0 || newHead[0] >= size || newHead[1] < 0 || newHead[1] >= size) {
+                    gameOver('撞墙了！再试一次吧');
+                    return;
+                }
+
+                // 检查是否撞到自己（除了尾部）
+                const snakeWithoutTail = ateFood ? gameState.snake : gameState.snake.slice(0, -1);
+                for (let seg of snakeWithoutTail) {
+                    if (seg[0] === newHead[0] && seg[1] === newHead[1]) {
+                        gameOver('咬到自己了！再试一次吧');
+                        return;
+                    }
+                }
+
+                // 移动蛇
+                const newSnake = [...gameState.snake];
+                if (ateFood) {
+                    newSnake.push(newHead);
+                } else {
+                    newSnake.push(newHead);
+                    newSnake.shift();
+                }
+                gameState.snake = newSnake;
+
+                // 更新网格
+                const grid = [];
+                for (let i = 0; i < size; i++) {
+                    grid.push(new Array(size).fill(0));
+                }
+                // 标记蛇
+                newSnake.forEach((pos, idx) => {
+                    const val = idx === newSnake.length - 1 ? 2 : 1;
+                    grid[pos[0]][pos[1]] = val;
+                });
+                // 标记食物
+                if (food && !ateFood) {
+                    grid[food[0]][food[1]] = 3;
+                } else if (ateFood) {
+                    // 生成新食物
+                    let newFood = null;
+                    let attempts = 0;
+                    while (!newFood && attempts < 200) {
+                        const r = Math.floor(Math.random() * size);
+                        const c = Math.floor(Math.random() * size);
+                        if (grid[r][c] === 0) {
+                            newFood = [r, c];
+                            grid[r][c] = 3;
+                            break;
+                        }
+                        attempts++;
+                    }
+                    gameState.food = newFood;
+                }
+
+                gameState.grid = grid;
+                renderGame();
+
+                // 检查是否胜利（所有格子填满）
+                let filled = true;
+                for (let r = 0; r < size; r++) {
+                    for (let c = 0; c < size; c++) {
+                        if (grid[r][c] === 0) {
+                            filled = false;
+                            break;
+                        }
+                    }
+                    if (!filled) break;
+                }
+                if (filled) {
+                    gameState.won = true;
+                    gameState.isPlaying = false;
+                    showGameResult('🎉 太棒了！通关成功！签到奖励 ¥' + SIGNIN_AMOUNT, 'success');
+                    // 签到成功
+                    completeSignin();
+                    updateGameUI();
+                    return;
+                }
+
+                updateGameUI();
+            }
+
+            function gameOver(message) {
+                gameState.gameOver = true;
+                gameState.isPlaying = false;
+                gameState.attempts--;
+                // 更新签到数据
+                updateSigninStatus(currentUser, { attempts: gameState.attempts });
+                showGameResult('💔 ' + message + ' (剩余 ' + gameState.attempts + ' 次机会)', 'fail');
+                updateGameUI();
+                updateSigninUI();
+
+                if (gameState.attempts <= 0) {
+                    setTimeout(() => {
+                        showToast('今日机会已用完，明天再来吧', '❌');
+                        closeGameModal();
+                    }, 2000);
+                }
+            }
+
+            function completeSignin() {
+                gameState.signed = true;
+                // 增加余额
+                const user = getUser(currentUser);
+                if (user) {
+                    const newBalance = (user.balance || 0) + SIGNIN_AMOUNT;
+                    updateUser(currentUser, { balance: newBalance });
+                    displayBalance.textContent = formatBalance(newBalance);
+                }
+                updateSigninStatus(currentUser, { signed: true, level: gameState.level + 1 });
+                updateSigninUI();
+                showToast('签到成功！获得 ¥' + SIGNIN_AMOUNT, '💰');
+            }
+
+            function resetGame() {
+                if (gameState.signed) {
+                    showToast('今日已签到，不能重玩', 'ℹ️');
+                    return;
+                }
+                if (gameState.attempts <= 0) {
+                    showToast('今日机会已用完', '❌');
+                    return;
+                }
+                gameState.level = gameState.level || 1;
+                gameState.size = Math.min(6 + gameState.level, 12);
+                gameState.isPlaying = true;
+                gameState.won = false;
+                gameState.gameOver = false;
+                gameResult.style.display = 'none';
+                initGame();
+                renderGame();
+                updateGameUI();
+                showToast('重新开始！', '🔄');
+            }
+
+            // 键盘控制
+            function handleKeydown(e) {
+                if (!gameModal.classList.contains('active') || !gameState.isPlaying) return;
+                const key = e.key;
+                const dirMap = {
+                    'ArrowUp': 'up',
+                    'ArrowDown': 'down',
+                    'ArrowLeft': 'left',
+                    'ArrowRight': 'right',
+                    'w': 'up',
+                    'W': 'up',
+                    's': 'down',
+                    'S': 'down',
+                    'a': 'left',
+                    'A': 'left',
+                    'd': 'right',
+                    'D': 'right'
+                };
+                const dir = dirMap[key];
+                if (!dir) return;
+                e.preventDefault();
+                // 不能反向
+                const opposites = { 'up': 'down', 'down': 'up', 'left': 'right', 'right': 'left' };
+                if (gameState.direction && opposites[dir] === gameState.direction) return;
+                gameState.nextDirection = dir;
+                // 自动移动（由定时器驱动）
+            }
+
+            // 定时器驱动游戏循环
+            let gameLoopInterval = null;
+
+            function startGameLoop() {
+                if (gameLoopInterval) clearInterval(gameLoopInterval);
+                gameLoopInterval = setInterval(() => {
+                    if (gameModal.classList.contains('active') && gameState.isPlaying && !gameState.gameOver && !gameState
+                        .won) {
+                        moveSnake();
+                    }
+                }, 350);
+            }
+
+            function stopGameLoop() {
+                if (gameLoopInterval) {
+                    clearInterval(gameLoopInterval);
+                    gameLoopInterval = null;
+                }
+            }
+
+            // ============================================================
             //  管理面板 - 用户操作
             // ============================================================
 
@@ -1929,7 +2757,6 @@
                     if (ok) {
                         showToast(`用户 ${username} 余额已更新`, '✅');
                         renderUserTable();
-                        // 如果当前用户是自己，更新显示
                         if (username === currentUser) {
                             const user = getUser(username);
                             displayBalance.textContent = formatBalance(user.balance);
@@ -1947,7 +2774,6 @@
                         if (ok) {
                             showToast(`用户 ${username} 已注销`, '🗑️');
                             renderUserTable();
-                            // 如果注销的是当前登录用户（非admin），则自动退出
                             if (username === currentUser) {
                                 handleLogout();
                             }
@@ -1966,7 +2792,6 @@
                 const items = loadScenery();
                 let item = items.find(i => i.id === id);
                 if (!item) {
-                    // 新增模式
                     editSceneryTitle.textContent = '➕ 新增风采';
                     editSceneryId.value = '';
                     editSceneryIcon.value = '';
@@ -2004,7 +2829,6 @@
 
                 let items = loadScenery();
                 if (id) {
-                    // 编辑
                     const idx = items.findIndex(i => i.id === parseInt(id));
                     if (idx !== -1) {
                         items[idx] = { ...items[idx], icon, name, desc };
@@ -2015,7 +2839,6 @@
                         return;
                     }
                 } else {
-                    // 新增
                     const newId = getNextId(items);
                     items.push({ id: newId, icon, name, desc });
                     saveScenery(items);
@@ -2023,7 +2846,6 @@
                 }
                 closeEditScenery();
                 renderSceneryAdmin();
-                // 同时更新首页展示（站车风采模态框内容会实时读取数据）
             }
 
             function deleteSceneryItem(id) {
@@ -2035,17 +2857,10 @@
             }
 
             // ============================================================
-            //  站车风采展示（普通用户点击）
+            //  站车风采展示（普通用户）
             // ============================================================
 
             function openSceneryViewer() {
-                // 直接使用之前已有的站车风采模态框？但是那个是管理面板里的，为了不混淆，我们新建一个浏览模态框。
-                // 但之前有sceneryModal，但已删除，改用动态生成？简单起见，我们用管理面板的样式，但只读。
-                // 或者创建一个新的模态框。为了省事，我们复用管理面板的tab，但普通用户看不到管理面板。
-                // 我们新增一个简单的模态框用于展示。
-                // 但因为代码已定，我们快速实现一个轻量展示：直接弹窗显示列表，或者创建新模态框。
-                // 为保持一致性，我们创建一个新的模态框（可以复制sceneryAdminList的内容但只读）
-                // 实际上，我们可以使用一个模态框，但为了防止冲突，新建一个。
                 const modal = document.createElement('div');
                 modal.className = 'modal-overlay active';
                 modal.style.zIndex = '1000';
@@ -2090,11 +2905,9 @@
                     showToast('权限不足', '⛔');
                     return;
                 }
-                // 渲染数据
                 renderUserTable();
                 renderSceneryAdmin();
                 adminModal.classList.add('active');
-                // 默认选中用户tab
                 switchTab('users');
             }
 
@@ -2133,6 +2946,7 @@
                     } else {
                         adminEntry.style.display = 'none';
                     }
+                    updateSigninUI();
                     renderLines();
                     startClock();
                     return true;
@@ -2166,6 +2980,17 @@
                 if (e.key === 'Enter') registerBtn.click();
             });
 
+            // 忘记密码
+            openForgotBtn.addEventListener('click', openForgotModal);
+            closeForgotBtn.addEventListener('click', closeForgotModal);
+            forgotBtn.addEventListener('click', handleForgot);
+            forgotModal.addEventListener('click', function(e) {
+                if (e.target === this) closeForgotModal();
+            });
+            forgotNewPassword.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') forgotBtn.click();
+            });
+
             // 快捷功能
             document.querySelectorAll('.quick-action[data-action]').forEach(el => {
                 el.addEventListener('click', function() {
@@ -2176,11 +3001,50 @@
                         showToast('线路查询功能开发中，敬请期待！', '🗺️');
                     } else if (action === 'scenery') {
                         openSceneryViewer();
+                    } else if (action === 'signin') {
+                        openGameModal();
                     } else if (action === 'admin') {
                         openAdminPanel();
                     }
                 });
             });
+
+            // 游戏控制
+            closeGameBtn.addEventListener('click', function() {
+                stopGameLoop();
+                closeGameModal();
+            });
+            gameModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    stopGameLoop();
+                    closeGameModal();
+                }
+            });
+            gameResetBtn.addEventListener('click', resetGame);
+
+            // 方向按钮
+            document.querySelectorAll('.btn-direction').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const dir = this.dataset.dir;
+                    if (!gameState.isPlaying || gameState.gameOver || gameState.won) return;
+                    const opposites = { 'up': 'down', 'down': 'up', 'left': 'right', 'right': 'left' };
+                    if (gameState.direction && opposites[dir] === gameState.direction) return;
+                    gameState.nextDirection = dir;
+                });
+            });
+
+            // 键盘控制
+            document.addEventListener('keydown', handleKeydown);
+
+            // 游戏循环启动（当模态框打开时）
+            const observer = new MutationObserver(() => {
+                if (gameModal.classList.contains('active')) {
+                    startGameLoop();
+                } else {
+                    stopGameLoop();
+                }
+            });
+            observer.observe(gameModal, { attributes: true, attributeFilter: ['class'] });
 
             // 管理面板
             closeAdminBtn.addEventListener('click', closeAdminPanel);
@@ -2196,7 +3060,7 @@
 
             // 编辑风采
             addSceneryBtn.addEventListener('click', function() {
-                openEditScenery(null); // 新增
+                openEditScenery(null);
             });
             closeEditSceneryBtn.addEventListener('click', closeEditScenery);
             saveSceneryBtn.addEventListener('click', saveSceneryItem);
@@ -2236,6 +3100,24 @@
                     homePage.style.display = 'none';
                     loginUsername.value = '';
                     loginPassword.value = '';
+                }
+
+                // 每日重置签到（在加载时自动清理过期数据）
+                const signinData = loadSigninData();
+                const today = getTodayStr();
+                let changed = false;
+                Object.keys(signinData).forEach(key => {
+                    if (signinData[key].date !== today) {
+                        // 重置
+                        signinData[key] = { date: today, attempts: MAX_ATTEMPTS, signed: false, level: 1 };
+                        changed = true;
+                    }
+                });
+                if (changed) {
+                    saveSigninData(signinData);
+                }
+                if (currentUser && currentUser !== 'admin') {
+                    updateSigninUI();
                 }
             })();
 
