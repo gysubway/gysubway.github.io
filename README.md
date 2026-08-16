@@ -38,9 +38,8 @@
         .modal-card .modal-title { font-size:24px; font-weight:700; color:#0b2a4a; text-align:center; margin-bottom:24px; letter-spacing:1px; }
         .modal-card .form-group { margin-bottom:18px; }
         .modal-card label { display:block; font-size:14px; font-weight:600; color:#2c3e50; margin-bottom:5px; }
-        .modal-card input[type="text"], .modal-card input[type="password"], .modal-card input[type="number"], .modal-card textarea { width:100%; padding:12px 16px; font-size:15px; border:2px solid #dce3ec; border-radius:10px; background:#f8fafc; transition:border-color 0.25s; outline:none; color:#1a2a3a; font-family:inherit; }
-        .modal-card input:focus, .modal-card textarea:focus { border-color:#1a6e9e; background:#ffffff; }
-        .modal-card textarea { min-height:60px; resize:vertical; }
+        .modal-card input[type="text"], .modal-card input[type="password"], .modal-card input[type="number"] { width:100%; padding:12px 16px; font-size:15px; border:2px solid #dce3ec; border-radius:10px; background:#f8fafc; transition:border-color 0.25s; outline:none; color:#1a2a3a; }
+        .modal-card input:focus { border-color:#1a6e9e; background:#ffffff; }
         .modal-card .form-actions { display:flex; gap:12px; margin-top:20px; }
         .modal-card .form-actions button { flex:1; padding:14px; font-size:16px; font-weight:700; border:none; border-radius:10px; cursor:pointer; transition:background 0.25s, transform 0.15s; }
         .modal-card .btn-primary { background:linear-gradient(135deg,#1a6e9e,#0b4a72); color:#ffffff; }
@@ -49,30 +48,30 @@
         .modal-card .btn-danger:hover { background:#c0392b; }
         .modal-card .btn-cancel { background:#eef2f7; color:#4a5a6a; }
         .modal-card .btn-cancel:hover { background:#e0e6ee; }
-        .modal-card .btn-success { background:#27ae60; color:#fff; }
-        .modal-card .btn-success:hover { background:#1e8449; }
         .modal-card .modal-error { margin-top:14px; padding:10px 14px; background:#fef2f0; border-left:4px solid #d94a4a; border-radius:6px; color:#b33a3a; font-size:14px; display:none; align-items:center; gap:8px; }
         .modal-card .modal-error.show { display:flex; }
         .modal-card .modal-success { margin-top:14px; padding:10px 14px; background:#ecf9f0; border-left:4px solid #2ecc71; border-radius:6px; color:#1a7a4a; font-size:14px; display:none; align-items:center; gap:8px; }
         .modal-card .modal-success.show { display:flex; }
         .register-modal .verify-question { background:#eef4fa; padding:12px 16px; border-radius:10px; font-size:15px; color:#0b2a4a; margin-bottom:10px; border-left:4px solid #1a6e9e; font-weight:500; }
-        .quiz-modal .modal-card { max-width:720px; }
-        .quiz-modal .quiz-question { font-size:18px; font-weight:600; color:#0b2a4a; padding:16px 20px; background:#f0f5fb; border-radius:12px; margin-bottom:20px; line-height:1.6; border-left:5px solid #1a6e9e; }
-        .quiz-modal .quiz-options { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
-        .quiz-modal .quiz-options .opt-btn { padding:12px 16px; border:2px solid #dce3ec; border-radius:10px; background:#fafcfd; cursor:pointer; transition:all 0.2s; font-size:15px; text-align:left; display:flex; align-items:center; gap:8px; font-weight:500; color:#1a2a3a; }
-        .quiz-modal .quiz-options .opt-btn:hover:not(.disabled) { border-color:#1a6e9e; background:#eaf3fa; transform:translateY(-1px); }
-        .quiz-modal .quiz-options .opt-btn .opt-label { display:inline-block; min-width:28px; font-weight:700; color:#1a6e9e; }
-        .quiz-modal .quiz-options .opt-btn.correct { border-color:#27ae60; background:#d5f5e3; }
-        .quiz-modal .quiz-options .opt-btn.wrong { border-color:#e74c3c; background:#fadbd8; }
-        .quiz-modal .quiz-options .opt-btn.disabled { cursor:not-allowed; opacity:0.7; }
-        .quiz-modal .quiz-status { display:flex; justify-content:space-between; align-items:center; padding:10px 0; font-weight:600; color:#2c3e50; flex-wrap:wrap; gap:8px; }
-        .quiz-modal .quiz-status .attempts-left { color:#d94a4a; }
-        .quiz-modal .quiz-status .status-msg { color:#1a6e9e; }
-        .quiz-modal .quiz-result-box { padding:14px 20px; border-radius:10px; margin-top:12px; font-weight:600; font-size:16px; display:none; text-align:center; }
-        .quiz-modal .quiz-result-box.success { display:block; background:#d5f5e3; color:#1a7a4a; }
-        .quiz-modal .quiz-result-box.fail { display:block; background:#fadbd8; color:#922b21; }
-        .quiz-modal .quiz-result-box.info { display:block; background:#d4e6f1; color:#1a4a6e; }
-        @media (max-width:600px) { .quiz-modal .quiz-options { grid-template-columns:1fr; } .quiz-modal .modal-card { padding:20px 14px; } .quiz-modal .quiz-question { font-size:16px; padding:12px 14px; } }
+
+        /* ===== 签到答题（键盘版） ===== */
+        .quiz-modal .modal-card { max-width:600px; }
+        .quiz-modal .quiz-header { display:flex; justify-content:space-between; font-size:18px; font-weight:600; color:#0b2a4a; padding:0 4px 16px 4px; border-bottom:2px solid #eef2f7; }
+        .quiz-modal .quiz-header .timer { color:#d94a4a; }
+        .quiz-modal .quiz-body { padding:24px 0 16px; text-align:center; }
+        .quiz-modal .quiz-body .question-number { font-size:16px; color:#5a6a7a; }
+        .quiz-modal .quiz-body .question-text { font-size:32px; font-weight:700; color:#0b2a4a; margin:16px 0 20px; letter-spacing:2px; }
+        .quiz-modal .quiz-body .answer-input { display:inline-block; width:120px; padding:10px 16px; font-size:28px; text-align:center; border:3px solid #dce3ec; border-radius:12px; outline:none; transition:border-color 0.2s; background:#f8fafc; }
+        .quiz-modal .quiz-body .answer-input:focus { border-color:#1a6e9e; background:#ffffff; }
+        .quiz-modal .quiz-body .answer-input:disabled { background:#eef2f7; border-color:#d0dae6; }
+        .quiz-modal .quiz-body .feedback { margin-top:16px; font-size:20px; font-weight:600; min-height:40px; }
+        .quiz-modal .quiz-body .feedback.correct { color:#27ae60; }
+        .quiz-modal .quiz-body .feedback.wrong { color:#e74c3c; }
+        .quiz-modal .quiz-footer { display:flex; justify-content:space-between; align-items:center; padding-top:16px; border-top:2px solid #eef2f7; font-size:14px; color:#5a6a7a; }
+        .quiz-modal .quiz-footer .score { font-weight:600; color:#0b2a4a; }
+        .quiz-modal .quiz-footer .score span { color:#1a6e9e; }
+
+        /* ===== 首页 ===== */
         #homePage { display:none; width:100%; min-height:100vh; background:#eef2f7; flex-direction:column; }
         .navbar { background:linear-gradient(135deg,#0b2a4a,#1a4a6e); padding:0 40px; height:72px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 20px rgba(0,0,0,0.15); position:sticky; top:0; z-index:100; flex-shrink:0; }
         .navbar .brand { display:flex; align-items:center; gap:12px; color:#ffffff; font-size:22px; font-weight:700; letter-spacing:1px; }
@@ -122,7 +121,9 @@
         .quick-action.signin-action.disabled:hover { transform:none; box-shadow:0 2px 12px rgba(0,0,0,0.04); border-color:#eef2f7; }
         .home-footer { text-align:center; padding:20px 20px 8px; color:#8a9aaa; font-size:13px; border-top:1px solid #e0e6ee; margin-top:12px; }
         .home-footer strong { color:#1a4a6e; }
-        .admin-modal .modal-card { max-width:900px; }
+
+        /* ===== 管理面板 ===== */
+        .admin-modal .modal-card { max-width:820px; }
         .admin-modal .tab-bar { display:flex; gap:4px; border-bottom:2px solid #e0e6ee; margin-bottom:24px; flex-wrap:wrap; }
         .admin-modal .tab-bar .tab-btn { padding:10px 24px; font-size:16px; font-weight:600; border:none; background:transparent; cursor:pointer; color:#5a6a7a; border-bottom:3px solid transparent; transition:color 0.2s, border-color 0.2s; }
         .admin-modal .tab-bar .tab-btn.active { color:#0b2a4a; border-bottom-color:#1a6e9e; }
@@ -144,36 +145,26 @@
         .admin-modal .btn-delete:hover { background:#f5b7b1; }
         .admin-modal .add-btn { margin-top:16px; padding:10px 20px; background:#1a6e9e; color:#fff; border:none; border-radius:8px; font-weight:600; cursor:pointer; transition:background 0.2s; }
         .admin-modal .add-btn:hover { background:#0b4a72; }
-        .admin-modal .admin-toolbar { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px; align-items:center; }
-        .admin-modal .admin-toolbar button { padding:8px 18px; border:none; border-radius:8px; font-weight:600; cursor:pointer; transition:background 0.2s; font-size:14px; }
-        .admin-modal .admin-toolbar .btn-shuffle { background:#f39c12; color:#fff; }
-        .admin-modal .admin-toolbar .btn-shuffle:hover { background:#d68910; }
-        .admin-modal .admin-toolbar .btn-refresh { background:#1a6e9e; color:#fff; }
-        .admin-modal .admin-toolbar .btn-refresh:hover { background:#0b4a72; }
-        .admin-modal .admin-toolbar .btn-danger { background:#d94a4a; color:#fff; }
-        .admin-modal .admin-toolbar .btn-danger:hover { background:#c0392b; }
-        .admin-modal .question-list { display:flex; flex-direction:column; gap:12px; margin-top:8px; max-height:400px; overflow-y:auto; }
-        .admin-modal .question-item { background:#f8fafc; border-radius:12px; padding:14px 18px; border:1px solid #eef2f7; display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; }
-        .admin-modal .question-item .q-info { flex:1; min-width:200px; }
-        .admin-modal .question-item .q-info .q-text { font-weight:600; color:#0b2a4a; font-size:15px; }
-        .admin-modal .question-item .q-info .q-options { font-size:13px; color:#5a6a7a; margin-top:4px; }
-        .admin-modal .question-item .q-info .q-options .opt-text { display:inline-block; margin-right:8px; }
-        .admin-modal .question-item .q-info .q-answer { font-size:13px; color:#27ae60; font-weight:600; margin-top:2px; }
-        .admin-modal .question-item .q-actions { display:flex; gap:6px; flex-shrink:0; }
-        .admin-modal .question-item .q-actions button { padding:4px 14px; font-size:12px; border:none; border-radius:6px; font-weight:600; cursor:pointer; transition:background 0.2s; }
-        .admin-modal .question-item .q-actions .btn-edit { background:#d4e6f1; color:#1a4a6e; }
-        .admin-modal .question-item .q-actions .btn-edit:hover { background:#b0d0e6; }
-        .admin-modal .question-item .q-actions .btn-delete { background:#fadbd8; color:#922b21; }
-        .admin-modal .question-item .q-actions .btn-delete:hover { background:#f5b7b1; }
-        .admin-modal .upload-area { background:#f0f5fb; border:2px dashed #b0c4d8; border-radius:12px; padding:20px; text-align:center; margin-bottom:16px; }
-        .admin-modal .upload-area input[type="file"] { display:block; margin:10px auto; }
-        .admin-modal .upload-area .upload-hint { font-size:13px; color:#5a6a7a; }
+        .admin-modal .scenery-list { display:flex; flex-direction:column; gap:12px; margin-top:8px; }
+        .admin-modal .scenery-item-admin { background:#f8fafc; border-radius:12px; padding:14px 18px; border:1px solid #eef2f7; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+        .admin-modal .scenery-item-admin .info { display:flex; align-items:center; gap:12px; flex:1; min-width:150px; }
+        .admin-modal .scenery-item-admin .info .icon { font-size:28px; }
+        .admin-modal .scenery-item-admin .info .name { font-weight:700; color:#0b2a4a; }
+        .admin-modal .scenery-item-admin .info .desc { color:#5a6a7a; font-size:13px; }
+        .admin-modal .scenery-item-admin .actions { display:flex; gap:6px; }
+        .admin-modal .scenery-item-admin .actions button { padding:4px 14px; font-size:12px; border:none; border-radius:6px; font-weight:600; cursor:pointer; transition:background 0.2s; }
+        .admin-modal .scenery-item-admin .actions .btn-edit { background:#d4e6f1; color:#1a4a6e; }
+        .admin-modal .scenery-item-admin .actions .btn-edit:hover { background:#b0d0e6; }
+        .admin-modal .scenery-item-admin .actions .btn-delete { background:#fadbd8; color:#922b21; }
+        .admin-modal .scenery-item-admin .actions .btn-delete:hover { background:#f5b7b1; }
+
         .toast-container { position:fixed; top:100px; left:50%; transform:translateX(-50%); z-index:9999; pointer-events:none; }
         .toast { background:#1a2a3a; color:#ffffff; padding:14px 32px; border-radius:12px; font-size:15px; font-weight:500; box-shadow:0 8px 32px rgba(0,0,0,0.30); opacity:0; transform:translateY(-20px) scale(0.95); transition:opacity 0.35s ease, transform 0.35s ease; pointer-events:auto; display:flex; align-items:center; gap:10px; white-space:nowrap; }
         .toast.show { opacity:1; transform:translateY(0) scale(1); }
         .toast .toast-icon { font-size:20px; }
+
         @media (max-width:992px) { .card-grid { grid-template-columns:1fr; gap:16px; } .quick-actions { grid-template-columns:repeat(3,1fr); } .home-main { padding:20px 24px 16px; } .navbar { padding:0 24px; height:64px; } .navbar .brand { font-size:18px; } .navbar .brand .brand-sub { display:none; } .hero-banner h1 { font-size:38px; letter-spacing:4px; } .welcome-banner { flex-direction:column; align-items:flex-start; } .welcome-banner .datetime { text-align:left; width:100%; white-space:normal; } .admin-modal .modal-card { max-width:95%; padding:24px 16px; } .quiz-modal .modal-card { max-width:95%; } }
-        @media (max-width:600px) { .login-card { padding:28px 18px 24px; } .login-logo h1 { font-size:22px; } .navbar .user-area .user-info { font-size:12px; gap:6px; flex-wrap:wrap; justify-content:flex-end; } .navbar .user-area .user-info .user-name, .navbar .user-area .user-info .user-balance { padding:3px 12px; font-size:12px; } .navbar .logout-btn { font-size:12px; padding:5px 14px; } .navbar { padding:0 14px; height:58px; } .navbar .brand { font-size:16px; gap:6px; } .navbar .brand .brand-icon { font-size:22px; } .hero-banner h1 { font-size:28px; letter-spacing:2px; } .hero-banner { padding:16px 12px; } .quick-actions { grid-template-columns:1fr 1fr 1fr; gap:10px; } .quick-action { padding:16px 6px 14px; } .quick-action .qa-icon { font-size:26px; } .quick-action .qa-label { font-size:14px; } .quick-action .qa-desc { font-size:11px; } .line-card { padding:14px 16px; } .line-card .line-stations { gap:2px 10px; padding-left:10px; } .line-card .line-stations .station { font-size:13px; } .home-main { padding:14px 14px 12px; } .welcome-banner { padding:14px 16px; } .welcome-banner .greeting h2 { font-size:18px; } .modal-card { padding:24px 18px 20px; } .modal-card .form-actions { flex-direction:column; } .toast { padding:12px 20px; font-size:14px; white-space:normal; } .admin-modal table th, .admin-modal table td { padding:6px 4px; font-size:12px; } .admin-modal .table-actions button { font-size:10px; padding:2px 8px; } .admin-modal .question-item { flex-direction:column; align-items:stretch; } .admin-modal .question-item .q-actions { margin-top:6px; } .admin-modal .admin-toolbar button { font-size:12px; padding:6px 14px; } .quiz-modal .quiz-options { grid-template-columns:1fr; } }
+        @media (max-width:600px) { .login-card { padding:28px 18px 24px; } .login-logo h1 { font-size:22px; } .navbar .user-area .user-info { font-size:12px; gap:6px; flex-wrap:wrap; justify-content:flex-end; } .navbar .user-area .user-info .user-name, .navbar .user-area .user-info .user-balance { padding:3px 12px; font-size:12px; } .navbar .logout-btn { font-size:12px; padding:5px 14px; } .navbar { padding:0 14px; height:58px; } .navbar .brand { font-size:16px; gap:6px; } .navbar .brand .brand-icon { font-size:22px; } .hero-banner h1 { font-size:28px; letter-spacing:2px; } .hero-banner { padding:16px 12px; } .quick-actions { grid-template-columns:1fr 1fr 1fr; gap:10px; } .quick-action { padding:16px 6px 14px; } .quick-action .qa-icon { font-size:26px; } .quick-action .qa-label { font-size:14px; } .quick-action .qa-desc { font-size:11px; } .line-card { padding:14px 16px; } .line-card .line-stations { gap:2px 10px; padding-left:10px; } .line-card .line-stations .station { font-size:13px; } .home-main { padding:14px 14px 12px; } .welcome-banner { padding:14px 16px; } .welcome-banner .greeting h2 { font-size:18px; } .modal-card { padding:24px 18px 20px; } .modal-card .form-actions { flex-direction:column; } .toast { padding:12px 20px; font-size:14px; white-space:normal; } .admin-modal table th, .admin-modal table td { padding:6px 4px; font-size:12px; } .admin-modal .table-actions button { font-size:10px; padding:2px 8px; } .admin-modal .scenery-item-admin { flex-direction:column; align-items:stretch; } .admin-modal .scenery-item-admin .info { flex-wrap:wrap; } .quiz-modal .quiz-body .question-text { font-size:24px; } .quiz-modal .quiz-body .answer-input { width:80px; font-size:22px; } }
         .text-muted { color:#8a9aaa; font-size:13px; }
         .mt-8 { margin-top:8px; }
         .flex-center { display:flex; align-items:center; gap:6px; }
@@ -183,7 +174,7 @@
 </head>
 <body>
 
-    <!-- 登录页 -->
+    <!-- ===== 登录页 ===== -->
     <div id="loginPage">
         <div class="login-card">
             <div class="login-logo"><span class="icon">🚇</span><h1>固原地铁</h1><p>售票系统 · 运营中心</p></div>
@@ -200,7 +191,7 @@
         </div>
     </div>
 
-    <!-- 注册模态框 -->
+    <!-- ===== 注册模态框 ===== -->
     <div class="modal-overlay register-modal" id="registerModal">
         <div class="modal-card">
             <div class="modal-title">📝 注册新账号</div>
@@ -218,7 +209,7 @@
         </div>
     </div>
 
-    <!-- 忘记密码模态框 -->
+    <!-- ===== 忘记密码模态框 ===== -->
     <div class="modal-overlay" id="forgotModal">
         <div class="modal-card">
             <div class="modal-title">🔑 重置密码</div>
@@ -235,64 +226,52 @@
         </div>
     </div>
 
-    <!-- 签到答题模态框 -->
+    <!-- ===== 签到答题模态框（键盘版） ===== -->
     <div class="modal-overlay quiz-modal" id="quizModal">
         <div class="modal-card">
-            <div class="modal-title">🧠 每日签到 · 逻辑推理</div>
-            <div class="quiz-question" id="quizQuestion">题目加载中...</div>
-            <div class="quiz-options" id="quizOptions"></div>
-            <div class="quiz-status">
-                <span>📅 <span id="quizDate">--</span></span>
-                <span>💪 剩余尝试: <span class="attempts-left" id="quizAttempts">2</span></span>
-                <span class="status-msg" id="quizStatusMsg">请选择答案</span>
+            <div class="modal-title">⏱️ 速算挑战 · 每日签到</div>
+            <div class="quiz-header">
+                <span>📝 <span id="quizProgress">1/20</span></span>
+                <span class="timer" id="quizTimer">⏳ 30s</span>
             </div>
-            <div class="quiz-result-box" id="quizResult"></div>
-            <div class="form-actions" style="margin-top:16px;"><button class="btn-cancel" id="closeQuizBtn">关闭</button></div>
+            <div class="quiz-body">
+                <div class="question-number" id="questionNumber">第 1 题</div>
+                <div class="question-text" id="questionText">3 + 5 = ?</div>
+                <input type="number" class="answer-input" id="answerInput" placeholder="?" autofocus />
+                <div class="feedback" id="feedback"></div>
+            </div>
+            <div class="quiz-footer">
+                <span>✅ 正确: <span id="correctCount">0</span></span>
+                <span>❌ 错误: <span id="wrongCount">0</span></span>
+                <span class="score">得分: <span id="scoreDisplay">0</span> / 20</span>
+            </div>
+            <div class="form-actions" style="margin-top:16px;">
+                <button class="btn-cancel" id="closeQuizBtn">关闭</button>
+            </div>
         </div>
     </div>
 
-    <!-- 管理面板 -->
+    <!-- ===== 管理面板 ===== -->
     <div class="modal-overlay admin-modal" id="adminModal">
         <div class="modal-card">
             <div class="modal-title">⚙️ 管理面板</div>
             <div class="tab-bar">
                 <button class="tab-btn active" data-tab="users">👥 用户管理</button>
                 <button class="tab-btn" data-tab="scenery">📸 站车风采</button>
-                <button class="tab-btn" data-tab="questions">📚 题库管理</button>
             </div>
-            <!-- 用户 -->
             <div class="tab-content active" id="tabUsers">
                 <div class="user-table-wrap"><table><thead><tr><th>用户名</th><th>余额</th><th>操作</th></tr></thead><tbody id="userTableBody"></tbody></table></div>
                 <p class="text-muted mt-8">* 管理员可修改密码、余额，注销账号（不能注销自己）</p>
             </div>
-            <!-- 风采 -->
             <div class="tab-content" id="tabScenery">
                 <div class="scenery-list" id="sceneryAdminList"></div>
                 <button class="add-btn" id="addSceneryBtn">➕ 新增风采</button>
-            </div>
-            <!-- 题库 -->
-            <div class="tab-content" id="tabQuestions">
-                <div class="admin-toolbar">
-                    <button class="btn-shuffle" id="shuffleDailyBtn">🎲 一键换题</button>
-                    <button class="btn-refresh" id="refreshQuestionsBtn">🔄 刷新列表</button>
-                    <button class="add-btn" id="addQuestionBtn" style="margin:0;">➕ 新增题目</button>
-                    <button class="btn-danger" id="clearQuestionsBtn">🗑️ 清空题库</button>
-                    <span style="font-size:13px;color:#7a8a9e;margin-left:4px;" id="questionCountInfo">共 0 题</span>
-                </div>
-                <!-- 上传区域 -->
-                <div class="upload-area">
-                    <div class="upload-hint">📤 上传题库 (txt格式，每行一道题，格式见说明)</div>
-                    <input type="file" id="uploadQuestionFile" accept=".txt" />
-                    <button class="btn-primary" id="uploadQuestionsBtn" style="margin-top:8px;">上传并替换题库</button>
-                    <div style="font-size:12px;color:#7a8a9e;margin-top:6px;">格式：题目||选项1||选项2||...||选项N||答案字母(A-Z)</div>
-                </div>
-                <div class="question-list" id="questionList"></div>
             </div>
             <div class="form-actions" style="margin-top:20px;"><button class="btn-cancel" id="closeAdminBtn" style="flex:1;">关闭</button></div>
         </div>
     </div>
 
-    <!-- 编辑风采 -->
+    <!-- ===== 编辑风采模态框 ===== -->
     <div class="modal-overlay" id="editSceneryModal">
         <div class="modal-card">
             <div class="modal-title" id="editSceneryTitle">编辑风采</div>
@@ -305,20 +284,7 @@
         </div>
     </div>
 
-    <!-- 编辑题目 -->
-    <div class="modal-overlay" id="editQuestionModal">
-        <div class="modal-card" style="max-width:760px;">
-            <div class="modal-title" id="editQuestionTitle">编辑题目</div>
-            <input type="hidden" id="editQuestionId" value="" />
-            <div class="form-group"><label>题目内容</label><textarea id="editQuestionText" rows="3" placeholder="请输入题目..."></textarea></div>
-            <div class="form-group"><label>选项 (每行一个，至少6个，最多10个)</label><textarea id="editQuestionOptions" rows="8" placeholder="选项A&#10;选项B&#10;选项C&#10;..."></textarea></div>
-            <div class="form-group"><label>正确答案 (填写对应字母，如 A、B、C...)</label><input type="text" id="editQuestionAnswer" placeholder="例如 A" style="max-width:120px;" /></div>
-            <div class="modal-error" id="editQuestionError"><span class="err-icon">⚠️</span><span id="editQuestionErrorMessage">错误信息</span></div>
-            <div class="form-actions"><button class="btn-cancel" id="closeEditQuestionBtn">取消</button><button class="btn-primary" id="saveQuestionBtn">保存</button></div>
-        </div>
-    </div>
-
-    <!-- 首页 -->
+    <!-- ===== 首页 ===== -->
     <div id="homePage">
         <nav class="navbar">
             <div class="brand"><span class="brand-icon">🚇</span><span>固原地铁</span><span class="brand-sub">· 售票系统</span></div>
@@ -330,7 +296,7 @@
         <div class="hero-banner"><h1>🚇 固原地铁欢迎您！</h1></div>
         <main class="home-main">
             <div class="welcome-banner">
-                <div class="greeting"><h2>👋 欢迎回来，<span class="highlight" id="greetingUser">用户</span></h2><p>固原地铁 · 智能售票系统 v3.0</p></div>
+                <div class="greeting"><h2>👋 欢迎回来，<span class="highlight" id="greetingUser">用户</span></h2><p>固原地铁 · 智能售票系统 v4.0</p></div>
                 <div class="datetime" id="datetimeDisplay"><span class="time" id="currentTime">--:--:--</span><span id="currentDate">----年--月--日</span></div>
             </div>
             <div class="section-title">📍 线路概览<span class="title-line"></span></div>
@@ -341,8 +307,8 @@
                 <div class="quick-action" data-action="line"><span class="qa-icon">🗺️</span><div class="qa-label">线路查询</div><div class="qa-desc">即将开放</div></div>
                 <div class="quick-action" data-action="scenery"><span class="qa-icon">📸</span><div class="qa-label">站车风采</div><div class="qa-desc">点击欣赏</div></div>
                 <div class="quick-action signin-action" data-action="signin" id="signinEntry">
-                    <span class="qa-icon">✅</span><div class="qa-label">每日签到</div>
-                    <div class="qa-desc" id="signinDesc">签到得 ¥20</div>
+                    <span class="qa-icon">⌨️</span><div class="qa-label">每日签到</div>
+                    <div class="qa-desc" id="signinDesc">速算挑战</div>
                 </div>
                 <div class="quick-action admin-action" data-action="admin" id="adminEntry" style="display:none;">
                     <span class="qa-icon">⚙️</span><div class="qa-label">管理面板</div><div class="qa-desc">管理员专用</div>
@@ -352,7 +318,7 @@
         </main>
     </div>
 
-    <!-- Toast -->
+    <!-- ===== Toast ===== -->
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
@@ -361,50 +327,37 @@
 
             // ===== 常量 =====
             const LINE_DATA = [
-                { id: 1, name: '1号线', code: 'M1', color: '#e74c3c', stations: ['火车站', '市政府', '人民广场', '大学城', '科技园',
-                        '体育中心'
-                    ] },
-                { id: 2, name: '2号线', code: 'M2', color: '#3498db', stations: ['机场', '会展中心', '市中心', '体育馆', '高铁站',
-                        '生态园'
-                    ] },
-                { id: 3, name: '3号线', code: 'M3', color: '#2ecc71', stations: ['汽车站', '商业街', '文化宫', '图书馆', '政务中心',
-                        '智慧谷'
-                    ] },
-                { id: 4, name: '4号线', code: 'M4', color: '#f39c12', stations: ['古雁岭', '新区医院', '实验中学', '万达广场',
-                        '行政中心', '固原南站'
-                    ] }
+                { id: 1, name: '1号线', code: 'M1', color: '#e74c3c', stations: ['火车站', '市政府', '人民广场', '大学城', '科技园', '体育中心'] },
+                { id: 2, name: '2号线', code: 'M2', color: '#3498db', stations: ['机场', '会展中心', '市中心', '体育馆', '高铁站', '生态园'] },
+                { id: 3, name: '3号线', code: 'M3', color: '#2ecc71', stations: ['汽车站', '商业街', '文化宫', '图书馆', '政务中心', '智慧谷'] },
+                { id: 4, name: '4号线', code: 'M4', color: '#f39c12', stations: ['古雁岭', '新区医院', '实验中学', '万达广场', '行政中心', '固原南站'] }
             ];
             const PRESET_USER = { username: 'admin', password: 'gysubway2026', balance: 1000000 };
             const VERIFY_QUESTION = '固局更高速度实验列车的车号是？';
             const VERIFY_ANSWER = 'CRH380CM-0304';
             const SIGNIN_AMOUNT = 20;
-            const MAX_ATTEMPTS = 2;
-            const DAILY_QUESTION_KEY = 'metro_daily_question';
-            const QUIZ_STORAGE_KEY = 'metro_quiz_data';
-            const QUESTION_BANK_KEY = 'metro_question_bank';
+            const MAX_ATTEMPTS_PER_DAY = 2;
+            const TOTAL_QUESTIONS = 20;
+            const TIME_LIMIT = 30; // 秒
+            const PASS_SCORE = 16; // 需要正确16题及以上
+
             const USER_STORAGE_KEY = 'metro_users_data';
             const SCENERY_STORAGE_KEY = 'metro_scenery_data';
-            const SIGNIN_HISTORY_KEY = 'metro_signin_history';
+            const SIGNIN_STORAGE_KEY = 'metro_signin_data'; // 存储签到状态（每天剩余次数）
 
             // ===== 存储工具 =====
             function getTodayStr() { return new Date().toISOString().split('T')[0]; }
 
             // 用户
             function loadUsers() {
-                try { const raw = localStorage.getItem(USER_STORAGE_KEY); if (raw) { const d = JSON.parse(raw); if (!d
-                            .admin) { d.admin = { password: PRESET_USER.password, balance: PRESET_USER.balance }; }
-                        return d; } } catch (_) {}
+                try { const raw = localStorage.getItem(USER_STORAGE_KEY); if (raw) { const d = JSON.parse(raw); if (!d.admin) { d.admin = { password: PRESET_USER.password, balance: PRESET_USER.balance }; } return d; } } catch (_) {}
                 const d = { admin: { password: PRESET_USER.password, balance: PRESET_USER.balance } };
                 localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(d));
                 return d;
             }
-
             function saveUsers(u) { localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(u)); }
-
             function getUser(name) { const u = loadUsers(); return u[name] || null; }
-
             function userExists(name) { const u = loadUsers(); return u.hasOwnProperty(name); }
-
             function createUser(name, pwd) {
                 const u = loadUsers();
                 if (u[name]) return false;
@@ -412,7 +365,6 @@
                 saveUsers(u);
                 return true;
             }
-
             function updateUser(name, upd) {
                 const u = loadUsers();
                 if (!u[name]) return false;
@@ -420,7 +372,6 @@
                 saveUsers(u);
                 return true;
             }
-
             function deleteUser(name) {
                 if (name === 'admin') return false;
                 const u = loadUsers();
@@ -430,130 +381,27 @@
                 return true;
             }
 
-            // 题库 - 初始为空
-            function loadQuestionBank() {
-                try {
-                    const raw = localStorage.getItem(QUESTION_BANK_KEY);
-                    if (raw) { const d = JSON.parse(raw); if (Array.isArray(d)) return d; }
-                } catch (_) {}
-                return [];
-            }
-
-            function saveQuestionBank(qs) { localStorage.setItem(QUESTION_BANK_KEY, JSON.stringify(qs)); }
-
-            function getNextQId(qs) { if (!qs.length) return 1; return Math.max(...qs.map(i => i.id)) + 1; }
-
-            // 每日题目
-            function getDailyQuestion() {
-                const today = getTodayStr();
-                const raw = localStorage.getItem(DAILY_QUESTION_KEY);
-                if (raw) {
-                    try {
-                        const d = JSON.parse(raw);
-                        if (d.date === today) {
-                            const bank = loadQuestionBank();
-                            const q = bank.find(item => item.id === d.questionId);
-                            if (q) return { date: d.date, questionId: d.questionId, question: q };
-                        }
-                    } catch (_) {}
-                }
-                return null;
-            }
-
-            function setDailyQuestion(qId) {
-                const today = getTodayStr();
-                localStorage.setItem(DAILY_QUESTION_KEY, JSON.stringify({ date: today, questionId: qId }));
-            }
-
-            function pickDailyQuestion() {
-                const bank = loadQuestionBank();
-                if (!bank.length) { localStorage.removeItem(DAILY_QUESTION_KEY); return null; }
-                const today = getTodayStr();
-                const history = getGlobalQuestionHistory();
-                const usedIds = history.slice(-30);
-                const available = bank.filter(q => !usedIds.includes(q.id));
-                if (!available.length) {
-                    resetGlobalQuestionHistory();
-                    return pickDailyQuestion();
-                }
-                const chosen = available[Math.floor(Math.random() * available.length)];
-                setDailyQuestion(chosen.id);
-                addGlobalQuestionHistory(chosen.id);
-                return chosen;
-            }
-
-            function getDailyQuestionForToday() {
-                let dq = getDailyQuestion();
-                if (dq) return dq;
-                const q = pickDailyQuestion();
-                if (!q) return null;
-                return { date: getTodayStr(), questionId: q.id, question: q };
-            }
-
-            function getGlobalQuestionHistory() {
-                try { const raw = localStorage.getItem('metro_global_q_history'); if (raw) { const d = JSON.parse(raw); if (
-                            Array.isArray(d)) return d; } } catch (_) {}
-                return [];
-            }
-
-            function addGlobalQuestionHistory(id) {
-                let hist = getGlobalQuestionHistory();
-                hist.push(id);
-                if (hist.length > 30) hist = hist.slice(-30);
-                localStorage.setItem('metro_global_q_history', JSON.stringify(hist));
-            }
-
-            function resetGlobalQuestionHistory() {
-                localStorage.setItem('metro_global_q_history', JSON.stringify([]));
-            }
-
-            // 签到数据（用户维度）
-            function loadQuizData() {
-                try { const raw = localStorage.getItem(QUIZ_STORAGE_KEY); if (raw) return JSON.parse(raw); } catch (_) {}
+            // 签到数据（每天剩余次数）
+            function loadSigninData() {
+                try { const raw = localStorage.getItem(SIGNIN_STORAGE_KEY); if (raw) return JSON.parse(raw); } catch (_) {}
                 return {};
             }
-
-            function saveQuizData(d) { localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(d)); }
-
-            function getUserQuizStatus(username) {
-                const data = loadQuizData();
+            function saveSigninData(d) { localStorage.setItem(SIGNIN_STORAGE_KEY, JSON.stringify(d)); }
+            function getUserSigninStatus(username) {
+                const data = loadSigninData();
                 const today = getTodayStr();
-                if (!data[username]) { data[username] = { date: today, signed: false, attempts: MAX_ATTEMPTS,
-                        questionId: null };
-                    saveQuizData(data); }
+                if (!data[username]) { data[username] = { date: today, attempts: MAX_ATTEMPTS_PER_DAY, signed: false }; saveSigninData(data); }
                 const u = data[username];
-                if (u.date !== today) { u.date = today;
-                    u.signed = false;
-                    u.attempts = MAX_ATTEMPTS;
-                    u.questionId = null;
-                    saveQuizData(data); }
+                if (u.date !== today) { u.date = today; u.attempts = MAX_ATTEMPTS_PER_DAY; u.signed = false; saveSigninData(data); }
                 return u;
             }
-
-            function updateUserQuizStatus(username, updates) {
-                const data = loadQuizData();
+            function updateUserSigninStatus(username, updates) {
+                const data = loadSigninData();
                 const today = getTodayStr();
-                if (!data[username]) { data[username] = { date: today, signed: false, attempts: MAX_ATTEMPTS,
-                        questionId: null }; }
-                if (data[username].date !== today) { data[username] = { date: today, signed: false, attempts: MAX_ATTEMPTS,
-                        questionId: null }; }
+                if (!data[username]) { data[username] = { date: today, attempts: MAX_ATTEMPTS_PER_DAY, signed: false }; }
+                if (data[username].date !== today) { data[username] = { date: today, attempts: MAX_ATTEMPTS_PER_DAY, signed: false }; }
                 Object.assign(data[username], updates);
-                saveQuizData(data);
-            }
-
-            // 签到历史
-            function getSigninHistory(username) {
-                try { const raw = localStorage.getItem(SIGNIN_HISTORY_KEY); if (raw) { const d = JSON.parse(raw); return d[
-                            username] || []; } } catch (_) {}
-                return [];
-            }
-
-            function addSigninHistory(username, date) {
-                let all = {};
-                try { const raw = localStorage.getItem(SIGNIN_HISTORY_KEY); if (raw) all = JSON.parse(raw); } catch (_) {}
-                if (!all[username]) all[username] = [];
-                all[username].push(date);
-                localStorage.setItem(SIGNIN_HISTORY_KEY, JSON.stringify(all));
+                saveSigninData(data);
             }
 
             // 站车风采
@@ -565,16 +413,12 @@
                 { id: 5, icon: '🚇', name: '固原地铁 A 型车', desc: '6节编组，最高时速80km/h，采用永磁同步电机与节能空调，绿色环保，噪音更低。' },
                 { id: 6, icon: '🛤️', name: '智慧运维系统', desc: '基于大数据与AI的列车智能运维平台，实时监测车辆状态，保障运营安全可靠。' }
             ];
-
             function loadScenery() {
-                try { const raw = localStorage.getItem(SCENERY_STORAGE_KEY); if (raw) { const d = JSON.parse(raw); if (Array
-                            .isArray(d) && d.length) return d; } } catch (_) {}
+                try { const raw = localStorage.getItem(SCENERY_STORAGE_KEY); if (raw) { const d = JSON.parse(raw); if (Array.isArray(d) && d.length) return d; } } catch (_) {}
                 localStorage.setItem(SCENERY_STORAGE_KEY, JSON.stringify(DEFAULT_SCENERY));
                 return DEFAULT_SCENERY.slice();
             }
-
             function saveScenery(items) { localStorage.setItem(SCENERY_STORAGE_KEY, JSON.stringify(items)); }
-
             function getNextSceneryId(items) { if (!items.length) return 1; return Math.max(...items.map(i => i.id)) + 1; }
 
             // ===== DOM 引用 =====
@@ -621,31 +465,27 @@
             const forgotSuccess = document.getElementById('forgotSuccess');
             const forgotSuccessMessage = document.getElementById('forgotSuccessMessage');
 
+            // 签到模态框
             const quizModal = document.getElementById('quizModal');
-            const quizQuestion = document.getElementById('quizQuestion');
-            const quizOptions = document.getElementById('quizOptions');
-            const quizDate = document.getElementById('quizDate');
-            const quizAttempts = document.getElementById('quizAttempts');
-            const quizStatusMsg = document.getElementById('quizStatusMsg');
-            const quizResult = document.getElementById('quizResult');
+            const quizProgress = document.getElementById('quizProgress');
+            const quizTimer = document.getElementById('quizTimer');
+            const questionNumber = document.getElementById('questionNumber');
+            const questionText = document.getElementById('questionText');
+            const answerInput = document.getElementById('answerInput');
+            const feedback = document.getElementById('feedback');
+            const correctCount = document.getElementById('correctCount');
+            const wrongCount = document.getElementById('wrongCount');
+            const scoreDisplay = document.getElementById('scoreDisplay');
             const closeQuizBtn = document.getElementById('closeQuizBtn');
 
+            // 管理面板
             const adminModal = document.getElementById('adminModal');
             const closeAdminBtn = document.getElementById('closeAdminBtn');
             const userTableBody = document.getElementById('userTableBody');
             const sceneryAdminList = document.getElementById('sceneryAdminList');
             const addSceneryBtn = document.getElementById('addSceneryBtn');
-            const questionList = document.getElementById('questionList');
-            const shuffleDailyBtn = document.getElementById('shuffleDailyBtn');
-            const refreshQuestionsBtn = document.getElementById('refreshQuestionsBtn');
-            const addQuestionBtn = document.getElementById('addQuestionBtn');
-            const clearQuestionsBtn = document.getElementById('clearQuestionsBtn');
-            const uploadQuestionFile = document.getElementById('uploadQuestionFile');
-            const uploadQuestionsBtn = document.getElementById('uploadQuestionsBtn');
-            const questionCountInfo = document.getElementById('questionCountInfo');
             const tabBtns = document.querySelectorAll('.tab-btn');
-            const tabContents = { users: document.getElementById('tabUsers'), scenery: document.getElementById(
-                    'tabScenery'), questions: document.getElementById('tabQuestions') };
+            const tabContents = { users: document.getElementById('tabUsers'), scenery: document.getElementById('tabScenery') };
 
             const editSceneryModal = document.getElementById('editSceneryModal');
             const closeEditSceneryBtn = document.getElementById('closeEditSceneryBtn');
@@ -658,36 +498,28 @@
             const editSceneryErrorMessage = document.getElementById('editSceneryErrorMessage');
             const editSceneryTitle = document.getElementById('editSceneryTitle');
 
-            const editQuestionModal = document.getElementById('editQuestionModal');
-            const closeEditQuestionBtn = document.getElementById('closeEditQuestionBtn');
-            const saveQuestionBtn = document.getElementById('saveQuestionBtn');
-            const editQuestionId = document.getElementById('editQuestionId');
-            const editQuestionText = document.getElementById('editQuestionText');
-            const editQuestionOptions = document.getElementById('editQuestionOptions');
-            const editQuestionAnswer = document.getElementById('editQuestionAnswer');
-            const editQuestionError = document.getElementById('editQuestionError');
-            const editQuestionErrorMessage = document.getElementById('editQuestionErrorMessage');
-            const editQuestionTitle = document.getElementById('editQuestionTitle');
-
             const toastContainer = document.getElementById('toastContainer');
 
             let currentUser = null;
             let clockInterval = null;
+
+            // ===== 签到答题相关状态 =====
+            let quizQuestions = [];
+            let currentIndex = 0;
+            let correctAnswers = 0;
+            let wrongAnswers = 0;
+            let timer = TIME_LIMIT;
+            let timerInterval = null;
             let quizActive = false;
+            let isWaiting = false; // 是否在等待反馈后跳转
 
-            // ===== 工具 =====
+            // ===== 工具函数 =====
             function formatDate(now) {
-                const y = now.getFullYear(),
-                    m = String(now.getMonth() + 1).padStart(2, '0'),
-                    d = String(now.getDate()).padStart(2, '0');
-                return y + '年' + m + '月' + d + '日 ' + ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'][now.getDay()];
+                const y = now.getFullYear(), m = String(now.getMonth()+1).padStart(2,'0'), d = String(now.getDate()).padStart(2,'0');
+                return y+'年'+m+'月'+d+'日 '+['星期日','星期一','星期二','星期三','星期四','星期五','星期六'][now.getDay()];
             }
-
-            function formatTime(now) { return String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes())
-                    .padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0'); }
-
-            function formatBalance(val) { return '¥' + Number(val).toFixed(2); }
-
+            function formatTime(now) { return String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')+':'+String(now.getSeconds()).padStart(2,'0'); }
+            function formatBalance(val) { return '¥'+Number(val).toFixed(2); }
             function showToast(msg, icon) {
                 icon = icon || 'ℹ️';
                 const t = document.createElement('div');
@@ -700,17 +532,296 @@
                     setTimeout(() => { if (t.parentNode) t.parentNode.removeChild(t); }, 400);
                 }, 2800);
             }
-
             function closeAllModals() {
                 registerModal.classList.remove('active');
                 adminModal.classList.remove('active');
                 editSceneryModal.classList.remove('active');
-                editQuestionModal.classList.remove('active');
                 forgotModal.classList.remove('active');
                 quizModal.classList.remove('active');
             }
 
-            // ===== 渲染函数 =====
+            // ===== 生成随机题目（10以内四则运算） =====
+            function generateQuestion() {
+                const ops = ['+', '-', '*', '/'];
+                let op, a, b, answer, symbol;
+                let attempts = 0;
+                while (attempts < 30) {
+                    op = ops[Math.floor(Math.random() * ops.length)];
+                    a = Math.floor(Math.random() * 11); // 0-10
+                    b = Math.floor(Math.random() * 11);
+                    if (op === '+') {
+                        answer = a + b;
+                        symbol = '+';
+                        if (answer <= 20) break;
+                    } else if (op === '-') {
+                        if (a >= b) {
+                            answer = a - b;
+                            symbol = '-';
+                            break;
+                        }
+                    } else if (op === '*') {
+                        answer = a * b;
+                        symbol = '×';
+                        if (answer <= 100) break;
+                    } else if (op === '/') {
+                        if (b !== 0 && a % b === 0) {
+                            answer = a / b;
+                            symbol = '÷';
+                            break;
+                        }
+                    }
+                    attempts++;
+                }
+                // 保底：用加法
+                if (attempts >= 30) {
+                    a = Math.floor(Math.random() * 11);
+                    b = Math.floor(Math.random() * 11);
+                    answer = a + b;
+                    symbol = '+';
+                }
+                const text = a + ' ' + symbol + ' ' + b + ' = ?';
+                return { text, answer };
+            }
+
+            function generateQuizQuestions(count) {
+                const qs = [];
+                for (let i = 0; i < count; i++) {
+                    qs.push(generateQuestion());
+                }
+                return qs;
+            }
+
+            // ===== 渲染签到UI =====
+            function updateSigninUI() {
+                if (!currentUser || currentUser === 'admin') { signinEntry.style.display = 'none'; return; }
+                signinEntry.style.display = 'block';
+                const status = getUserSigninStatus(currentUser);
+                if (status.signed) {
+                    signinDesc.textContent = '✅ 今日已签到';
+                    signinEntry.classList.add('disabled');
+                } else if (status.attempts <= 0) {
+                    signinDesc.textContent = '❌ 今日机会已用完';
+                    signinEntry.classList.add('disabled');
+                } else {
+                    signinDesc.textContent = `⌨️ 剩余 ${status.attempts} 次机会`;
+                    signinEntry.classList.remove('disabled');
+                }
+            }
+
+            // ===== 开始签到挑战 =====
+            function openQuizModal() {
+                if (!currentUser || currentUser === 'admin') { showToast('普通用户专享', 'ℹ️'); return; }
+                const status = getUserSigninStatus(currentUser);
+                if (status.signed) { showToast('今日已签到，明天再来吧！', '✅'); return; }
+                if (status.attempts <= 0) { showToast('今日机会已用完，明天再来！', '❌'); return; }
+
+                // 重置状态
+                quizQuestions = generateQuizQuestions(TOTAL_QUESTIONS);
+                currentIndex = 0;
+                correctAnswers = 0;
+                wrongAnswers = 0;
+                timer = TIME_LIMIT;
+                quizActive = true;
+                isWaiting = false;
+
+                // 更新UI
+                quizModal.classList.add('active');
+                renderQuestion();
+                updateStats();
+                startTimer();
+                answerInput.value = '';
+                answerInput.disabled = false;
+                answerInput.focus();
+                feedback.textContent = '';
+                feedback.className = 'feedback';
+            }
+
+            function renderQuestion() {
+                if (currentIndex >= TOTAL_QUESTIONS) {
+                    finishQuiz();
+                    return;
+                }
+                const q = quizQuestions[currentIndex];
+                questionNumber.textContent = '第 ' + (currentIndex + 1) + ' 题';
+                questionText.textContent = q.text;
+                quizProgress.textContent = (currentIndex + 1) + '/' + TOTAL_QUESTIONS;
+                answerInput.value = '';
+                answerInput.disabled = false;
+                answerInput.focus();
+                feedback.textContent = '';
+                feedback.className = 'feedback';
+                isWaiting = false;
+            }
+
+            function updateStats() {
+                correctCount.textContent = correctAnswers;
+                wrongCount.textContent = wrongAnswers;
+                scoreDisplay.textContent = correctAnswers;
+            }
+
+            function startTimer() {
+                if (timerInterval) clearInterval(timerInterval);
+                timer = TIME_LIMIT;
+                updateTimerDisplay();
+                timerInterval = setInterval(() => {
+                    timer--;
+                    updateTimerDisplay();
+                    if (timer <= 0) {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        // 超时，判定失败
+                        if (quizActive) {
+                            finishQuiz(true); // 超时结束
+                        }
+                    }
+                }, 1000);
+            }
+
+            function updateTimerDisplay() {
+                quizTimer.textContent = '⏳ ' + timer + 's';
+                if (timer <= 5) {
+                    quizTimer.style.color = '#d94a4a';
+                } else {
+                    quizTimer.style.color = '#d94a4a';
+                }
+            }
+
+            function stopTimer() {
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+            }
+
+            // ===== 提交答案 =====
+            function handleAnswer() {
+                if (!quizActive || isWaiting) return;
+                if (currentIndex >= TOTAL_QUESTIONS) return;
+                const input = answerInput.value.trim();
+                if (input === '') return;
+                const userAns = Number(input);
+                if (isNaN(userAns)) { showToast('请输入有效数字', '⚠️'); return; }
+
+                const q = quizQuestions[currentIndex];
+                const correct = userAns === q.answer;
+
+                // 禁用输入
+                answerInput.disabled = true;
+
+                if (correct) {
+                    correctAnswers++;
+                    feedback.textContent = '✅ 正确！';
+                    feedback.className = 'feedback correct';
+                } else {
+                    wrongAnswers++;
+                    feedback.textContent = '❌ 错误，正确答案是 ' + q.answer;
+                    feedback.className = 'feedback wrong';
+                }
+                updateStats();
+                isWaiting = true;
+
+                // 延迟后进入下一题
+                setTimeout(() => {
+                    if (!quizActive) return;
+                    currentIndex++;
+                    if (currentIndex >= TOTAL_QUESTIONS) {
+                        finishQuiz(false);
+                    } else {
+                        renderQuestion();
+                        // 重新启用输入
+                        answerInput.disabled = false;
+                        answerInput.focus();
+                    }
+                }, 600);
+            }
+
+            // ===== 结束答题（正常完成或超时） =====
+            function finishQuiz(timeout) {
+                if (!quizActive) return;
+                quizActive = false;
+                stopTimer();
+                answerInput.disabled = true;
+
+                const status = getUserSigninStatus(currentUser);
+                const remaining = status.attempts - 1;
+                let success = false;
+
+                if (timeout) {
+                    // 超时未完成
+                    success = false;
+                    feedback.textContent = '⏰ 时间到！';
+                    feedback.className = 'feedback wrong';
+                } else {
+                    // 正常完成，判断是否达标
+                    success = correctAnswers >= PASS_SCORE;
+                    if (success) {
+                        feedback.textContent = '🎉 达标！签到成功！';
+                        feedback.className = 'feedback correct';
+                    } else {
+                        feedback.textContent = '😞 未达标（需要 ≥' + PASS_SCORE + ' 题正确）';
+                        feedback.className = 'feedback wrong';
+                    }
+                }
+
+                // 更新签到状态
+                if (success) {
+                    // 签到成功：加余额，标记已签到
+                    const user = getUser(currentUser);
+                    const newBalance = (user.balance || 0) + SIGNIN_AMOUNT;
+                    updateUser(currentUser, { balance: newBalance });
+                    updateUserSigninStatus(currentUser, { signed: true, attempts: remaining });
+                    displayBalance.textContent = formatBalance(newBalance);
+                    showToast('签到成功！获得 ¥' + SIGNIN_AMOUNT, '💰');
+                } else {
+                    // 消耗一次机会
+                    updateUserSigninStatus(currentUser, { attempts: remaining });
+                    if (remaining <= 0) {
+                        showToast('今日机会已用完', '❌');
+                    } else {
+                        showToast('还剩 ' + remaining + ' 次机会', 'ℹ️');
+                    }
+                }
+                updateSigninUI();
+                // 显示结果
+                quizProgress.textContent = (currentIndex + 1) + '/' + TOTAL_QUESTIONS;
+                // 禁用关闭按钮功能，让用户手动关闭
+                // 但我们要保持模态框打开，显示结果
+                // 可以额外显示一个结果信息
+                const resultMsg = document.createElement('div');
+                resultMsg.style.marginTop = '16px';
+                resultMsg.style.fontSize = '18px';
+                resultMsg.style.fontWeight = '700';
+                resultMsg.style.textAlign = 'center';
+                if (success) {
+                    resultMsg.style.color = '#27ae60';
+                    resultMsg.textContent = '✅ 签到成功！余额 +' + SIGNIN_AMOUNT;
+                } else {
+                    resultMsg.style.color = '#e74c3c';
+                    resultMsg.textContent = '❌ 签到失败，剩余次数 ' + Math.max(0, remaining);
+                }
+                // 插入到footer前
+                const footer = document.querySelector('.quiz-footer');
+                footer.parentNode.insertBefore(resultMsg, footer);
+                // 5秒后自动清除？让用户手动关闭。
+            }
+
+            // ===== 关闭签到模态框 =====
+            function closeQuizModal() {
+                stopTimer();
+                quizActive = false;
+                quizModal.classList.remove('active');
+                // 清除可能存在的动态消息
+                const extra = document.querySelector('.quiz-footer ~ div[style]');
+                if (extra) extra.remove();
+                // 重置输入
+                answerInput.disabled = false;
+                answerInput.value = '';
+                feedback.textContent = '';
+                feedback.className = 'feedback';
+                if (currentUser) updateSigninUI();
+            }
+
+            // ===== 渲染线路 =====
             function renderLines() {
                 if (!lineGrid) return;
                 lineGrid.innerHTML = '';
@@ -718,16 +829,15 @@
                     const card = document.createElement('div');
                     card.className = 'line-card';
                     const stationsHtml = line.stations.map((s, idx) => {
-                        let arrow = (idx < line.stations.length - 1) ? ' <span class="dir-icon">→</span> ' :
-                            '';
+                        let arrow = (idx < line.stations.length - 1) ? ' <span class="dir-icon">→</span> ' : '';
                         return '<span class="station">' + s + arrow + '</span>';
                     }).join('');
-                    card.innerHTML =
-                        `<div class="line-header"><div class="line-color" style="background:${line.color};"></div><span class="line-name">${line.name}<span class="line-code">${line.code}</span></span></div><div class="line-stations">${stationsHtml}</div>`;
+                    card.innerHTML = `<div class="line-header"><div class="line-color" style="background:${line.color};"></div><span class="line-name">${line.name}<span class="line-code">${line.code}</span></span></div><div class="line-stations">${stationsHtml}</div>`;
                     lineGrid.appendChild(card);
                 });
             }
 
+            // ===== 管理面板 - 用户 =====
             function renderUserTable() {
                 const users = loadUsers();
                 const names = Object.keys(users);
@@ -735,16 +845,13 @@
                 names.forEach(uname => {
                     const u = users[uname];
                     const tr = document.createElement('tr');
-                    let actions =
-                        `<button class="btn-edit" data-username="${uname}" data-action="changePwd">改密码</button><button class="btn-balance" data-username="${uname}" data-action="changeBalance">改余额</button>`;
+                    let actions = `<button class="btn-edit" data-username="${uname}" data-action="changePwd">改密码</button><button class="btn-balance" data-username="${uname}" data-action="changeBalance">改余额</button>`;
                     if (uname !== 'admin') {
-                        actions +=
-                            `<button class="btn-delete" data-username="${uname}" data-action="delete">注销</button>`;
+                        actions += `<button class="btn-delete" data-username="${uname}" data-action="delete">注销</button>`;
                     } else {
                         actions += `<span style="color:#aaa;font-size:12px;">(管理员)</span>`;
                     }
-                    tr.innerHTML =
-                        `<td><strong>${uname}</strong></td><td>${formatBalance(u.balance)}</td><td><div class="table-actions">${actions}</div></td>`;
+                    tr.innerHTML = `<td><strong>${uname}</strong></td><td>${formatBalance(u.balance)}</td><td><div class="table-actions">${actions}</div></td>`;
                     userTableBody.appendChild(tr);
                 });
                 userTableBody.querySelectorAll('[data-action]').forEach(btn => {
@@ -754,14 +861,42 @@
                 });
             }
 
+            function handleUserAction(action, username) {
+                if (action === 'changePwd') {
+                    const p = prompt('请输入新密码（至少6个字符）：');
+                    if (p === null) return;
+                    if (p.length < 6) { showToast('密码至少6个字符', '⚠️'); return; }
+                    if (updateUser(username, { password: p })) { showToast('密码已修改', '✅'); renderUserTable(); } else showToast('修改失败', '❌');
+                } else if (action === 'changeBalance') {
+                    const input = prompt('请输入新的余额（数字）：');
+                    if (input === null) return;
+                    const val = parseFloat(input);
+                    if (isNaN(val) || val < 0) { showToast('请输入有效数字', '⚠️'); return; }
+                    if (updateUser(username, { balance: val })) {
+                        showToast('余额已更新', '✅');
+                        renderUserTable();
+                        if (username === currentUser) { const u = getUser(username); displayBalance.textContent = formatBalance(u.balance); }
+                    } else showToast('修改失败', '❌');
+                } else if (action === 'delete') {
+                    if (username === 'admin') { showToast('不能注销管理员', '⚠️'); return; }
+                    if (confirm('确定注销用户 ' + username + ' 吗？')) {
+                        if (deleteUser(username)) {
+                            showToast('已注销', '🗑️');
+                            renderUserTable();
+                            if (username === currentUser) handleLogout();
+                        } else showToast('注销失败', '❌');
+                    }
+                }
+            }
+
+            // ===== 管理面板 - 站车风采 =====
             function renderSceneryAdmin() {
                 const items = loadScenery();
                 sceneryAdminList.innerHTML = '';
                 items.forEach(item => {
                     const div = document.createElement('div');
                     div.className = 'scenery-item-admin';
-                    div.innerHTML =
-                        `<div class="info"><span class="icon">${item.icon}</span><span class="name">${item.name}</span><span class="desc">${item.desc}</span></div><div class="actions"><button class="btn-edit" data-id="${item.id}">编辑</button><button class="btn-delete" data-id="${item.id}">删除</button></div>`;
+                    div.innerHTML = `<div class="info"><span class="icon">${item.icon}</span><span class="name">${item.name}</span><span class="desc">${item.desc}</span></div><div class="actions"><button class="btn-edit" data-id="${item.id}">编辑</button><button class="btn-delete" data-id="${item.id}">删除</button></div>`;
                     sceneryAdminList.appendChild(div);
                 });
                 sceneryAdminList.querySelectorAll('.btn-edit').forEach(btn => {
@@ -774,56 +909,90 @@
                 });
             }
 
-            function renderQuestionList() {
-                const bank = loadQuestionBank();
-                questionList.innerHTML = '';
-                bank.forEach(q => {
-                    const div = document.createElement('div');
-                    div.className = 'question-item';
-                    const opts = q.options.map((o, i) => {
-                        const label = String.fromCharCode(65 + i);
-                        const isAns = i === q.answer;
-                        return `<span class="opt-text">${label}. ${o}${isAns ? ' ✓' : ''}</span>`;
-                    }).join(' ');
-                    div.innerHTML =
-                        `<div class="q-info"><div class="q-text">#${q.id} ${q.question}</div><div class="q-options">${opts}</div><div class="q-answer">✅ 正确答案: ${String.fromCharCode(65 + q.answer)}</div></div><div class="q-actions"><button class="btn-edit" data-id="${q.id}">编辑</button><button class="btn-delete" data-id="${q.id}">删除</button></div>`;
-                    questionList.appendChild(div);
-                });
-                questionCountInfo.textContent = '共 ' + bank.length + ' 题';
-                questionList.querySelectorAll('.btn-edit').forEach(btn => {
-                    btn.addEventListener('click', function() { openEditQuestion(parseInt(this.dataset.id)); });
-                });
-                questionList.querySelectorAll('.btn-delete').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        if (confirm('确定删除此题？')) deleteQuestion(parseInt(this.dataset.id));
-                    });
-                });
-                // 更新签到UI（题库变化可能影响签到状态）
-                if (currentUser && currentUser !== 'admin') updateSigninUI();
+            function openEditScenery(id) {
+                const items = loadScenery();
+                const item = items.find(i => i.id === id);
+                if (item) {
+                    editSceneryTitle.textContent = '✏️ 编辑风采';
+                    editSceneryId.value = item.id;
+                    editSceneryIcon.value = item.icon || '';
+                    editSceneryName.value = item.name || '';
+                    editSceneryDesc.value = item.desc || '';
+                } else {
+                    editSceneryTitle.textContent = '➕ 新增风采';
+                    editSceneryId.value = '';
+                    editSceneryIcon.value = '';
+                    editSceneryName.value = '';
+                    editSceneryDesc.value = '';
+                }
+                editSceneryError.classList.remove('show');
+                editSceneryModal.classList.add('active');
             }
 
-            // ===== 时钟 =====
-            function updateClock() {
-                const now = new Date();
-                if (currentTimeEl) currentTimeEl.textContent = formatTime(now);
-                if (currentDateEl) currentDateEl.textContent = formatDate(now);
+            function closeEditScenery() { editSceneryModal.classList.remove('active'); editSceneryError.classList.remove('show'); }
+
+            function saveSceneryItem() {
+                const id = editSceneryId.value.trim(), icon = editSceneryIcon.value.trim(), name = editSceneryName.value.trim(), desc = editSceneryDesc.value.trim();
+                editSceneryError.classList.remove('show');
+                if (!name) { editSceneryErrorMessage.textContent = '名称不能为空'; editSceneryError.classList.add('show'); return; }
+                let items = loadScenery();
+                if (id) {
+                    const idx = items.findIndex(i => i.id === parseInt(id));
+                    if (idx !== -1) { items[idx] = { ...items[idx], icon, name, desc }; saveScenery(items); showToast('已更新', '✅'); } else { showToast('未找到', '❌'); return; }
+                } else {
+                    items.push({ id: getNextSceneryId(items), icon, name, desc });
+                    saveScenery(items);
+                    showToast('已添加', '✅');
+                }
+                closeEditScenery();
+                renderSceneryAdmin();
             }
 
-            function startClock() { if (clockInterval) clearInterval(clockInterval);
-                updateClock();
-                clockInterval = setInterval(updateClock, 1000); }
+            function deleteSceneryItem(id) {
+                let items = loadScenery();
+                items = items.filter(i => i.id !== id);
+                saveScenery(items);
+                renderSceneryAdmin();
+                showToast('已删除', '🗑️');
+            }
 
-            function stopClock() { if (clockInterval) { clearInterval(clockInterval);
-                    clockInterval = null; } }
+            // ===== 站车风采浏览 =====
+            function openSceneryViewer() {
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay active';
+                modal.style.zIndex = '1000';
+                const items = loadScenery();
+                let html = `<div class="modal-card" style="max-width:600px;"><div class="modal-title">🚉 站车风采</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;">`;
+                items.forEach(item => {
+                    html += `<div style="background:#f8fafc;border-radius:14px;padding:16px 14px;border:1px solid #eef2f7;"><span style="font-size:28px;display:block;margin-bottom:4px;">${item.icon}</span><div style="font-weight:700;font-size:16px;color:#0b2a4a;">${item.name}</div><div style="font-size:13px;color:#5a6a7a;margin-top:2px;line-height:1.4;">${item.desc}</div></div>`;
+                });
+                html += `</div><div class="form-actions"><button class="btn-cancel" id="closeSceneryViewerBtn" style="flex:1;">关闭</button></div></div>`;
+                modal.innerHTML = html;
+                document.body.appendChild(modal);
+                modal.querySelector('#closeSceneryViewerBtn').addEventListener('click', function() { modal.remove(); });
+                modal.addEventListener('click', function(e) { if (e.target === this) modal.remove(); });
+            }
+
+            // ===== 管理面板打开/关闭 =====
+            function openAdminPanel() {
+                if (currentUser !== 'admin') { showToast('权限不足', '⛔'); return; }
+                renderUserTable();
+                renderSceneryAdmin();
+                adminModal.classList.add('active');
+                switchTab('users');
+            }
+            function closeAdminPanel() { adminModal.classList.remove('active'); }
+            function switchTab(tabName) {
+                tabBtns.forEach(btn => { const t = btn.dataset.tab; btn.classList.toggle('active', t === tabName); });
+                Object.keys(tabContents).forEach(key => { tabContents[key].classList.toggle('active', key === tabName); });
+            }
 
             // ===== 登录 / 登出 =====
             function handleLogin(e) {
                 e.preventDefault();
-                const username = loginUsername.value.trim(),
-                    password = loginPassword.value.trim();
+                const username = loginUsername.value.trim(), password = loginPassword.value.trim();
                 loginError.classList.remove('show');
-                if (!username || !password) { errorMessage.textContent = '请输入账号和密码';
-                    loginError.classList.add('show'); return; }
+                if (!username || !password) { errorMessage.textContent = '请输入账号和密码'; loginError.classList.add('show'); return; }
                 const user = getUser(username);
                 if (user && user.password === password) { loginSuccess(username); } else {
                     errorMessage.textContent = '账号或密码错误，请重新输入';
@@ -863,39 +1032,31 @@
                 showToast('已安全退出', '👋');
             }
 
+            // ===== 时钟 =====
+            function updateClock() {
+                const now = new Date();
+                if (currentTimeEl) currentTimeEl.textContent = formatTime(now);
+                if (currentDateEl) currentDateEl.textContent = formatDate(now);
+            }
+            function startClock() { if (clockInterval) clearInterval(clockInterval); updateClock(); clockInterval = setInterval(updateClock, 1000); }
+            function stopClock() { if (clockInterval) { clearInterval(clockInterval); clockInterval = null; } }
+
             // ===== 注册 =====
             function clearRegisterForm() {
-                regUsername.value = '';
-                regPassword.value = '';
-                regConfirm.value = '';
-                regVerify.value = '';
-                regError.classList.remove('show');
-                regSuccess.classList.remove('show');
+                regUsername.value = ''; regPassword.value = ''; regConfirm.value = ''; regVerify.value = '';
+                regError.classList.remove('show'); regSuccess.classList.remove('show');
             }
-
-            function openRegisterModal() { clearRegisterForm();
-                registerModal.classList.add('active'); }
-
-            function closeRegisterModal() { registerModal.classList.remove('active');
-                clearRegisterForm(); }
+            function openRegisterModal() { clearRegisterForm(); registerModal.classList.add('active'); }
+            function closeRegisterModal() { registerModal.classList.remove('active'); clearRegisterForm(); }
 
             function handleRegister() {
-                const username = regUsername.value.trim(),
-                    password = regPassword.value.trim(),
-                    confirm = regConfirm.value.trim(),
-                    verify = regVerify.value.trim();
-                regError.classList.remove('show');
-                regSuccess.classList.remove('show');
-                if (!username || username.length < 2) { regErrorMessage.textContent = '账号至少需要2个字符';
-                    regError.classList.add('show'); return; }
-                if (userExists(username)) { regErrorMessage.textContent = '该账号已存在，请换一个';
-                    regError.classList.add('show'); return; }
-                if (!password || password.length < 6) { regErrorMessage.textContent = '密码至少需要6个字符';
-                    regError.classList.add('show'); return; }
-                if (password !== confirm) { regErrorMessage.textContent = '两次输入的密码不一致';
-                    regError.classList.add('show'); return; }
-                if (!verify) { regErrorMessage.textContent = '请回答验证问题';
-                    regError.classList.add('show'); return; }
+                const username = regUsername.value.trim(), password = regPassword.value.trim(), confirm = regConfirm.value.trim(), verify = regVerify.value.trim();
+                regError.classList.remove('show'); regSuccess.classList.remove('show');
+                if (!username || username.length < 2) { regErrorMessage.textContent = '账号至少需要2个字符'; regError.classList.add('show'); return; }
+                if (userExists(username)) { regErrorMessage.textContent = '该账号已存在，请换一个'; regError.classList.add('show'); return; }
+                if (!password || password.length < 6) { regErrorMessage.textContent = '密码至少需要6个字符'; regError.classList.add('show'); return; }
+                if (password !== confirm) { regErrorMessage.textContent = '两次输入的密码不一致'; regError.classList.add('show'); return; }
+                if (!verify) { regErrorMessage.textContent = '请回答验证问题'; regError.classList.add('show'); return; }
                 if (verify.trim().toUpperCase() !== VERIFY_ANSWER.toUpperCase()) {
                     regErrorMessage.textContent = '验证答案错误，请重新输入';
                     regError.classList.add('show');
@@ -906,8 +1067,7 @@
                 if (createUser(username, password)) {
                     regSuccessMessage.textContent = '🎉 注册成功！即将自动登录...';
                     regSuccess.classList.add('show');
-                    setTimeout(() => { closeRegisterModal();
-                        loginSuccess(username); }, 1200);
+                    setTimeout(() => { closeRegisterModal(); loginSuccess(username); }, 1200);
                 } else {
                     regErrorMessage.textContent = '注册失败，请稍后重试';
                     regError.classList.add('show');
@@ -916,32 +1076,19 @@
 
             // ===== 忘记密码 =====
             function openForgotModal() {
-                forgotUsername.value = '';
-                forgotVerify.value = '';
-                forgotNewPassword.value = '';
-                forgotError.classList.remove('show');
-                forgotSuccess.classList.remove('show');
+                forgotUsername.value = ''; forgotVerify.value = ''; forgotNewPassword.value = '';
+                forgotError.classList.remove('show'); forgotSuccess.classList.remove('show');
                 forgotModal.classList.add('active');
             }
-
-            function closeForgotModal() { forgotModal.classList.remove('active');
-                forgotError.classList.remove('show');
-                forgotSuccess.classList.remove('show'); }
+            function closeForgotModal() { forgotModal.classList.remove('active'); forgotError.classList.remove('show'); forgotSuccess.classList.remove('show'); }
 
             function handleForgot() {
-                const username = forgotUsername.value.trim(),
-                    verify = forgotVerify.value.trim(),
-                    newPwd = forgotNewPassword.value.trim();
-                forgotError.classList.remove('show');
-                forgotSuccess.classList.remove('show');
-                if (!username) { forgotErrorMessage.textContent = '请输入账号';
-                    forgotError.classList.add('show'); return; }
-                if (!userExists(username)) { forgotErrorMessage.textContent = '该账号不存在';
-                    forgotError.classList.add('show'); return; }
-                if (username === 'admin') { forgotErrorMessage.textContent = '管理员账号请通过其他方式重置';
-                    forgotError.classList.add('show'); return; }
-                if (!verify) { forgotErrorMessage.textContent = '请回答验证问题';
-                    forgotError.classList.add('show'); return; }
+                const username = forgotUsername.value.trim(), verify = forgotVerify.value.trim(), newPwd = forgotNewPassword.value.trim();
+                forgotError.classList.remove('show'); forgotSuccess.classList.remove('show');
+                if (!username) { forgotErrorMessage.textContent = '请输入账号'; forgotError.classList.add('show'); return; }
+                if (!userExists(username)) { forgotErrorMessage.textContent = '该账号不存在'; forgotError.classList.add('show'); return; }
+                if (username === 'admin') { forgotErrorMessage.textContent = '管理员账号请通过其他方式重置'; forgotError.classList.add('show'); return; }
+                if (!verify) { forgotErrorMessage.textContent = '请回答验证问题'; forgotError.classList.add('show'); return; }
                 if (verify.trim().toUpperCase() !== VERIFY_ANSWER.toUpperCase()) {
                     forgotErrorMessage.textContent = '验证答案错误，请重新输入';
                     forgotError.classList.add('show');
@@ -949,429 +1096,15 @@
                     forgotVerify.focus();
                     return;
                 }
-                if (!newPwd || newPwd.length < 6) { forgotErrorMessage.textContent = '新密码至少需要6个字符';
-                    forgotError.classList.add('show'); return; }
+                if (!newPwd || newPwd.length < 6) { forgotErrorMessage.textContent = '新密码至少需要6个字符'; forgotError.classList.add('show'); return; }
                 if (updateUser(username, { password: newPwd })) {
                     forgotSuccessMessage.textContent = '✅ 密码已重置，请使用新密码登录';
                     forgotSuccess.classList.add('show');
-                    setTimeout(() => { closeForgotModal();
-                        showToast('密码已重置，请重新登录', '🔑'); }, 1500);
+                    setTimeout(() => { closeForgotModal(); showToast('密码已重置，请重新登录', '🔑'); }, 1500);
                 } else {
                     forgotErrorMessage.textContent = '重置失败，请稍后重试';
                     forgotError.classList.add('show');
                 }
-            }
-
-            // ===== 签到 + 答题 =====
-            function updateSigninUI() {
-                if (!currentUser || currentUser === 'admin') { signinEntry.style.display = 'none'; return; }
-                signinEntry.style.display = 'block';
-                const bank = loadQuestionBank();
-                if (!bank.length) {
-                    signinDesc.textContent = '📚 题库更新中，今日无法签到';
-                    signinEntry.classList.add('disabled');
-                    return;
-                }
-                const status = getUserQuizStatus(currentUser);
-                if (status.signed) {
-                    signinDesc.textContent = '✅ 今日已签到';
-                    signinEntry.classList.add('disabled');
-                } else if (status.attempts <= 0) {
-                    signinDesc.textContent = '❌ 今日机会已用完';
-                    signinEntry.classList.add('disabled');
-                } else {
-                    signinDesc.textContent = `🧠 剩余 ${status.attempts} 次机会`;
-                    signinEntry.classList.remove('disabled');
-                }
-            }
-
-            function openQuizModal() {
-                if (!currentUser || currentUser === 'admin') { showToast('普通用户专享', 'ℹ️'); return; }
-                const bank = loadQuestionBank();
-                if (!bank.length) { showToast('题库为空，请管理员上传题库', '⚠️'); return; }
-                const status = getUserQuizStatus(currentUser);
-                if (status.signed) { showToast('今日已签到，明天再来吧！', '✅'); return; }
-                if (status.attempts <= 0) { showToast('今日机会已用完，明天再来！', '❌'); return; }
-
-                const dq = getDailyQuestionForToday();
-                if (!dq) { showToast('题库为空或无法抽题', '⚠️'); return; }
-                if (status.questionId !== dq.questionId) {
-                    updateUserQuizStatus(currentUser, { questionId: dq.questionId });
-                }
-                quizActive = true;
-                quizModal.classList.add('active');
-                renderQuiz(dq);
-            }
-
-            function renderQuiz(dq) {
-                const q = dq.question;
-                quizQuestion.textContent = q.question;
-                quizDate.textContent = getTodayStr();
-                const status = getUserQuizStatus(currentUser);
-                quizAttempts.textContent = status.attempts;
-                quizStatusMsg.textContent = '请选择答案';
-                quizResult.className = 'quiz-result-box';
-                quizResult.style.display = 'none';
-                quizResult.textContent = '';
-                quizOptions.innerHTML = '';
-                const labels = 'ABCDEFGHIJ'.split('');
-                q.options.forEach((opt, idx) => {
-                    const btn = document.createElement('button');
-                    btn.className = 'opt-btn';
-                    btn.innerHTML = `<span class="opt-label">${labels[idx]}.</span> ${opt}`;
-                    btn.dataset.idx = idx;
-                    btn.addEventListener('click', function() { handleQuizAnswer(idx); });
-                    quizOptions.appendChild(btn);
-                });
-            }
-function handleQuizAnswer(idx) {
-    if (!quizActive) return;
-    const status = getUserQuizStatus(currentUser);
-    if (status.signed || status.attempts <= 0) return;
-    const dq = getDailyQuestionForToday();
-    if (!dq) { showToast('题目加载失败', '⚠️'); return; }
-    const q = dq.question;
-    const correct = idx === q.answer;
-
-    // 禁用所有选项
-    document.querySelectorAll('.opt-btn').forEach(b => b.classList.add('disabled'));
-    const btns = document.querySelectorAll('.opt-btn');
-
-    // 答错时：只将选中的选项标红，不显示正确选项
-    btns.forEach((b, i) => {
-        if (i === idx && !correct) {
-            b.classList.add('wrong');
-        }
-        // 答对时，正确选项会在后面的 correct 分支中标绿
-    });
-
-    const newAttempts = status.attempts - 1;
-
-    if (correct) {
-        // 答对：显示正确选项绿色，签到成功
-        btns.forEach((b, i) => {
-            if (i === q.answer) b.classList.add('correct');
-        });
-        const user = getUser(currentUser);
-        const newBalance = (user.balance || 0) + SIGNIN_AMOUNT;
-        updateUser(currentUser, { balance: newBalance });
-        updateUserQuizStatus(currentUser, { signed: true, attempts: newAttempts });
-        addSigninHistory(currentUser, getTodayStr());
-        displayBalance.textContent = formatBalance(newBalance);
-        quizStatusMsg.textContent = '🎉 回答正确！签到成功！';
-        quizResult.className = 'quiz-result-box success';
-        quizResult.style.display = 'block';
-        quizResult.textContent = '✅ 恭喜获得 ¥' + SIGNIN_AMOUNT + '！';
-        quizActive = false;
-        showToast('签到成功！获得 ¥' + SIGNIN_AMOUNT, '💰');
-        updateSigninUI();
-        const u2 = getUser(currentUser);
-        if (u2) displayBalance.textContent = formatBalance(u2.balance);
-        return;
-    } else {
-        // 答错：只显示选中的错误为红色，不显示正确答案
-        updateUserQuizStatus(currentUser, { attempts: newAttempts });
-        const remaining = newAttempts;
-        quizAttempts.textContent = remaining;
-        if (remaining <= 0) {
-            quizStatusMsg.textContent = '❌ 机会已用完，签到失败';
-            quizResult.className = 'quiz-result-box fail';
-            quizResult.style.display = 'block';
-            quizResult.textContent = '💔 两次机会均未答对，明天再来吧！';
-            quizActive = false;
-            updateSigninUI();
-        } else {
-            quizStatusMsg.textContent = '❌ 回答错误，剩余 ' + remaining + ' 次机会';
-            quizResult.className = 'quiz-result-box info';
-            quizResult.style.display = 'block';
-            quizResult.textContent = '再想想，还有 ' + remaining + ' 次机会！';
-            // 1.5 秒后重新启用选项，并清除所有标记（包括红色）
-            setTimeout(() => {
-                document.querySelectorAll('.opt-btn').forEach(b => {
-                    b.classList.remove('disabled', 'correct', 'wrong');
-                });
-                quizResult.style.display = 'none';
-                quizStatusMsg.textContent = '请重新选择';
-                quizActive = true;
-            }, 1500);
-        }
-        updateSigninUI();
-    }
-}
-            function closeQuizModal() { quizModal.classList.remove('active');
-                quizActive = false; if (currentUser) updateSigninUI(); }
-
-            // ===== 管理面板 - 用户操作 =====
-            function handleUserAction(action, username) {
-                if (action === 'changePwd') {
-                    const p = prompt('请输入新密码（至少6个字符）：');
-                    if (p === null) return;
-                    if (p.length < 6) { showToast('密码至少6个字符', '⚠️'); return; }
-                    if (updateUser(username, { password: p })) { showToast('密码已修改', '✅');
-                        renderUserTable(); } else showToast('修改失败', '❌');
-                } else if (action === 'changeBalance') {
-                    const input = prompt('请输入新的余额（数字）：');
-                    if (input === null) return;
-                    const val = parseFloat(input);
-                    if (isNaN(val) || val < 0) { showToast('请输入有效数字', '⚠️'); return; }
-                    if (updateUser(username, { balance: val })) {
-                        showToast('余额已更新', '✅');
-                        renderUserTable();
-                        if (username === currentUser) { const u = getUser(username);
-                            displayBalance.textContent = formatBalance(u.balance); }
-                    } else showToast('修改失败', '❌');
-                } else if (action === 'delete') {
-                    if (username === 'admin') { showToast('不能注销管理员', '⚠️'); return; }
-                    if (confirm('确定注销用户 ' + username + ' 吗？')) {
-                        if (deleteUser(username)) {
-                            showToast('已注销', '🗑️');
-                            renderUserTable();
-                            if (username === currentUser) handleLogout();
-                        } else showToast('注销失败', '❌');
-                    }
-                }
-            }
-
-            // ===== 管理面板 - 站车风采 =====
-            function openEditScenery(id) {
-                const items = loadScenery();
-                const item = items.find(i => i.id === id);
-                if (item) {
-                    editSceneryTitle.textContent = '✏️ 编辑风采';
-                    editSceneryId.value = item.id;
-                    editSceneryIcon.value = item.icon || '';
-                    editSceneryName.value = item.name || '';
-                    editSceneryDesc.value = item.desc || '';
-                } else {
-                    editSceneryTitle.textContent = '➕ 新增风采';
-                    editSceneryId.value = '';
-                    editSceneryIcon.value = '';
-                    editSceneryName.value = '';
-                    editSceneryDesc.value = '';
-                }
-                editSceneryError.classList.remove('show');
-                editSceneryModal.classList.add('active');
-            }
-
-            function closeEditScenery() { editSceneryModal.classList.remove('active');
-                editSceneryError.classList.remove('show'); }
-
-            function saveSceneryItem() {
-                const id = editSceneryId.value.trim(),
-                    icon = editSceneryIcon.value.trim(),
-                    name = editSceneryName.value.trim(),
-                    desc = editSceneryDesc.value.trim();
-                editSceneryError.classList.remove('show');
-                if (!name) { editSceneryErrorMessage.textContent = '名称不能为空';
-                    editSceneryError.classList.add('show'); return; }
-                let items = loadScenery();
-                if (id) {
-                    const idx = items.findIndex(i => i.id === parseInt(id));
-                    if (idx !== -1) { items[idx] = { ...items[idx], icon, name, desc };
-                        saveScenery(items);
-                        showToast('已更新', '✅'); } else { showToast('未找到', '❌'); return; }
-                } else {
-                    items.push({ id: getNextSceneryId(items), icon, name, desc });
-                    saveScenery(items);
-                    showToast('已添加', '✅');
-                }
-                closeEditScenery();
-                renderSceneryAdmin();
-            }
-
-            function deleteSceneryItem(id) {
-                let items = loadScenery();
-                items = items.filter(i => i.id !== id);
-                saveScenery(items);
-                renderSceneryAdmin();
-                showToast('已删除', '🗑️');
-            }
-
-            // ===== 管理面板 - 题库管理 =====
-            function openEditQuestion(id) {
-                const bank = loadQuestionBank();
-                let item = bank.find(i => i.id === id);
-                if (item) {
-                    editQuestionTitle.textContent = '✏️ 编辑题目';
-                    editQuestionId.value = item.id;
-                    editQuestionText.value = item.question || '';
-                    editQuestionOptions.value = item.options.join('\n');
-                    editQuestionAnswer.value = String.fromCharCode(65 + item.answer);
-                } else {
-                    editQuestionTitle.textContent = '➕ 新增题目';
-                    editQuestionId.value = '';
-                    editQuestionText.value = '';
-                    editQuestionOptions.value = '';
-                    editQuestionAnswer.value = '';
-                }
-                editQuestionError.classList.remove('show');
-                editQuestionModal.classList.add('active');
-            }
-
-            function closeEditQuestion() { editQuestionModal.classList.remove('active');
-                editQuestionError.classList.remove('show'); }
-
-            function saveQuestionItem() {
-                const id = editQuestionId.value.trim(),
-                    text = editQuestionText.value.trim(),
-                    optsRaw = editQuestionOptions.value.trim(),
-                    ansRaw = editQuestionAnswer.value.trim().toUpperCase();
-                editQuestionError.classList.remove('show');
-                if (!text) { editQuestionErrorMessage.textContent = '题目内容不能为空';
-                    editQuestionError.classList.add('show'); return; }
-                const opts = optsRaw.split('\n').filter(s => s.trim()).map(s => s.trim());
-                if (opts.length < 6 || opts.length > 10) { editQuestionErrorMessage.textContent = '选项数量应为6-10个';
-                    editQuestionError.classList.add('show'); return; }
-                if (!ansRaw) { editQuestionErrorMessage.textContent = '请输入正确答案';
-                    editQuestionError.classList.add('show'); return; }
-                const ansIdx = ansRaw.charCodeAt(0) - 65;
-                if (ansIdx < 0 || ansIdx >= opts.length) { editQuestionErrorMessage.textContent = '正确答案字母超出选项范围';
-                    editQuestionError.classList.add('show'); return; }
-                let bank = loadQuestionBank();
-                if (id) {
-                    const idx = bank.findIndex(i => i.id === parseInt(id));
-                    if (idx !== -1) { bank[idx] = { ...bank[idx], question: text, options: opts, answer: ansIdx };
-                        saveQuestionBank(bank);
-                        showToast('题目已更新', '✅'); } else { showToast('未找到', '❌'); return; }
-                } else {
-                    bank.push({ id: getNextQId(bank), question: text, options: opts, answer: ansIdx });
-                    saveQuestionBank(bank);
-                    showToast('题目已添加', '✅');
-                }
-                closeEditQuestion();
-                renderQuestionList();
-                // 刷新每日题目（若当前没有则抽取）
-                if (!getDailyQuestion()) pickDailyQuestion();
-                updateSigninUI();
-            }
-
-            function deleteQuestion(id) {
-                let bank = loadQuestionBank();
-                bank = bank.filter(i => i.id !== id);
-                saveQuestionBank(bank);
-                renderQuestionList();
-                // 如果删除了当前每日题目，重新抽取
-                const dq = getDailyQuestion();
-                if (dq && !bank.find(i => i.id === dq.questionId)) {
-                    localStorage.removeItem(DAILY_QUESTION_KEY);
-                    pickDailyQuestion();
-                }
-                updateSigninUI();
-                showToast('已删除', '🗑️');
-            }
-
-            // ===== 上传题库 =====
-            function uploadQuestions() {
-                const file = uploadQuestionFile.files[0];
-                if (!file) { showToast('请选择文件', '⚠️'); return; }
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const content = e.target.result;
-                    const lines = content.split('\n').filter(line => line.trim() !== '');
-                    const newBank = [];
-                    let errorCount = 0;
-                    lines.forEach((line, idx) => {
-                        const parts = line.split('||').map(s => s.trim());
-                        if (parts.length < 8) { errorCount++; return; } // 至少题目+6选项+答案
-                        const question = parts[0];
-                        const options = parts.slice(1, -1);
-                        const ansLetter = parts[parts.length - 1].toUpperCase();
-                        if (options.length < 6 || options.length > 10) { errorCount++; return; }
-                        const ansIdx = ansLetter.charCodeAt(0) - 65;
-                        if (ansIdx < 0 || ansIdx >= options.length) { errorCount++; return; }
-                        newBank.push({ id: 0, question, options, answer: ansIdx });
-                    });
-                    if (newBank.length === 0) { showToast('解析失败，请检查格式', '❌'); return; }
-                    // 分配ID
-                    let maxId = loadQuestionBank().reduce((max, q) => Math.max(max, q.id), 0);
-                    newBank.forEach(q => { q.id = ++maxId; });
-                    saveQuestionBank(newBank);
-                    // 重置每日题目和历史
-                    localStorage.removeItem(DAILY_QUESTION_KEY);
-                    resetGlobalQuestionHistory();
-                    pickDailyQuestion();
-                    renderQuestionList();
-                    updateSigninUI();
-                    showToast('成功上传 ' + newBank.length + ' 道题' + (errorCount ? '，' + errorCount + ' 行格式错误被跳过' : ''),
-                        '✅');
-                };
-                reader.onerror = function() { showToast('读取文件失败', '❌'); };
-                reader.readAsText(file, 'UTF-8');
-            }
-
-            // ===== 清空题库 =====
-            function clearQuestions() {
-                if (!confirm('确定清空所有题目吗？此操作不可恢复！')) return;
-                saveQuestionBank([]);
-                localStorage.removeItem(DAILY_QUESTION_KEY);
-                resetGlobalQuestionHistory();
-                renderQuestionList();
-                updateSigninUI();
-                showToast('题库已清空', '🗑️');
-            }
-
-            // ===== 一键换题 =====
-            function shuffleDailyQuestion() {
-                if (currentUser !== 'admin') { showToast('权限不足', '⛔'); return; }
-                const bank = loadQuestionBank();
-                if (!bank.length) { showToast('题库为空', '⚠️'); return; }
-                const history = getGlobalQuestionHistory();
-                const usedIds = history.slice(-30);
-                const available = bank.filter(q => !usedIds.includes(q.id));
-                if (!available.length) {
-                    resetGlobalQuestionHistory();
-                    showToast('已重置历史，重新洗牌', '🔄');
-                    const q = pickDailyQuestion();
-                    if (q) { showToast('已换题：' + q.question.slice(0, 30) + '...', '🎲');
-                        renderQuestionList(); }
-                    return;
-                }
-                const chosen = available[Math.floor(Math.random() * available.length)];
-                setDailyQuestion(chosen.id);
-                addGlobalQuestionHistory(chosen.id);
-                showToast('已换题：' + chosen.question.slice(0, 30) + '...', '🎲');
-                renderQuestionList();
-            }
-
-            // ===== 站车风采浏览 =====
-            function openSceneryViewer() {
-                const modal = document.createElement('div');
-                modal.className = 'modal-overlay active';
-                modal.style.zIndex = '1000';
-                const items = loadScenery();
-                let html =
-                    `<div class="modal-card" style="max-width:600px;"><div class="modal-title">🚉 站车风采</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;">`;
-                items.forEach(item => {
-                    html +=
-                        `<div style="background:#f8fafc;border-radius:14px;padding:16px 14px;border:1px solid #eef2f7;"><span style="font-size:28px;display:block;margin-bottom:4px;">${item.icon}</span><div style="font-weight:700;font-size:16px;color:#0b2a4a;">${item.name}</div><div style="font-size:13px;color:#5a6a7a;margin-top:2px;line-height:1.4;">${item.desc}</div></div>`;
-                });
-                html +=
-                    `</div><div class="form-actions"><button class="btn-cancel" id="closeSceneryViewerBtn" style="flex:1;">关闭</button></div></div>`;
-                modal.innerHTML = html;
-                document.body.appendChild(modal);
-                modal.querySelector('#closeSceneryViewerBtn').addEventListener('click', function() { modal.remove(); });
-                modal.addEventListener('click', function(e) { if (e.target === this) modal.remove(); });
-            }
-
-            // ===== 管理面板 =====
-            function openAdminPanel() {
-                if (currentUser !== 'admin') { showToast('权限不足', '⛔'); return; }
-                renderUserTable();
-                renderSceneryAdmin();
-                renderQuestionList();
-                adminModal.classList.add('active');
-                switchTab('users');
-            }
-
-            function closeAdminPanel() { adminModal.classList.remove('active'); }
-
-            function switchTab(tabName) {
-                tabBtns.forEach(btn => { const t = btn.dataset.tab;
-                    btn.classList.toggle('active', t === tabName); });
-                Object.keys(tabContents).forEach(key => {
-                    tabContents[key].classList.toggle('active', key === tabName);
-                });
-                if (tabName === 'questions') renderQuestionList();
             }
 
             // ===== 检查登录状态 =====
@@ -1396,8 +1129,7 @@ function handleQuizAnswer(idx) {
 
             // ===== 事件绑定 =====
             loginForm.addEventListener('submit', handleLogin);
-            loginPassword.addEventListener('keydown', function(e) { if (e.key === 'Enter') loginForm.dispatchEvent(new Event(
-                        'submit')); });
+            loginPassword.addEventListener('keydown', function(e) { if (e.key === 'Enter') loginForm.dispatchEvent(new Event('submit')); });
             logoutBtn.addEventListener('click', handleLogout);
 
             openRegisterBtn.addEventListener('click', openRegisterModal);
@@ -1412,6 +1144,7 @@ function handleQuizAnswer(idx) {
             forgotModal.addEventListener('click', function(e) { if (e.target === this) closeForgotModal(); });
             forgotNewPassword.addEventListener('keydown', function(e) { if (e.key === 'Enter') forgotBtn.click(); });
 
+            // 快捷功能
             document.querySelectorAll('.quick-action[data-action]').forEach(el => {
                 el.addEventListener('click', function() {
                     const action = this.dataset.action;
@@ -1423,9 +1156,18 @@ function handleQuizAnswer(idx) {
                 });
             });
 
+            // 签到答题 - 键盘事件
+            answerInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAnswer();
+                }
+            });
+
             closeQuizBtn.addEventListener('click', closeQuizModal);
             quizModal.addEventListener('click', function(e) { if (e.target === this) closeQuizModal(); });
 
+            // 管理面板
             closeAdminBtn.addEventListener('click', closeAdminPanel);
             adminModal.addEventListener('click', function(e) { if (e.target === this) closeAdminPanel(); });
             tabBtns.forEach(btn => {
@@ -1437,48 +1179,29 @@ function handleQuizAnswer(idx) {
             saveSceneryBtn.addEventListener('click', saveSceneryItem);
             editSceneryModal.addEventListener('click', function(e) { if (e.target === this) closeEditScenery(); });
 
-            shuffleDailyBtn.addEventListener('click', shuffleDailyQuestion);
-            refreshQuestionsBtn.addEventListener('click', renderQuestionList);
-            addQuestionBtn.addEventListener('click', function() { openEditQuestion(null); });
-            clearQuestionsBtn.addEventListener('click', clearQuestions);
-            uploadQuestionsBtn.addEventListener('click', uploadQuestions);
-            closeEditQuestionBtn.addEventListener('click', closeEditQuestion);
-            saveQuestionBtn.addEventListener('click', saveQuestionItem);
-            editQuestionModal.addEventListener('click', function(e) { if (e.target === this) closeEditQuestion(); });
-
             loginUsername.addEventListener('focus', function() { loginError.classList.remove('show'); });
             loginPassword.addEventListener('focus', function() { loginError.classList.remove('show'); });
 
             // ===== 初始化 =====
             (function init() {
                 const users = loadUsers();
-                if (!users.admin) { users.admin = { password: PRESET_USER.password, balance: PRESET_USER.balance };
-                    saveUsers(users); }
-                // 题库初始为空，不做预设
+                if (!users.admin) { users.admin = { password: PRESET_USER.password, balance: PRESET_USER.balance }; saveUsers(users); }
                 const sc = loadScenery();
                 if (!sc.length) { saveScenery(DEFAULT_SCENERY); }
                 // 清理过期签到数据
                 const today = getTodayStr();
-                const quizData = loadQuizData();
+                const signinData = loadSigninData();
                 let changed = false;
-                Object.keys(quizData).forEach(key => {
-                    if (quizData[key].date !== today) {
-                        quizData[key] = { date: today, signed: false, attempts: MAX_ATTEMPTS, questionId: null };
+                Object.keys(signinData).forEach(key => {
+                    if (signinData[key].date !== today) {
+                        signinData[key] = { date: today, attempts: MAX_ATTEMPTS_PER_DAY, signed: false };
                         changed = true;
                     }
                 });
-                if (changed) saveQuizData(quizData);
+                if (changed) saveSigninData(signinData);
 
                 const hasSession = checkSession();
-                if (!hasSession) { loginPage.style.display = 'flex';
-                    homePage.style.display = 'none';
-                    loginUsername.value = '';
-                    loginPassword.value = ''; }
-
-                // 如果题库不为空且没有每日题目，则抽取
-                const bank = loadQuestionBank();
-                if (bank.length && !getDailyQuestion()) pickDailyQuestion();
-
+                if (!hasSession) { loginPage.style.display = 'flex'; homePage.style.display = 'none'; loginUsername.value = ''; loginPassword.value = ''; }
                 if (currentUser && currentUser !== 'admin') updateSigninUI();
             })();
 
