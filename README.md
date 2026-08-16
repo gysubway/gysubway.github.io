@@ -157,6 +157,8 @@
         .admin-modal .scenery-item-admin .actions .btn-edit:hover { background:#b0d0e6; }
         .admin-modal .scenery-item-admin .actions .btn-delete { background:#fadbd8; color:#922b21; }
         .admin-modal .scenery-item-admin .actions .btn-delete:hover { background:#f5b7b1; }
+        /* 新增提示 */
+        .admin-modal .local-hint { background:#f0f5fb; padding:8px 16px; border-radius:8px; font-size:13px; color:#3a5a7a; margin-bottom:16px; border-left:4px solid #1a6e9e; }
 
         .toast-container { position:fixed; top:100px; left:50%; transform:translateX(-50%); z-index:9999; pointer-events:none; }
         .toast { background:#1a2a3a; color:#ffffff; padding:14px 32px; border-radius:12px; font-size:15px; font-weight:500; box-shadow:0 8px 32px rgba(0,0,0,0.30); opacity:0; transform:translateY(-20px) scale(0.95); transition:opacity 0.35s ease, transform 0.35s ease; pointer-events:auto; display:flex; align-items:center; gap:10px; white-space:nowrap; }
@@ -226,7 +228,7 @@
         </div>
     </div>
 
-    <!-- ===== 签到答题模态框（键盘版） ===== -->
+    <!-- ===== 签到答题模态框 ===== -->
     <div class="modal-overlay quiz-modal" id="quizModal">
         <div class="modal-card">
             <div class="modal-title">⏱️ 速算挑战 · 每日签到</div>
@@ -260,6 +262,7 @@
                 <button class="tab-btn" data-tab="scenery">📸 站车风采</button>
             </div>
             <div class="tab-content active" id="tabUsers">
+                <div class="local-hint">💡 显示所有用户（跨设备/浏览器互通）</div>
                 <div class="user-table-wrap"><table><thead><tr><th>用户名</th><th>余额</th><th>操作</th></tr></thead><tbody id="userTableBody"></tbody></table></div>
                 <p class="text-muted mt-8">* 管理员可修改密码、余额，注销账号（不能注销自己）</p>
             </div>
@@ -325,6 +328,28 @@
         (function() {
             'use strict';
 
+            // ===== 后端 API 地址 =====
+            const API_BASE = 'https://gysubwaygithubio-production.up.railway.app/api';
+
+            // ===== 封装 API 调用 =====
+            async function apiCall(endpoint, options = {}) {
+                const url = `${API_BASE}${endpoint}`;
+                const config = {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    body: options.body ? JSON.stringify(options.body) : undefined
+                };
+                const res = await fetch(url, config);
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({ message: '请求失败' }));
+                    throw new Error(err.message || '网络错误');
+                }
+                return res.json();
+            }
+
             // ===== 常量 =====
             const LINE_DATA = [
                 { id: 1, name: '1号线', code: 'M1', color: '#e74c3c', stations: ['火车站', '市政府', '人民广场', '大学城', '科技园', '体育中心'] },
@@ -332,94 +357,13 @@
                 { id: 3, name: '3号线', code: 'M3', color: '#2ecc71', stations: ['汽车站', '商业街', '文化宫', '图书馆', '政务中心', '智慧谷'] },
                 { id: 4, name: '4号线', code: 'M4', color: '#f39c12', stations: ['古雁岭', '新区医院', '实验中学', '万达广场', '行政中心', '固原南站'] }
             ];
-            const PRESET_USER = { username: 'admin', password: 'gysubway2026', balance: 1000000 };
             const VERIFY_QUESTION = '固局更高速度实验列车的车号是？';
             const VERIFY_ANSWER = 'CRH380CM-0304';
             const SIGNIN_AMOUNT = 20;
             const MAX_ATTEMPTS_PER_DAY = 2;
             const TOTAL_QUESTIONS = 20;
-            const TIME_LIMIT = 30; // 秒
-            const PASS_SCORE = 16; // 需要正确16题及以上
-
-            const USER_STORAGE_KEY = 'metro_users_data';
-            const SCENERY_STORAGE_KEY = 'metro_scenery_data';
-            const SIGNIN_STORAGE_KEY = 'metro_signin_data'; // 存储签到状态（每天剩余次数）
-
-            // ===== 存储工具 =====
-            function getTodayStr() { return new Date().toISOString().split('T')[0]; }
-
-            // 用户
-            function loadUsers() {
-                try { const raw = localStorage.getItem(USER_STORAGE_KEY); if (raw) { const d = JSON.parse(raw); if (!d.admin) { d.admin = { password: PRESET_USER.password, balance: PRESET_USER.balance }; } return d; } } catch (_) {}
-                const d = { admin: { password: PRESET_USER.password, balance: PRESET_USER.balance } };
-                localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(d));
-                return d;
-            }
-            function saveUsers(u) { localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(u)); }
-            function getUser(name) { const u = loadUsers(); return u[name] || null; }
-            function userExists(name) { const u = loadUsers(); return u.hasOwnProperty(name); }
-            function createUser(name, pwd) {
-                const u = loadUsers();
-                if (u[name]) return false;
-                u[name] = { password: pwd, balance: 0 };
-                saveUsers(u);
-                return true;
-            }
-            function updateUser(name, upd) {
-                const u = loadUsers();
-                if (!u[name]) return false;
-                Object.assign(u[name], upd);
-                saveUsers(u);
-                return true;
-            }
-            function deleteUser(name) {
-                if (name === 'admin') return false;
-                const u = loadUsers();
-                if (!u[name]) return false;
-                delete u[name];
-                saveUsers(u);
-                return true;
-            }
-
-            // 签到数据（每天剩余次数）
-            function loadSigninData() {
-                try { const raw = localStorage.getItem(SIGNIN_STORAGE_KEY); if (raw) return JSON.parse(raw); } catch (_) {}
-                return {};
-            }
-            function saveSigninData(d) { localStorage.setItem(SIGNIN_STORAGE_KEY, JSON.stringify(d)); }
-            function getUserSigninStatus(username) {
-                const data = loadSigninData();
-                const today = getTodayStr();
-                if (!data[username]) { data[username] = { date: today, attempts: MAX_ATTEMPTS_PER_DAY, signed: false }; saveSigninData(data); }
-                const u = data[username];
-                if (u.date !== today) { u.date = today; u.attempts = MAX_ATTEMPTS_PER_DAY; u.signed = false; saveSigninData(data); }
-                return u;
-            }
-            function updateUserSigninStatus(username, updates) {
-                const data = loadSigninData();
-                const today = getTodayStr();
-                if (!data[username]) { data[username] = { date: today, attempts: MAX_ATTEMPTS_PER_DAY, signed: false }; }
-                if (data[username].date !== today) { data[username] = { date: today, attempts: MAX_ATTEMPTS_PER_DAY, signed: false }; }
-                Object.assign(data[username], updates);
-                saveSigninData(data);
-            }
-
-            // 站车风采
-            const DEFAULT_SCENERY = [
-                { id: 1, icon: '🏛️', name: '固原站', desc: '固原地铁1号线起点站，集交通、商业、文化于一体的综合枢纽，日均客流量超10万人次。' },
-                { id: 2, icon: '🏙️', name: '人民广场站', desc: '位于城市核心区，2号线与3号线换乘站，毗邻市政府与商业中心，是城市最繁忙的站点之一。' },
-                { id: 3, icon: '🌳', name: '古雁岭站', desc: '4号线站点，毗邻古雁岭生态公园，车站设计融入自然元素，被誉为"最美地铁站"。' },
-                { id: 4, icon: '🚄', name: 'CRH380 系列', desc: '高速动车组，最高运营时速380km/h，中国高铁的标杆车型，安全、舒适、快捷。' },
-                { id: 5, icon: '🚇', name: '固原地铁 A 型车', desc: '6节编组，最高时速80km/h，采用永磁同步电机与节能空调，绿色环保，噪音更低。' },
-                { id: 6, icon: '🛤️', name: '智慧运维系统', desc: '基于大数据与AI的列车智能运维平台，实时监测车辆状态，保障运营安全可靠。' }
-            ];
-            function loadScenery() {
-                try { const raw = localStorage.getItem(SCENERY_STORAGE_KEY); if (raw) { const d = JSON.parse(raw); if (Array.isArray(d) && d.length) return d; } } catch (_) {}
-                localStorage.setItem(SCENERY_STORAGE_KEY, JSON.stringify(DEFAULT_SCENERY));
-                return DEFAULT_SCENERY.slice();
-            }
-            function saveScenery(items) { localStorage.setItem(SCENERY_STORAGE_KEY, JSON.stringify(items)); }
-            function getNextSceneryId(items) { if (!items.length) return 1; return Math.max(...items.map(i => i.id)) + 1; }
+            const TIME_LIMIT = 30;
+            const PASS_SCORE = 16;
 
             // ===== DOM 引用 =====
             const loginPage = document.getElementById('loginPage');
@@ -465,7 +409,6 @@
             const forgotSuccess = document.getElementById('forgotSuccess');
             const forgotSuccessMessage = document.getElementById('forgotSuccessMessage');
 
-            // 签到模态框
             const quizModal = document.getElementById('quizModal');
             const quizProgress = document.getElementById('quizProgress');
             const quizTimer = document.getElementById('quizTimer');
@@ -478,7 +421,6 @@
             const scoreDisplay = document.getElementById('scoreDisplay');
             const closeQuizBtn = document.getElementById('closeQuizBtn');
 
-            // 管理面板
             const adminModal = document.getElementById('adminModal');
             const closeAdminBtn = document.getElementById('closeAdminBtn');
             const userTableBody = document.getElementById('userTableBody');
@@ -503,7 +445,7 @@
             let currentUser = null;
             let clockInterval = null;
 
-            // ===== 签到答题相关状态 =====
+            // ===== 签到答题状态 =====
             let quizQuestions = [];
             let currentIndex = 0;
             let correctAnswers = 0;
@@ -511,7 +453,7 @@
             let timer = TIME_LIMIT;
             let timerInterval = null;
             let quizActive = false;
-            let isWaiting = false; // 是否在等待反馈后跳转
+            let isWaiting = false;
 
             // ===== 工具函数 =====
             function formatDate(now) {
@@ -540,14 +482,14 @@
                 quizModal.classList.remove('active');
             }
 
-            // ===== 生成随机题目（10以内四则运算） =====
+            // ===== 生成随机题目 =====
             function generateQuestion() {
                 const ops = ['+', '-', '*', '/'];
                 let op, a, b, answer, symbol;
                 let attempts = 0;
                 while (attempts < 30) {
                     op = ops[Math.floor(Math.random() * ops.length)];
-                    a = Math.floor(Math.random() * 11); // 0-10
+                    a = Math.floor(Math.random() * 11);
                     b = Math.floor(Math.random() * 11);
                     if (op === '+') {
                         answer = a + b;
@@ -572,7 +514,6 @@
                     }
                     attempts++;
                 }
-                // 保底：用加法
                 if (attempts >= 30) {
                     a = Math.floor(Math.random() * 11);
                     b = Math.floor(Math.random() * 11);
@@ -591,49 +532,55 @@
                 return qs;
             }
 
-            // ===== 渲染签到UI =====
-            function updateSigninUI() {
+            // ===== 签到UI更新（从后端获取状态） =====
+            async function updateSigninUI() {
                 if (!currentUser || currentUser === 'admin') { signinEntry.style.display = 'none'; return; }
                 signinEntry.style.display = 'block';
-                const status = getUserSigninStatus(currentUser);
-                if (status.signed) {
-                    signinDesc.textContent = '✅ 今日已签到';
+                try {
+                    const status = await apiCall(`/signin/${currentUser}`);
+                    if (status.signed) {
+                        signinDesc.textContent = '✅ 今日已签到';
+                        signinEntry.classList.add('disabled');
+                    } else if (status.attempts <= 0) {
+                        signinDesc.textContent = '❌ 今日机会已用完';
+                        signinEntry.classList.add('disabled');
+                    } else {
+                        signinDesc.textContent = `⌨️ 剩余 ${status.attempts} 次机会`;
+                        signinEntry.classList.remove('disabled');
+                    }
+                } catch (e) {
+                    signinDesc.textContent = '⚠️ 加载失败';
                     signinEntry.classList.add('disabled');
-                } else if (status.attempts <= 0) {
-                    signinDesc.textContent = '❌ 今日机会已用完';
-                    signinEntry.classList.add('disabled');
-                } else {
-                    signinDesc.textContent = `⌨️ 剩余 ${status.attempts} 次机会`;
-                    signinEntry.classList.remove('disabled');
                 }
             }
 
-            // ===== 开始签到挑战 =====
+            // ===== 打开签到模态框 =====
             function openQuizModal() {
                 if (!currentUser || currentUser === 'admin') { showToast('普通用户专享', 'ℹ️'); return; }
-                const status = getUserSigninStatus(currentUser);
-                if (status.signed) { showToast('今日已签到，明天再来吧！', '✅'); return; }
-                if (status.attempts <= 0) { showToast('今日机会已用完，明天再来！', '❌'); return; }
+                // 先获取状态
+                apiCall(`/signin/${currentUser}`).then(status => {
+                    if (status.signed) { showToast('今日已签到，明天再来吧！', '✅'); return; }
+                    if (status.attempts <= 0) { showToast('今日机会已用完，明天再来！', '❌'); return; }
 
-                // 重置状态
-                quizQuestions = generateQuizQuestions(TOTAL_QUESTIONS);
-                currentIndex = 0;
-                correctAnswers = 0;
-                wrongAnswers = 0;
-                timer = TIME_LIMIT;
-                quizActive = true;
-                isWaiting = false;
+                    // 重置状态
+                    quizQuestions = generateQuizQuestions(TOTAL_QUESTIONS);
+                    currentIndex = 0;
+                    correctAnswers = 0;
+                    wrongAnswers = 0;
+                    timer = TIME_LIMIT;
+                    quizActive = true;
+                    isWaiting = false;
 
-                // 更新UI
-                quizModal.classList.add('active');
-                renderQuestion();
-                updateStats();
-                startTimer();
-                answerInput.value = '';
-                answerInput.disabled = false;
-                answerInput.focus();
-                feedback.textContent = '';
-                feedback.className = 'feedback';
+                    quizModal.classList.add('active');
+                    renderQuestion();
+                    updateStats();
+                    startTimer();
+                    answerInput.value = '';
+                    answerInput.disabled = false;
+                    answerInput.focus();
+                    feedback.textContent = '';
+                    feedback.className = 'feedback';
+                }).catch(() => showToast('获取签到状态失败', '❌'));
             }
 
             function renderQuestion() {
@@ -669,9 +616,8 @@
                     if (timer <= 0) {
                         clearInterval(timerInterval);
                         timerInterval = null;
-                        // 超时，判定失败
                         if (quizActive) {
-                            finishQuiz(true); // 超时结束
+                            finishQuiz(true);
                         }
                     }
                 }, 1000);
@@ -705,7 +651,6 @@
                 const q = quizQuestions[currentIndex];
                 const correct = userAns === q.answer;
 
-                // 禁用输入
                 answerInput.disabled = true;
 
                 if (correct) {
@@ -720,7 +665,6 @@
                 updateStats();
                 isWaiting = true;
 
-                // 延迟后进入下一题
                 setTimeout(() => {
                     if (!quizActive) return;
                     currentIndex++;
@@ -728,31 +672,25 @@
                         finishQuiz(false);
                     } else {
                         renderQuestion();
-                        // 重新启用输入
                         answerInput.disabled = false;
                         answerInput.focus();
                     }
                 }, 600);
             }
 
-            // ===== 结束答题（正常完成或超时） =====
+            // ===== 结束答题 =====
             function finishQuiz(timeout) {
                 if (!quizActive) return;
                 quizActive = false;
                 stopTimer();
                 answerInput.disabled = true;
 
-                const status = getUserSigninStatus(currentUser);
-                const remaining = status.attempts - 1;
                 let success = false;
-
                 if (timeout) {
-                    // 超时未完成
                     success = false;
                     feedback.textContent = '⏰ 时间到！';
                     feedback.className = 'feedback wrong';
                 } else {
-                    // 正常完成，判断是否达标
                     success = correctAnswers >= PASS_SCORE;
                     if (success) {
                         feedback.textContent = '🎉 达标！签到成功！';
@@ -763,30 +701,25 @@
                     }
                 }
 
-                // 更新签到状态
-                if (success) {
-                    // 签到成功：加余额，标记已签到
-                    const user = getUser(currentUser);
-                    const newBalance = (user.balance || 0) + SIGNIN_AMOUNT;
-                    updateUser(currentUser, { balance: newBalance });
-                    updateUserSigninStatus(currentUser, { signed: true, attempts: remaining });
-                    displayBalance.textContent = formatBalance(newBalance);
-                    showToast('签到成功！获得 ¥' + SIGNIN_AMOUNT, '💰');
-                } else {
-                    // 消耗一次机会
-                    updateUserSigninStatus(currentUser, { attempts: remaining });
-                    if (remaining <= 0) {
-                        showToast('今日机会已用完', '❌');
-                    } else {
-                        showToast('还剩 ' + remaining + ' 次机会', 'ℹ️');
-                    }
-                }
-                updateSigninUI();
-                // 显示结果
-                quizProgress.textContent = (currentIndex + 1) + '/' + TOTAL_QUESTIONS;
-                // 禁用关闭按钮功能，让用户手动关闭
-                // 但我们要保持模态框打开，显示结果
-                // 可以额外显示一个结果信息
+                // 更新后端签到状态
+                apiCall(`/signin/${currentUser}`, { method: 'POST', body: { attempts: -1, signed: success } })
+                    .then(() => {
+                        // 若成功，还需更新用户余额
+                        if (success) {
+                            // 获取最新用户信息并更新显示
+                            apiCall(`/login`, { method: 'POST', body: { username: currentUser, password: '' } })
+                                .then(data => {
+                                    if (data.success) {
+                                        displayBalance.textContent = formatBalance(data.balance);
+                                        showToast('签到成功！获得 ¥' + SIGNIN_AMOUNT, '💰');
+                                    }
+                                });
+                        }
+                        updateSigninUI();
+                    })
+                    .catch(() => showToast('更新签到状态失败', '❌'));
+
+                // 显示结果信息
                 const resultMsg = document.createElement('div');
                 resultMsg.style.marginTop = '16px';
                 resultMsg.style.fontSize = '18px';
@@ -797,23 +730,18 @@
                     resultMsg.textContent = '✅ 签到成功！余额 +' + SIGNIN_AMOUNT;
                 } else {
                     resultMsg.style.color = '#e74c3c';
-                    resultMsg.textContent = '❌ 签到失败，剩余次数 ' + Math.max(0, remaining);
+                    resultMsg.textContent = '❌ 签到失败';
                 }
-                // 插入到footer前
                 const footer = document.querySelector('.quiz-footer');
                 footer.parentNode.insertBefore(resultMsg, footer);
-                // 5秒后自动清除？让用户手动关闭。
             }
 
-            // ===== 关闭签到模态框 =====
             function closeQuizModal() {
                 stopTimer();
                 quizActive = false;
                 quizModal.classList.remove('active');
-                // 清除可能存在的动态消息
                 const extra = document.querySelector('.quiz-footer ~ div[style]');
                 if (extra) extra.remove();
-                // 重置输入
                 answerInput.disabled = false;
                 answerInput.value = '';
                 feedback.textContent = '';
@@ -838,142 +766,162 @@
             }
 
             // ===== 管理面板 - 用户 =====
-            function renderUserTable() {
-                const users = loadUsers();
-                const names = Object.keys(users);
-                userTableBody.innerHTML = '';
-                names.forEach(uname => {
-                    const u = users[uname];
-                    const tr = document.createElement('tr');
-                    let actions = `<button class="btn-edit" data-username="${uname}" data-action="changePwd">改密码</button><button class="btn-balance" data-username="${uname}" data-action="changeBalance">改余额</button>`;
-                    if (uname !== 'admin') {
-                        actions += `<button class="btn-delete" data-username="${uname}" data-action="delete">注销</button>`;
-                    } else {
-                        actions += `<span style="color:#aaa;font-size:12px;">(管理员)</span>`;
-                    }
-                    tr.innerHTML = `<td><strong>${uname}</strong></td><td>${formatBalance(u.balance)}</td><td><div class="table-actions">${actions}</div></td>`;
-                    userTableBody.appendChild(tr);
-                });
-                userTableBody.querySelectorAll('[data-action]').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        handleUserAction(this.dataset.action, this.dataset.username);
+            async function renderUserTable() {
+                try {
+                    const users = await apiCall('/users');
+                    userTableBody.innerHTML = '';
+                    users.forEach(u => {
+                        const tr = document.createElement('tr');
+                        let actions = `<button class="btn-edit" data-username="${u.username}" data-action="changePwd">改密码</button><button class="btn-balance" data-username="${u.username}" data-action="changeBalance">改余额</button>`;
+                        if (u.username !== 'admin') {
+                            actions += `<button class="btn-delete" data-username="${u.username}" data-action="delete">注销</button>`;
+                        } else {
+                            actions += `<span style="color:#aaa;font-size:12px;">(管理员)</span>`;
+                        }
+                        tr.innerHTML = `<td><strong>${u.username}</strong></td><td>${formatBalance(u.balance)}</td><td><div class="table-actions">${actions}</div></td>`;
+                        userTableBody.appendChild(tr);
                     });
-                });
+                    // 绑定事件
+                    userTableBody.querySelectorAll('[data-action]').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            handleUserAction(this.dataset.action, this.dataset.username);
+                        });
+                    });
+                } catch (e) {
+                    showToast('加载用户列表失败', '❌');
+                }
             }
 
-            function handleUserAction(action, username) {
+            async function handleUserAction(action, username) {
                 if (action === 'changePwd') {
                     const p = prompt('请输入新密码（至少6个字符）：');
                     if (p === null) return;
                     if (p.length < 6) { showToast('密码至少6个字符', '⚠️'); return; }
-                    if (updateUser(username, { password: p })) { showToast('密码已修改', '✅'); renderUserTable(); } else showToast('修改失败', '❌');
+                    try {
+                        await apiCall(`/user/${username}`, { method: 'PUT', body: { password: p } });
+                        showToast('密码已修改', '✅');
+                        renderUserTable();
+                    } catch (e) { showToast('修改失败', '❌'); }
                 } else if (action === 'changeBalance') {
                     const input = prompt('请输入新的余额（数字）：');
                     if (input === null) return;
                     const val = parseFloat(input);
                     if (isNaN(val) || val < 0) { showToast('请输入有效数字', '⚠️'); return; }
-                    if (updateUser(username, { balance: val })) {
+                    try {
+                        await apiCall(`/user/${username}`, { method: 'PUT', body: { balance: val } });
                         showToast('余额已更新', '✅');
                         renderUserTable();
-                        if (username === currentUser) { const u = getUser(username); displayBalance.textContent = formatBalance(u.balance); }
-                    } else showToast('修改失败', '❌');
+                        if (username === currentUser) {
+                            const data = await apiCall('/login', { method: 'POST', body: { username: currentUser, password: '' } });
+                            if (data.success) displayBalance.textContent = formatBalance(data.balance);
+                        }
+                    } catch (e) { showToast('修改失败', '❌'); }
                 } else if (action === 'delete') {
                     if (username === 'admin') { showToast('不能注销管理员', '⚠️'); return; }
                     if (confirm('确定注销用户 ' + username + ' 吗？')) {
-                        if (deleteUser(username)) {
+                        try {
+                            await apiCall(`/user/${username}`, { method: 'DELETE' });
                             showToast('已注销', '🗑️');
                             renderUserTable();
                             if (username === currentUser) handleLogout();
-                        } else showToast('注销失败', '❌');
+                        } catch (e) { showToast('注销失败', '❌'); }
                     }
                 }
             }
 
             // ===== 管理面板 - 站车风采 =====
-            function renderSceneryAdmin() {
-                const items = loadScenery();
-                sceneryAdminList.innerHTML = '';
-                items.forEach(item => {
-                    const div = document.createElement('div');
-                    div.className = 'scenery-item-admin';
-                    div.innerHTML = `<div class="info"><span class="icon">${item.icon}</span><span class="name">${item.name}</span><span class="desc">${item.desc}</span></div><div class="actions"><button class="btn-edit" data-id="${item.id}">编辑</button><button class="btn-delete" data-id="${item.id}">删除</button></div>`;
-                    sceneryAdminList.appendChild(div);
-                });
-                sceneryAdminList.querySelectorAll('.btn-edit').forEach(btn => {
-                    btn.addEventListener('click', function() { openEditScenery(parseInt(this.dataset.id)); });
-                });
-                sceneryAdminList.querySelectorAll('.btn-delete').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        if (confirm('确定删除？')) deleteSceneryItem(parseInt(this.dataset.id));
+            async function renderSceneryAdmin() {
+                try {
+                    const items = await apiCall('/scenery');
+                    sceneryAdminList.innerHTML = '';
+                    items.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'scenery-item-admin';
+                        div.innerHTML = `<div class="info"><span class="icon">${item.icon}</span><span class="name">${item.name}</span><span class="desc">${item.desc}</span></div><div class="actions"><button class="btn-edit" data-id="${item.id}">编辑</button><button class="btn-delete" data-id="${item.id}">删除</button></div>`;
+                        sceneryAdminList.appendChild(div);
                     });
-                });
+                    sceneryAdminList.querySelectorAll('.btn-edit').forEach(btn => {
+                        btn.addEventListener('click', function() { openEditScenery(parseInt(this.dataset.id)); });
+                    });
+                    sceneryAdminList.querySelectorAll('.btn-delete').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            if (confirm('确定删除？')) deleteSceneryItem(parseInt(this.dataset.id));
+                        });
+                    });
+                } catch (e) {
+                    showToast('加载风采列表失败', '❌');
+                }
             }
 
-            function openEditScenery(id) {
-                const items = loadScenery();
-                const item = items.find(i => i.id === id);
-                if (item) {
-                    editSceneryTitle.textContent = '✏️ 编辑风采';
-                    editSceneryId.value = item.id;
-                    editSceneryIcon.value = item.icon || '';
-                    editSceneryName.value = item.name || '';
-                    editSceneryDesc.value = item.desc || '';
-                } else {
-                    editSceneryTitle.textContent = '➕ 新增风采';
-                    editSceneryId.value = '';
-                    editSceneryIcon.value = '';
-                    editSceneryName.value = '';
-                    editSceneryDesc.value = '';
-                }
-                editSceneryError.classList.remove('show');
-                editSceneryModal.classList.add('active');
+            async function openEditScenery(id) {
+                try {
+                    const items = await apiCall('/scenery');
+                    const item = items.find(i => i.id === id);
+                    if (item) {
+                        editSceneryTitle.textContent = '✏️ 编辑风采';
+                        editSceneryId.value = item.id;
+                        editSceneryIcon.value = item.icon || '';
+                        editSceneryName.value = item.name || '';
+                        editSceneryDesc.value = item.desc || '';
+                    } else {
+                        editSceneryTitle.textContent = '➕ 新增风采';
+                        editSceneryId.value = '';
+                        editSceneryIcon.value = '';
+                        editSceneryName.value = '';
+                        editSceneryDesc.value = '';
+                    }
+                    editSceneryError.classList.remove('show');
+                    editSceneryModal.classList.add('active');
+                } catch (e) { showToast('加载数据失败', '❌'); }
             }
 
             function closeEditScenery() { editSceneryModal.classList.remove('active'); editSceneryError.classList.remove('show'); }
 
-            function saveSceneryItem() {
+            async function saveSceneryItem() {
                 const id = editSceneryId.value.trim(), icon = editSceneryIcon.value.trim(), name = editSceneryName.value.trim(), desc = editSceneryDesc.value.trim();
                 editSceneryError.classList.remove('show');
                 if (!name) { editSceneryErrorMessage.textContent = '名称不能为空'; editSceneryError.classList.add('show'); return; }
-                let items = loadScenery();
-                if (id) {
-                    const idx = items.findIndex(i => i.id === parseInt(id));
-                    if (idx !== -1) { items[idx] = { ...items[idx], icon, name, desc }; saveScenery(items); showToast('已更新', '✅'); } else { showToast('未找到', '❌'); return; }
-                } else {
-                    items.push({ id: getNextSceneryId(items), icon, name, desc });
-                    saveScenery(items);
-                    showToast('已添加', '✅');
-                }
-                closeEditScenery();
-                renderSceneryAdmin();
+                try {
+                    if (id) {
+                        await apiCall(`/scenery/${id}`, { method: 'PUT', body: { icon, name, desc } });
+                        showToast('已更新', '✅');
+                    } else {
+                        await apiCall('/scenery', { method: 'POST', body: { icon, name, desc } });
+                        showToast('已添加', '✅');
+                    }
+                    closeEditScenery();
+                    renderSceneryAdmin();
+                } catch (e) { showToast('操作失败', '❌'); }
             }
 
-            function deleteSceneryItem(id) {
-                let items = loadScenery();
-                items = items.filter(i => i.id !== id);
-                saveScenery(items);
-                renderSceneryAdmin();
-                showToast('已删除', '🗑️');
+            async function deleteSceneryItem(id) {
+                try {
+                    await apiCall(`/scenery/${id}`, { method: 'DELETE' });
+                    renderSceneryAdmin();
+                    showToast('已删除', '🗑️');
+                } catch (e) { showToast('删除失败', '❌'); }
             }
 
-            // ===== 站车风采浏览 =====
-            function openSceneryViewer() {
-                const modal = document.createElement('div');
-                modal.className = 'modal-overlay active';
-                modal.style.zIndex = '1000';
-                const items = loadScenery();
-                let html = `<div class="modal-card" style="max-width:600px;"><div class="modal-title">🚉 站车风采</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;">`;
-                items.forEach(item => {
-                    html += `<div style="background:#f8fafc;border-radius:14px;padding:16px 14px;border:1px solid #eef2f7;"><span style="font-size:28px;display:block;margin-bottom:4px;">${item.icon}</span><div style="font-weight:700;font-size:16px;color:#0b2a4a;">${item.name}</div><div style="font-size:13px;color:#5a6a7a;margin-top:2px;line-height:1.4;">${item.desc}</div></div>`;
-                });
-                html += `</div><div class="form-actions"><button class="btn-cancel" id="closeSceneryViewerBtn" style="flex:1;">关闭</button></div></div>`;
-                modal.innerHTML = html;
-                document.body.appendChild(modal);
-                modal.querySelector('#closeSceneryViewerBtn').addEventListener('click', function() { modal.remove(); });
-                modal.addEventListener('click', function(e) { if (e.target === this) modal.remove(); });
+            // ===== 站车风采浏览（公共） =====
+            async function openSceneryViewer() {
+                try {
+                    const items = await apiCall('/scenery');
+                    const modal = document.createElement('div');
+                    modal.className = 'modal-overlay active';
+                    modal.style.zIndex = '1000';
+                    let html = `<div class="modal-card" style="max-width:600px;"><div class="modal-title">🚉 站车风采</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;">`;
+                    items.forEach(item => {
+                        html += `<div style="background:#f8fafc;border-radius:14px;padding:16px 14px;border:1px solid #eef2f7;"><span style="font-size:28px;display:block;margin-bottom:4px;">${item.icon}</span><div style="font-weight:700;font-size:16px;color:#0b2a4a;">${item.name}</div><div style="font-size:13px;color:#5a6a7a;margin-top:2px;line-height:1.4;">${item.desc}</div></div>`;
+                    });
+                    html += `</div><div class="form-actions"><button class="btn-cancel" id="closeSceneryViewerBtn" style="flex:1;">关闭</button></div></div>`;
+                    modal.innerHTML = html;
+                    document.body.appendChild(modal);
+                    modal.querySelector('#closeSceneryViewerBtn').addEventListener('click', function() { modal.remove(); });
+                    modal.addEventListener('click', function(e) { if (e.target === this) modal.remove(); });
+                } catch (e) { showToast('加载失败', '❌'); }
             }
 
-            // ===== 管理面板打开/关闭 =====
+            // ===== 管理面板开关 =====
             function openAdminPanel() {
                 if (currentUser !== 'admin') { showToast('权限不足', '⛔'); return; }
                 renderUserTable();
@@ -985,32 +933,40 @@
             function switchTab(tabName) {
                 tabBtns.forEach(btn => { const t = btn.dataset.tab; btn.classList.toggle('active', t === tabName); });
                 Object.keys(tabContents).forEach(key => { tabContents[key].classList.toggle('active', key === tabName); });
+                if (tabName === 'users') renderUserTable();
+                if (tabName === 'scenery') renderSceneryAdmin();
             }
 
             // ===== 登录 / 登出 =====
-            function handleLogin(e) {
+            async function handleLogin(e) {
                 e.preventDefault();
                 const username = loginUsername.value.trim(), password = loginPassword.value.trim();
                 loginError.classList.remove('show');
                 if (!username || !password) { errorMessage.textContent = '请输入账号和密码'; loginError.classList.add('show'); return; }
-                const user = getUser(username);
-                if (user && user.password === password) { loginSuccess(username); } else {
-                    errorMessage.textContent = '账号或密码错误，请重新输入';
+                try {
+                    const data = await apiCall('/login', { method: 'POST', body: { username, password } });
+                    if (data.success) {
+                        loginSuccess(username, data.balance);
+                    } else {
+                        errorMessage.textContent = '账号或密码错误';
+                        loginError.classList.add('show');
+                        loginPassword.value = '';
+                        loginPassword.focus();
+                    }
+                } catch (e) {
+                    errorMessage.textContent = '网络错误，请检查后端服务';
                     loginError.classList.add('show');
-                    loginPassword.value = '';
-                    loginPassword.focus();
                 }
             }
 
-            function loginSuccess(username) {
+            function loginSuccess(username, balance) {
                 currentUser = username;
                 sessionStorage.setItem('metro_session_user', username);
                 loginPage.style.display = 'none';
                 homePage.style.display = 'flex';
-                const user = getUser(username);
                 displayUsername.textContent = username;
                 greetingUser.textContent = username;
-                if (user) displayBalance.textContent = formatBalance(user.balance);
+                displayBalance.textContent = formatBalance(balance);
                 adminEntry.style.display = (username === 'admin') ? 'block' : 'none';
                 updateSigninUI();
                 renderLines();
@@ -1049,11 +1005,10 @@
             function openRegisterModal() { clearRegisterForm(); registerModal.classList.add('active'); }
             function closeRegisterModal() { registerModal.classList.remove('active'); clearRegisterForm(); }
 
-            function handleRegister() {
+            async function handleRegister() {
                 const username = regUsername.value.trim(), password = regPassword.value.trim(), confirm = regConfirm.value.trim(), verify = regVerify.value.trim();
                 regError.classList.remove('show'); regSuccess.classList.remove('show');
                 if (!username || username.length < 2) { regErrorMessage.textContent = '账号至少需要2个字符'; regError.classList.add('show'); return; }
-                if (userExists(username)) { regErrorMessage.textContent = '该账号已存在，请换一个'; regError.classList.add('show'); return; }
                 if (!password || password.length < 6) { regErrorMessage.textContent = '密码至少需要6个字符'; regError.classList.add('show'); return; }
                 if (password !== confirm) { regErrorMessage.textContent = '两次输入的密码不一致'; regError.classList.add('show'); return; }
                 if (!verify) { regErrorMessage.textContent = '请回答验证问题'; regError.classList.add('show'); return; }
@@ -1064,12 +1019,18 @@
                     regVerify.focus();
                     return;
                 }
-                if (createUser(username, password)) {
-                    regSuccessMessage.textContent = '🎉 注册成功！即将自动登录...';
-                    regSuccess.classList.add('show');
-                    setTimeout(() => { closeRegisterModal(); loginSuccess(username); }, 1200);
-                } else {
-                    regErrorMessage.textContent = '注册失败，请稍后重试';
+                try {
+                    const data = await apiCall('/register', { method: 'POST', body: { username, password } });
+                    if (data.success) {
+                        regSuccessMessage.textContent = '🎉 注册成功！即将自动登录...';
+                        regSuccess.classList.add('show');
+                        setTimeout(() => { closeRegisterModal(); loginSuccess(username, 0); }, 1200);
+                    } else {
+                        regErrorMessage.textContent = data.message || '注册失败';
+                        regError.classList.add('show');
+                    }
+                } catch (e) {
+                    regErrorMessage.textContent = '网络错误，请稍后重试';
                     regError.classList.add('show');
                 }
             }
@@ -1082,12 +1043,10 @@
             }
             function closeForgotModal() { forgotModal.classList.remove('active'); forgotError.classList.remove('show'); forgotSuccess.classList.remove('show'); }
 
-            function handleForgot() {
+            async function handleForgot() {
                 const username = forgotUsername.value.trim(), verify = forgotVerify.value.trim(), newPwd = forgotNewPassword.value.trim();
                 forgotError.classList.remove('show'); forgotSuccess.classList.remove('show');
                 if (!username) { forgotErrorMessage.textContent = '请输入账号'; forgotError.classList.add('show'); return; }
-                if (!userExists(username)) { forgotErrorMessage.textContent = '该账号不存在'; forgotError.classList.add('show'); return; }
-                if (username === 'admin') { forgotErrorMessage.textContent = '管理员账号请通过其他方式重置'; forgotError.classList.add('show'); return; }
                 if (!verify) { forgotErrorMessage.textContent = '请回答验证问题'; forgotError.classList.add('show'); return; }
                 if (verify.trim().toUpperCase() !== VERIFY_ANSWER.toUpperCase()) {
                     forgotErrorMessage.textContent = '验证答案错误，请重新输入';
@@ -1097,32 +1056,32 @@
                     return;
                 }
                 if (!newPwd || newPwd.length < 6) { forgotErrorMessage.textContent = '新密码至少需要6个字符'; forgotError.classList.add('show'); return; }
-                if (updateUser(username, { password: newPwd })) {
+                try {
+                    await apiCall(`/user/${username}`, { method: 'PUT', body: { password: newPwd } });
                     forgotSuccessMessage.textContent = '✅ 密码已重置，请使用新密码登录';
                     forgotSuccess.classList.add('show');
                     setTimeout(() => { closeForgotModal(); showToast('密码已重置，请重新登录', '🔑'); }, 1500);
-                } else {
+                } catch (e) {
                     forgotErrorMessage.textContent = '重置失败，请稍后重试';
                     forgotError.classList.add('show');
                 }
             }
 
             // ===== 检查登录状态 =====
-            function checkSession() {
+            async function checkSession() {
                 const username = sessionStorage.getItem('metro_session_user');
-                if (username && userExists(username)) {
-                    currentUser = username;
-                    loginPage.style.display = 'none';
-                    homePage.style.display = 'flex';
-                    const user = getUser(username);
-                    displayUsername.textContent = username;
-                    greetingUser.textContent = username;
-                    if (user) displayBalance.textContent = formatBalance(user.balance);
-                    adminEntry.style.display = (username === 'admin') ? 'block' : 'none';
-                    updateSigninUI();
-                    renderLines();
-                    startClock();
-                    return true;
+                if (username) {
+                    try {
+                        // 用登录接口验证token，但我们没做token，直接用密码验证？简化：尝试获取用户信息，若失败则退出
+                        const data = await apiCall('/login', { method: 'POST', body: { username, password: '' } });
+                        if (data.success) {
+                            loginSuccess(username, data.balance);
+                            return true;
+                        }
+                    } catch (e) {
+                        // 无效，清除session
+                        sessionStorage.removeItem('metro_session_user');
+                    }
                 }
                 return false;
             }
@@ -1144,7 +1103,6 @@
             forgotModal.addEventListener('click', function(e) { if (e.target === this) closeForgotModal(); });
             forgotNewPassword.addEventListener('keydown', function(e) { if (e.key === 'Enter') forgotBtn.click(); });
 
-            // 快捷功能
             document.querySelectorAll('.quick-action[data-action]').forEach(el => {
                 el.addEventListener('click', function() {
                     const action = this.dataset.action;
@@ -1156,7 +1114,6 @@
                 });
             });
 
-            // 签到答题 - 键盘事件
             answerInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
@@ -1167,7 +1124,6 @@
             closeQuizBtn.addEventListener('click', closeQuizModal);
             quizModal.addEventListener('click', function(e) { if (e.target === this) closeQuizModal(); });
 
-            // 管理面板
             closeAdminBtn.addEventListener('click', closeAdminPanel);
             adminModal.addEventListener('click', function(e) { if (e.target === this) closeAdminPanel(); });
             tabBtns.forEach(btn => {
@@ -1184,25 +1140,16 @@
 
             // ===== 初始化 =====
             (function init() {
-                const users = loadUsers();
-                if (!users.admin) { users.admin = { password: PRESET_USER.password, balance: PRESET_USER.balance }; saveUsers(users); }
-                const sc = loadScenery();
-                if (!sc.length) { saveScenery(DEFAULT_SCENERY); }
-                // 清理过期签到数据
-                const today = getTodayStr();
-                const signinData = loadSigninData();
-                let changed = false;
-                Object.keys(signinData).forEach(key => {
-                    if (signinData[key].date !== today) {
-                        signinData[key] = { date: today, attempts: MAX_ATTEMPTS_PER_DAY, signed: false };
-                        changed = true;
+                // 先检查session
+                checkSession().then(hasSession => {
+                    if (!hasSession) {
+                        loginPage.style.display = 'flex';
+                        homePage.style.display = 'none';
+                        loginUsername.value = '';
+                        loginPassword.value = '';
                     }
                 });
-                if (changed) saveSigninData(signinData);
-
-                const hasSession = checkSession();
-                if (!hasSession) { loginPage.style.display = 'flex'; homePage.style.display = 'none'; loginUsername.value = ''; loginPassword.value = ''; }
-                if (currentUser && currentUser !== 'admin') updateSigninUI();
+                // 如果后端没有默认管理员，初始化时由后端处理，前端不需要创建
             })();
 
         })();
