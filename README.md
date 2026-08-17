@@ -7,1077 +7,175 @@
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet" />
     <style>
         /* ===== 全局重置 ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            background: #e9edf2;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: background 0.3s;
-        }
-        #loginPage {
-            width: 100%;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(145deg, #0b2a4a 0%, #1a4a6e 100%);
-            padding: 20px;
-        }
-        .login-card {
-            background: #ffffff;
-            border-radius: 24px;
-            padding: 44px 40px 36px;
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 0 25px 60px rgba(0, 20, 40, 0.45);
-            transition: transform 0.25s ease;
-        }
-        .login-card:hover {
-            transform: translateY(-2px);
-        }
-        .login-logo {
-            text-align: center;
-            margin-bottom: 28px;
-        }
-        .login-logo .icon {
-            font-size: 44px;
-            line-height: 1;
-            display: block;
-            margin-bottom: 6px;
-        }
-        .login-logo h1 {
-            font-size: 26px;
-            font-weight: 700;
-            color: #0b2a4a;
-            letter-spacing: 2px;
-        }
-        .login-logo p {
-            font-size: 14px;
-            color: #7a8a9e;
-            margin-top: 2px;
-            letter-spacing: 1px;
-        }
-        .login-form .form-group {
-            margin-bottom: 20px;
-        }
-        .login-form label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 6px;
-            letter-spacing: 0.5px;
-        }
-        .login-form input[type="text"],
-        .login-form input[type="password"] {
-            width: 100%;
-            padding: 14px 18px;
-            font-size: 16px;
-            border: 2px solid #dce3ec;
-            border-radius: 12px;
-            background: #f8fafc;
-            transition: border-color 0.25s, box-shadow 0.25s;
-            outline: none;
-            color: #1a2a3a;
-        }
-        .login-form input:focus {
-            border-color: #1a6e9e;
-            box-shadow: 0 0 0 4px rgba(26, 110, 158, 0.12);
-            background: #ffffff;
-        }
-        .login-btn {
-            width: 100%;
-            padding: 16px;
-            font-size: 18px;
-            font-weight: 700;
-            color: #ffffff;
-            background: linear-gradient(135deg, #1a6e9e, #0b4a72);
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: background 0.25s, transform 0.15s, box-shadow 0.25s;
-            letter-spacing: 2px;
-            margin-top: 4px;
-        }
-        .login-btn:hover {
-            background: linear-gradient(135deg, #1f7eb2, #0e5580);
-            box-shadow: 0 8px 24px rgba(26, 110, 158, 0.30);
-            transform: translateY(-1px);
-        }
-        .login-btn:active {
-            transform: scale(0.98);
-        }
-        .login-error {
-            margin-top: 16px;
-            padding: 12px 16px;
-            background: #fef2f0;
-            border-left: 4px solid #d94a4a;
-            border-radius: 8px;
-            color: #b33a3a;
-            font-size: 14px;
-            display: none;
-            align-items: center;
-            gap: 8px;
-        }
-        .login-error.show {
-            display: flex;
-        }
-        .login-error .err-icon {
-            font-size: 18px;
-        }
-        .login-footer {
-            text-align: center;
-            margin-top: 22px;
-            font-size: 14px;
-            color: #9aabba;
-        }
-        .login-footer .register-link {
-            display: inline-block;
-            margin-top: 6px;
-            color: #1a6e9e;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: underline;
-            transition: color 0.2s;
-        }
-        .login-footer .register-link:hover {
-            color: #0b4a72;
-        }
-        .login-footer .forgot-link {
-            display: inline-block;
-            margin-top: 4px;
-            color: #7a8a9e;
-            font-size: 13px;
-            cursor: pointer;
-            transition: color 0.2s;
-            text-decoration: underline;
-        }
-        .login-footer .forgot-link:hover {
-            color: #1a6e9e;
-        }
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.55);
-            backdrop-filter: blur(4px);
-            z-index: 999;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            animation: fadeIn 0.25s ease;
-        }
-        .modal-overlay.active {
-            display: flex;
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.96);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-        .modal-card {
-            background: #ffffff;
-            border-radius: 24px;
-            padding: 36px 32px 32px;
-            width: 100%;
-            max-width: 580px;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .modal-card .modal-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #0b2a4a;
-            text-align: center;
-            margin-bottom: 24px;
-            letter-spacing: 1px;
-        }
-        .modal-card .form-group {
-            margin-bottom: 18px;
-        }
-        .modal-card label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
-        .modal-card input[type="text"],
-        .modal-card input[type="password"],
-        .modal-card input[type="number"] {
-            width: 100%;
-            padding: 12px 16px;
-            font-size: 15px;
-            border: 2px solid #dce3ec;
-            border-radius: 10px;
-            background: #f8fafc;
-            transition: border-color 0.25s;
-            outline: none;
-            color: #1a2a3a;
-        }
-        .modal-card input:focus {
-            border-color: #1a6e9e;
-            background: #ffffff;
-        }
-        .modal-card .form-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 20px;
-        }
-        .modal-card .form-actions button {
-            flex: 1;
-            padding: 14px;
-            font-size: 16px;
-            font-weight: 700;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background 0.25s, transform 0.15s;
-        }
-        .modal-card .btn-primary {
-            background: linear-gradient(135deg, #1a6e9e, #0b4a72);
-            color: #ffffff;
-        }
-        .modal-card .btn-primary:hover {
-            background: linear-gradient(135deg, #1f7eb2, #0e5580);
-        }
-        .modal-card .btn-danger {
-            background: #d94a4a;
-            color: #ffffff;
-        }
-        .modal-card .btn-danger:hover {
-            background: #c0392b;
-        }
-        .modal-card .btn-cancel {
-            background: #eef2f7;
-            color: #4a5a6a;
-        }
-        .modal-card .btn-cancel:hover {
-            background: #e0e6ee;
-        }
-        .modal-card .modal-error {
-            margin-top: 14px;
-            padding: 10px 14px;
-            background: #fef2f0;
-            border-left: 4px solid #d94a4a;
-            border-radius: 6px;
-            color: #b33a3a;
-            font-size: 14px;
-            display: none;
-            align-items: center;
-            gap: 8px;
-        }
-        .modal-card .modal-error.show {
-            display: flex;
-        }
-        .modal-card .modal-success {
-            margin-top: 14px;
-            padding: 10px 14px;
-            background: #ecf9f0;
-            border-left: 4px solid #2ecc71;
-            border-radius: 6px;
-            color: #1a7a4a;
-            font-size: 14px;
-            display: none;
-            align-items: center;
-            gap: 8px;
-        }
-        .modal-card .modal-success.show {
-            display: flex;
-        }
-        .register-modal .verify-question {
-            background: #eef4fa;
-            padding: 12px 16px;
-            border-radius: 10px;
-            font-size: 15px;
-            color: #0b2a4a;
-            margin-bottom: 10px;
-            border-left: 4px solid #1a6e9e;
-            font-weight: 500;
-        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; background:#e9edf2; min-height:100vh; display:flex; justify-content:center; align-items:center; transition:background 0.3s; }
+        #loginPage { width:100%; min-height:100vh; display:flex; justify-content:center; align-items:center; background:linear-gradient(145deg,#0b2a4a 0%,#1a4a6e 100%); padding:20px; }
+        .login-card { background:#ffffff; border-radius:24px; padding:44px 40px 36px; width:100%; max-width:420px; box-shadow:0 25px 60px rgba(0,20,40,0.45); transition:transform 0.25s ease; }
+        .login-card:hover { transform:translateY(-2px); }
+        .login-logo { text-align:center; margin-bottom:28px; }
+        .login-logo .icon { font-size:44px; line-height:1; display:block; margin-bottom:6px; }
+        .login-logo h1 { font-size:26px; font-weight:700; color:#0b2a4a; letter-spacing:2px; }
+        .login-logo p { font-size:14px; color:#7a8a9e; margin-top:2px; letter-spacing:1px; }
+        .login-form .form-group { margin-bottom:20px; }
+        .login-form label { display:block; font-size:14px; font-weight:600; color:#2c3e50; margin-bottom:6px; letter-spacing:0.5px; }
+        .login-form input[type="text"], .login-form input[type="password"] { width:100%; padding:14px 18px; font-size:16px; border:2px solid #dce3ec; border-radius:12px; background:#f8fafc; transition:border-color 0.25s, box-shadow 0.25s; outline:none; color:#1a2a3a; }
+        .login-form input:focus { border-color:#1a6e9e; box-shadow:0 0 0 4px rgba(26,110,158,0.12); background:#ffffff; }
+        .login-btn { width:100%; padding:16px; font-size:18px; font-weight:700; color:#ffffff; background:linear-gradient(135deg,#1a6e9e,#0b4a72); border:none; border-radius:12px; cursor:pointer; transition:background 0.25s, transform 0.15s, box-shadow 0.25s; letter-spacing:2px; margin-top:4px; }
+        .login-btn:hover { background:linear-gradient(135deg,#1f7eb2,#0e5580); box-shadow:0 8px 24px rgba(26,110,158,0.30); transform:translateY(-1px); }
+        .login-btn:active { transform:scale(0.98); }
+        .login-error { margin-top:16px; padding:12px 16px; background:#fef2f0; border-left:4px solid #d94a4a; border-radius:8px; color:#b33a3a; font-size:14px; display:none; align-items:center; gap:8px; }
+        .login-error.show { display:flex; }
+        .login-error .err-icon { font-size:18px; }
+        .login-footer { text-align:center; margin-top:22px; font-size:14px; color:#9aabba; }
+        .login-footer .register-link { display:inline-block; margin-top:6px; color:#1a6e9e; font-weight:600; cursor:pointer; text-decoration:underline; transition:color 0.2s; }
+        .login-footer .register-link:hover { color:#0b4a72; }
+        .login-footer .forgot-link { display:inline-block; margin-top:4px; color:#7a8a9e; font-size:13px; cursor:pointer; transition:color 0.2s; text-decoration:underline; }
+        .login-footer .forgot-link:hover { color:#1a6e9e; }
+        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); backdrop-filter:blur(4px); z-index:999; justify-content:center; align-items:center; padding:20px; animation:fadeIn 0.25s ease; }
+        .modal-overlay.active { display:flex; }
+        @keyframes fadeIn { from{opacity:0; transform:scale(0.96);} to{opacity:1; transform:scale(1);} }
+        .modal-card { background:#ffffff; border-radius:24px; padding:36px 32px 32px; width:100%; max-width:580px; box-shadow:0 30px 80px rgba(0,0,0,0.45); max-height:90vh; overflow-y:auto; }
+        .modal-card .modal-title { font-size:24px; font-weight:700; color:#0b2a4a; text-align:center; margin-bottom:24px; letter-spacing:1px; }
+        .modal-card .form-group { margin-bottom:18px; }
+        .modal-card label { display:block; font-size:14px; font-weight:600; color:#2c3e50; margin-bottom:5px; }
+        .modal-card input[type="text"], .modal-card input[type="password"], .modal-card input[type="number"] { width:100%; padding:12px 16px; font-size:15px; border:2px solid #dce3ec; border-radius:10px; background:#f8fafc; transition:border-color 0.25s; outline:none; color:#1a2a3a; }
+        .modal-card input:focus { border-color:#1a6e9e; background:#ffffff; }
+        .modal-card .form-actions { display:flex; gap:12px; margin-top:20px; }
+        .modal-card .form-actions button { flex:1; padding:14px; font-size:16px; font-weight:700; border:none; border-radius:10px; cursor:pointer; transition:background 0.25s, transform 0.15s; }
+        .modal-card .btn-primary { background:linear-gradient(135deg,#1a6e9e,#0b4a72); color:#ffffff; }
+        .modal-card .btn-primary:hover { background:linear-gradient(135deg,#1f7eb2,#0e5580); }
+        .modal-card .btn-danger { background:#d94a4a; color:#ffffff; }
+        .modal-card .btn-danger:hover { background:#c0392b; }
+        .modal-card .btn-cancel { background:#eef2f7; color:#4a5a6a; }
+        .modal-card .btn-cancel:hover { background:#e0e6ee; }
+        .modal-card .modal-error { margin-top:14px; padding:10px 14px; background:#fef2f0; border-left:4px solid #d94a4a; border-radius:6px; color:#b33a3a; font-size:14px; display:none; align-items:center; gap:8px; }
+        .modal-card .modal-error.show { display:flex; }
+        .modal-card .modal-success { margin-top:14px; padding:10px 14px; background:#ecf9f0; border-left:4px solid #2ecc71; border-radius:6px; color:#1a7a4a; font-size:14px; display:none; align-items:center; gap:8px; }
+        .modal-card .modal-success.show { display:flex; }
+        .register-modal .verify-question { background:#eef4fa; padding:12px 16px; border-radius:10px; font-size:15px; color:#0b2a4a; margin-bottom:10px; border-left:4px solid #1a6e9e; font-weight:500; }
 
         /* 签到答题 */
-        .quiz-modal .modal-card {
-            max-width: 600px;
-        }
-        .quiz-modal .quiz-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 18px;
-            font-weight: 600;
-            color: #0b2a4a;
-            padding: 0 4px 16px 4px;
-            border-bottom: 2px solid #eef2f7;
-        }
-        .quiz-modal .quiz-header .timer {
-            color: #d94a4a;
-        }
-        .quiz-modal .quiz-body {
-            padding: 24px 0 16px;
-            text-align: center;
-        }
-        .quiz-modal .quiz-body .question-number {
-            font-size: 16px;
-            color: #5a6a7a;
-        }
-        .quiz-modal .quiz-body .question-text {
-            font-size: 32px;
-            font-weight: 700;
-            color: #0b2a4a;
-            margin: 16px 0 20px;
-            letter-spacing: 2px;
-        }
-        .quiz-modal .quiz-body .answer-input {
-            display: inline-block;
-            width: 120px;
-            padding: 10px 16px;
-            font-size: 28px;
-            text-align: center;
-            border: 3px solid #dce3ec;
-            border-radius: 12px;
-            outline: none;
-            transition: border-color 0.2s;
-            background: #f8fafc;
-        }
-        .quiz-modal .quiz-body .answer-input:focus {
-            border-color: #1a6e9e;
-            background: #ffffff;
-        }
-        .quiz-modal .quiz-body .answer-input:disabled {
-            background: #eef2f7;
-            border-color: #d0dae6;
-        }
-        .quiz-modal .quiz-body .feedback {
-            margin-top: 16px;
-            font-size: 20px;
-            font-weight: 600;
-            min-height: 40px;
-        }
-        .quiz-modal .quiz-body .feedback.correct {
-            color: #27ae60;
-        }
-        .quiz-modal .quiz-body .feedback.wrong {
-            color: #e74c3c;
-        }
-        .quiz-modal .quiz-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 16px;
-            border-top: 2px solid #eef2f7;
-            font-size: 14px;
-            color: #5a6a7a;
-        }
-        .quiz-modal .quiz-footer .score {
-            font-weight: 600;
-            color: #0b2a4a;
-        }
-        .quiz-modal .quiz-footer .score span {
-            color: #1a6e9e;
-        }
+        .quiz-modal .modal-card { max-width:600px; }
+        .quiz-modal .quiz-header { display:flex; justify-content:space-between; font-size:18px; font-weight:600; color:#0b2a4a; padding:0 4px 16px 4px; border-bottom:2px solid #eef2f7; }
+        .quiz-modal .quiz-header .timer { color:#d94a4a; }
+        .quiz-modal .quiz-body { padding:24px 0 16px; text-align:center; }
+        .quiz-modal .quiz-body .question-number { font-size:16px; color:#5a6a7a; }
+        .quiz-modal .quiz-body .question-text { font-size:32px; font-weight:700; color:#0b2a4a; margin:16px 0 20px; letter-spacing:2px; }
+        .quiz-modal .quiz-body .answer-input { display:inline-block; width:120px; padding:10px 16px; font-size:28px; text-align:center; border:3px solid #dce3ec; border-radius:12px; outline:none; transition:border-color 0.2s; background:#f8fafc; }
+        .quiz-modal .quiz-body .answer-input:focus { border-color:#1a6e9e; background:#ffffff; }
+        .quiz-modal .quiz-body .answer-input:disabled { background:#eef2f7; border-color:#d0dae6; }
+        .quiz-modal .quiz-body .feedback { margin-top:16px; font-size:20px; font-weight:600; min-height:40px; }
+        .quiz-modal .quiz-body .feedback.correct { color:#27ae60; }
+        .quiz-modal .quiz-body .feedback.wrong { color:#e74c3c; }
+        .quiz-modal .quiz-footer { display:flex; justify-content:space-between; align-items:center; padding-top:16px; border-top:2px solid #eef2f7; font-size:14px; color:#5a6a7a; }
+        .quiz-modal .quiz-footer .score { font-weight:600; color:#0b2a4a; }
+        .quiz-modal .quiz-footer .score span { color:#1a6e9e; }
+        /* 新增开始区域 */
+        .quiz-start-area { margin:10px 0 16px; }
+        .quiz-start-area .start-btn { padding:14px 48px; font-size:22px; font-weight:700; border-radius:40px; border:none; background:linear-gradient(135deg,#27ae60,#1e8449); color:#fff; cursor:pointer; transition:transform 0.2s, box-shadow 0.2s; box-shadow:0 4px 16px rgba(39,174,96,0.3); }
+        .quiz-start-area .start-btn:hover { transform:scale(1.03); box-shadow:0 6px 24px rgba(39,174,96,0.4); }
+        .quiz-start-area .countdown { font-size:56px; font-weight:900; color:#1a6e9e; letter-spacing:4px; display:none; }
+        .quiz-start-area .countdown.active { display:block; }
 
         /* 首页 */
-        #homePage {
-            display: none;
-            width: 100%;
-            min-height: 100vh;
-            background: #eef2f7;
-            flex-direction: column;
-        }
-        .navbar {
-            background: linear-gradient(135deg, #0b2a4a, #1a4a6e);
-            padding: 0 40px;
-            height: 72px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            flex-shrink: 0;
-        }
-        .navbar .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: #ffffff;
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-        .navbar .brand .brand-icon {
-            font-size: 30px;
-            line-height: 1;
-        }
-        .navbar .brand .brand-sub {
-            font-size: 13px;
-            font-weight: 400;
-            opacity: 0.7;
-            margin-left: 4px;
-        }
-        .navbar .user-area {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-        }
-        .navbar .user-area .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: #ffffff;
-            font-size: 14px;
-        }
-        .navbar .user-area .user-info .user-name {
-            font-weight: 600;
-            background: rgba(255, 255, 255, 0.12);
-            padding: 5px 16px;
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .navbar .user-area .user-info .user-balance {
-            background: rgba(255, 215, 0, 0.20);
-            padding: 5px 16px;
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            color: #ffd700;
-            font-weight: 600;
-        }
-        .navbar .logout-btn {
-            background: rgba(255, 255, 255, 0.10);
-            border: 1.5px solid rgba(255, 255, 255, 0.25);
-            color: #ffffff;
-            padding: 7px 22px;
-            border-radius: 30px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.25s, border-color 0.25s;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-        }
-        .navbar .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.20);
-            border-color: rgba(255, 255, 255, 0.45);
-        }
-        .hero-banner {
-            background: #c0392b;
-            background: linear-gradient(135deg, #b71c1c, #c0392b);
-            padding: 24px 20px;
-            text-align: center;
-            border-bottom: 4px solid #922b21;
-            box-shadow: 0 4px 20px rgba(192, 57, 43, 0.25);
-            flex-shrink: 0;
-        }
-        .hero-banner h1 {
-            font-family: 'Ma Shan Zheng', '华文行楷', 'STXingkai', 'KaiTi', cursive;
-            font-size: 52px;
-            color: #ffffff;
-            letter-spacing: 8px;
-            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.20);
-            font-weight: 400;
-            line-height: 1.2;
-        }
-        .home-main {
-            flex: 1;
-            padding: 28px 40px 20px;
-            max-width: 1280px;
-            margin: 0 auto;
-            width: 100%;
-        }
-        .welcome-banner {
-            background: linear-gradient(135deg, #ffffff, #f5f9ff);
-            border-radius: 20px;
-            padding: 22px 30px;
-            margin-bottom: 28px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .welcome-banner .greeting h2 {
-            font-size: 22px;
-            font-weight: 700;
-            color: #0b2a4a;
-        }
-        .welcome-banner .greeting h2 .highlight {
-            color: #1a6e9e;
-        }
-        .welcome-banner .greeting p {
-            color: #5a6a7a;
-            font-size: 14px;
-            margin-top: 2px;
-        }
-        .welcome-banner .datetime {
-            text-align: right;
-            color: #3a5a7a;
-            font-size: 15px;
-            background: #eef4fa;
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-        .welcome-banner .datetime .time {
-            font-size: 20px;
-            font-weight: 700;
-            color: #0b2a4a;
-            margin-right: 6px;
-        }
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1a2a3a;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .section-title .title-line {
-            flex: 1;
-            height: 2px;
-            background: linear-gradient(to right, #d0dae6, transparent);
-        }
-        .card-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 22px;
-            margin-bottom: 28px;
-        }
-        .line-card {
-            background: #ffffff;
-            border-radius: 18px;
-            padding: 20px 24px 18px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-            border: 1px solid #eef2f7;
-            transition: box-shadow 0.2s, transform 0.2s;
-        }
-        .line-card:hover {
-            box-shadow: 0 8px 28px rgba(0, 20, 40, 0.08);
-            transform: translateY(-2px);
-        }
-        .line-card .line-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 10px;
-        }
-        .line-card .line-color {
-            width: 6px;
-            height: 30px;
-            border-radius: 6px;
-            flex-shrink: 0;
-        }
-        .line-card .line-name {
-            font-size: 18px;
-            font-weight: 700;
-            color: #0b2a4a;
-        }
-        .line-card .line-name .line-code {
-            font-size: 14px;
-            font-weight: 400;
-            color: #7a8a9e;
-            margin-left: 6px;
-        }
-        .line-card .line-stations {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px 14px;
-            padding-left: 18px;
-            margin-top: 4px;
-        }
-        .line-card .line-stations .station {
-            font-size: 14px;
-            color: #2a4a6a;
-            padding: 2px 0;
-            position: relative;
-        }
-        .line-card .line-stations .station::after {
-            content: "·";
-            color: #b0c4d8;
-            margin-left: 10px;
-        }
-        .line-card .line-stations .station:last-child::after {
-            content: "";
-            margin: 0;
-        }
-        .line-card .line-stations .station .dir-icon {
-            font-size: 12px;
-            color: #8a9aaa;
-            margin: 0 2px;
-        }
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 16px;
-            margin-bottom: 8px;
-        }
-        .quick-action {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 24px 12px 20px;
-            text-align: center;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-            border: 1px solid #eef2f7;
-            cursor: pointer;
-            transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
-            user-select: none;
-        }
-        .quick-action:hover {
-            box-shadow: 0 8px 28px rgba(0, 20, 40, 0.10);
-            transform: translateY(-3px);
-            border-color: #c8d8e8;
-        }
-        .quick-action:active {
-            transform: scale(0.97);
-        }
-        .quick-action .qa-icon {
-            font-size: 34px;
-            display: block;
-            margin-bottom: 8px;
-        }
-        .quick-action .qa-label {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1a2a3a;
-        }
-        .quick-action .qa-desc {
-            font-size: 12px;
-            color: #8a9aaa;
-            margin-top: 2px;
-        }
-        .quick-action.admin-action {
-            border-color: #f1c40f;
-            background: #fef9e7;
-        }
-        .quick-action.admin-action:hover {
-            border-color: #d4ac0d;
-        }
-        .quick-action.signin-action {
-            border-color: #2ecc71;
-            background: #eafaf1;
-        }
-        .quick-action.signin-action:hover {
-            border-color: #1e8449;
-        }
-        .quick-action.signin-action.disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            filter: grayscale(0.3);
-        }
-        .quick-action.signin-action.disabled:hover {
-            transform: none;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-            border-color: #eef2f7;
-        }
-        .home-footer {
-            text-align: center;
-            padding: 20px 20px 8px;
-            color: #8a9aaa;
-            font-size: 13px;
-            border-top: 1px solid #e0e6ee;
-            margin-top: 12px;
-        }
-        .home-footer strong {
-            color: #1a4a6e;
-        }
+        #homePage { display:none; width:100%; min-height:100vh; background:#eef2f7; flex-direction:column; }
+        .navbar { background:linear-gradient(135deg,#0b2a4a,#1a4a6e); padding:0 40px; height:72px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 20px rgba(0,0,0,0.15); position:sticky; top:0; z-index:100; flex-shrink:0; }
+        .navbar .brand { display:flex; align-items:center; gap:12px; color:#ffffff; font-size:22px; font-weight:700; letter-spacing:1px; }
+        .navbar .brand .brand-icon { font-size:30px; line-height:1; }
+        .navbar .brand .brand-sub { font-size:13px; font-weight:400; opacity:0.7; margin-left:4px; }
+        .navbar .user-area { display:flex; align-items:center; gap:16px; flex-wrap:wrap; justify-content:flex-end; }
+        .navbar .user-area .user-info { display:flex; align-items:center; gap:12px; color:#ffffff; font-size:14px; }
+        .navbar .user-area .user-info .user-name { font-weight:600; background:rgba(255,255,255,0.12); padding:5px 16px; border-radius:30px; display:flex; align-items:center; gap:6px; }
+        .navbar .user-area .user-info .user-balance { background:rgba(255,215,0,0.20); padding:5px 16px; border-radius:30px; display:flex; align-items:center; gap:4px; color:#ffd700; font-weight:600; }
+        .navbar .logout-btn { background:rgba(255,255,255,0.10); border:1.5px solid rgba(255,255,255,0.25); color:#ffffff; padding:7px 22px; border-radius:30px; font-size:14px; font-weight:600; cursor:pointer; transition:background 0.25s, border-color 0.25s; letter-spacing:0.5px; white-space:nowrap; }
+        .navbar .logout-btn:hover { background:rgba(255,255,255,0.20); border-color:rgba(255,255,255,0.45); }
+        .hero-banner { background:#c0392b; background:linear-gradient(135deg,#b71c1c,#c0392b); padding:24px 20px; text-align:center; border-bottom:4px solid #922b21; box-shadow:0 4px 20px rgba(192,57,43,0.25); flex-shrink:0; }
+        .hero-banner h1 { font-family:'Ma Shan Zheng','华文行楷','STXingkai','KaiTi',cursive; font-size:52px; color:#ffffff; letter-spacing:8px; text-shadow:0 2px 12px rgba(0,0,0,0.20); font-weight:400; line-height:1.2; }
+        .home-main { flex:1; padding:28px 40px 20px; max-width:1280px; margin:0 auto; width:100%; }
+        .welcome-banner { background:linear-gradient(135deg,#ffffff,#f5f9ff); border-radius:20px; padding:22px 30px; margin-bottom:28px; box-shadow:0 2px 12px rgba(0,0,0,0.04); border:1px solid rgba(255,255,255,0.6); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
+        .welcome-banner .greeting h2 { font-size:22px; font-weight:700; color:#0b2a4a; }
+        .welcome-banner .greeting h2 .highlight { color:#1a6e9e; }
+        .welcome-banner .greeting p { color:#5a6a7a; font-size:14px; margin-top:2px; }
+        .welcome-banner .datetime { text-align:right; color:#3a5a7a; font-size:15px; background:#eef4fa; padding:8px 20px; border-radius:40px; font-weight:500; white-space:nowrap; }
+        .welcome-banner .datetime .time { font-size:20px; font-weight:700; color:#0b2a4a; margin-right:6px; }
+        .section-title { font-size:18px; font-weight:700; color:#1a2a3a; margin-bottom:14px; display:flex; align-items:center; gap:10px; }
+        .section-title .title-line { flex:1; height:2px; background:linear-gradient(to right,#d0dae6,transparent); }
+        .card-grid { display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-bottom:28px; }
+        .line-card { background:#ffffff; border-radius:18px; padding:20px 24px 18px; box-shadow:0 2px 12px rgba(0,0,0,0.04); border:1px solid #eef2f7; transition:box-shadow 0.2s, transform 0.2s; }
+        .line-card:hover { box-shadow:0 8px 28px rgba(0,20,40,0.08); transform:translateY(-2px); }
+        .line-card .line-header { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+        .line-card .line-color { width:6px; height:30px; border-radius:6px; flex-shrink:0; }
+        .line-card .line-name { font-size:18px; font-weight:700; color:#0b2a4a; }
+        .line-card .line-name .line-code { font-size:14px; font-weight:400; color:#7a8a9e; margin-left:6px; }
+        .line-card .line-stations { display:flex; flex-wrap:wrap; gap:4px 14px; padding-left:18px; margin-top:4px; }
+        .line-card .line-stations .station { font-size:14px; color:#2a4a6a; padding:2px 0; position:relative; }
+        .line-card .line-stations .station::after { content:"·"; color:#b0c4d8; margin-left:10px; }
+        .line-card .line-stations .station:last-child::after { content:""; margin:0; }
+        .line-card .line-stations .station .dir-icon { font-size:12px; color:#8a9aaa; margin:0 2px; }
+        .quick-actions { display:grid; grid-template-columns:repeat(5,1fr); gap:16px; margin-bottom:8px; }
+        .quick-action { background:#ffffff; border-radius:16px; padding:24px 12px 20px; text-align:center; box-shadow:0 2px 12px rgba(0,0,0,0.04); border:1px solid #eef2f7; cursor:pointer; transition:box-shadow 0.2s, transform 0.2s, border-color 0.2s; user-select:none; }
+        .quick-action:hover { box-shadow:0 8px 28px rgba(0,20,40,0.10); transform:translateY(-3px); border-color:#c8d8e8; }
+        .quick-action:active { transform:scale(0.97); }
+        .quick-action .qa-icon { font-size:34px; display:block; margin-bottom:8px; }
+        .quick-action .qa-label { font-size:16px; font-weight:600; color:#1a2a3a; }
+        .quick-action .qa-desc { font-size:12px; color:#8a9aaa; margin-top:2px; }
+        .quick-action.admin-action { border-color:#f1c40f; background:#fef9e7; }
+        .quick-action.admin-action:hover { border-color:#d4ac0d; }
+        .quick-action.signin-action { border-color:#2ecc71; background:#eafaf1; }
+        .quick-action.signin-action:hover { border-color:#1e8449; }
+        .quick-action.signin-action.disabled { opacity:0.6; cursor:not-allowed; filter:grayscale(0.3); }
+        .quick-action.signin-action.disabled:hover { transform:none; box-shadow:0 2px 12px rgba(0,0,0,0.04); border-color:#eef2f7; }
+        .home-footer { text-align:center; padding:20px 20px 8px; color:#8a9aaa; font-size:13px; border-top:1px solid #e0e6ee; margin-top:12px; }
+        .home-footer strong { color:#1a4a6e; }
 
         /* 管理面板 */
-        .admin-modal .modal-card {
-            max-width: 820px;
-        }
-        .admin-modal .tab-bar {
-            display: flex;
-            gap: 4px;
-            border-bottom: 2px solid #e0e6ee;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-        .admin-modal .tab-bar .tab-btn {
-            padding: 10px 24px;
-            font-size: 16px;
-            font-weight: 600;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            color: #5a6a7a;
-            border-bottom: 3px solid transparent;
-            transition: color 0.2s, border-color 0.2s;
-        }
-        .admin-modal .tab-bar .tab-btn.active {
-            color: #0b2a4a;
-            border-bottom-color: #1a6e9e;
-        }
-        .admin-modal .tab-bar .tab-btn:hover {
-            color: #0b2a4a;
-        }
-        .admin-modal .tab-content {
-            display: none;
-        }
-        .admin-modal .tab-content.active {
-            display: block;
-        }
-        .admin-modal .user-table-wrap {
-            overflow-x: auto;
-        }
-        .admin-modal table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-        .admin-modal table th {
-            background: #eef4fa;
-            color: #0b2a4a;
-            font-weight: 700;
-            padding: 12px 10px;
-            text-align: left;
-            border-bottom: 2px solid #d0dae6;
-        }
-        .admin-modal table td {
-            padding: 10px 10px;
-            border-bottom: 1px solid #eef2f7;
-            vertical-align: middle;
-        }
-        .admin-modal table tr:hover td {
-            background: #f8fafc;
-        }
-        .admin-modal .table-actions {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-        .admin-modal .table-actions button {
-            padding: 4px 12px;
-            font-size: 12px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .admin-modal .btn-edit {
-            background: #d4e6f1;
-            color: #1a4a6e;
-        }
-        .admin-modal .btn-edit:hover {
-            background: #b0d0e6;
-        }
-        .admin-modal .btn-balance {
-            background: #fdebd0;
-            color: #a04000;
-        }
-        .admin-modal .btn-balance:hover {
-            background: #fad7a0;
-        }
-        .admin-modal .btn-delete {
-            background: #fadbd8;
-            color: #922b21;
-        }
-        .admin-modal .btn-delete:hover {
-            background: #f5b7b1;
-        }
-        .admin-modal .add-btn {
-            margin-top: 16px;
-            padding: 10px 20px;
-            background: #1a6e9e;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .admin-modal .add-btn:hover {
-            background: #0b4a72;
-        }
-        .admin-modal .scenery-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 8px;
-        }
-        .admin-modal .scenery-item-admin {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 14px 18px;
-            border: 1px solid #eef2f7;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .admin-modal .scenery-item-admin .info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex: 1;
-            min-width: 150px;
-        }
-        .admin-modal .scenery-item-admin .info .icon {
-            font-size: 28px;
-        }
-        .admin-modal .scenery-item-admin .info .name {
-            font-weight: 700;
-            color: #0b2a4a;
-        }
-        .admin-modal .scenery-item-admin .info .desc {
-            color: #5a6a7a;
-            font-size: 13px;
-        }
-        .admin-modal .scenery-item-admin .actions {
-            display: flex;
-            gap: 6px;
-        }
-        .admin-modal .scenery-item-admin .actions button {
-            padding: 4px 14px;
-            font-size: 12px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .admin-modal .scenery-item-admin .actions .btn-edit {
-            background: #d4e6f1;
-            color: #1a4a6e;
-        }
-        .admin-modal .scenery-item-admin .actions .btn-edit:hover {
-            background: #b0d0e6;
-        }
-        .admin-modal .scenery-item-admin .actions .btn-delete {
-            background: #fadbd8;
-            color: #922b21;
-        }
-        .admin-modal .scenery-item-admin .actions .btn-delete:hover {
-            background: #f5b7b1;
-        }
+        .admin-modal .modal-card { max-width:820px; }
+        .admin-modal .tab-bar { display:flex; gap:4px; border-bottom:2px solid #e0e6ee; margin-bottom:24px; flex-wrap:wrap; }
+        .admin-modal .tab-bar .tab-btn { padding:10px 24px; font-size:16px; font-weight:600; border:none; background:transparent; cursor:pointer; color:#5a6a7a; border-bottom:3px solid transparent; transition:color 0.2s, border-color 0.2s; }
+        .admin-modal .tab-bar .tab-btn.active { color:#0b2a4a; border-bottom-color:#1a6e9e; }
+        .admin-modal .tab-bar .tab-btn:hover { color:#0b2a4a; }
+        .admin-modal .tab-content { display:none; }
+        .admin-modal .tab-content.active { display:block; }
+        .admin-modal .user-table-wrap { overflow-x:auto; }
+        .admin-modal table { width:100%; border-collapse:collapse; font-size:14px; }
+        .admin-modal table th { background:#eef4fa; color:#0b2a4a; font-weight:700; padding:12px 10px; text-align:left; border-bottom:2px solid #d0dae6; }
+        .admin-modal table td { padding:10px 10px; border-bottom:1px solid #eef2f7; vertical-align:middle; }
+        .admin-modal table tr:hover td { background:#f8fafc; }
+        .admin-modal .table-actions { display:flex; gap:6px; flex-wrap:wrap; }
+        .admin-modal .table-actions button { padding:4px 12px; font-size:12px; border:none; border-radius:6px; font-weight:600; cursor:pointer; transition:background 0.2s; }
+        .admin-modal .btn-edit { background:#d4e6f1; color:#1a4a6e; }
+        .admin-modal .btn-edit:hover { background:#b0d0e6; }
+        .admin-modal .btn-balance { background:#fdebd0; color:#a04000; }
+        .admin-modal .btn-balance:hover { background:#fad7a0; }
+        .admin-modal .btn-delete { background:#fadbd8; color:#922b21; }
+        .admin-modal .btn-delete:hover { background:#f5b7b1; }
+        .admin-modal .add-btn { margin-top:16px; padding:10px 20px; background:#1a6e9e; color:#fff; border:none; border-radius:8px; font-weight:600; cursor:pointer; transition:background 0.2s; }
+        .admin-modal .add-btn:hover { background:#0b4a72; }
+        .admin-modal .scenery-list { display:flex; flex-direction:column; gap:12px; margin-top:8px; }
+        .admin-modal .scenery-item-admin { background:#f8fafc; border-radius:12px; padding:14px 18px; border:1px solid #eef2f7; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+        .admin-modal .scenery-item-admin .info { display:flex; align-items:center; gap:12px; flex:1; min-width:150px; }
+        .admin-modal .scenery-item-admin .info .icon { font-size:28px; }
+        .admin-modal .scenery-item-admin .info .name { font-weight:700; color:#0b2a4a; }
+        .admin-modal .scenery-item-admin .info .desc { color:#5a6a7a; font-size:13px; }
+        .admin-modal .scenery-item-admin .actions { display:flex; gap:6px; }
+        .admin-modal .scenery-item-admin .actions button { padding:4px 14px; font-size:12px; border:none; border-radius:6px; font-weight:600; cursor:pointer; transition:background 0.2s; }
+        .admin-modal .scenery-item-admin .actions .btn-edit { background:#d4e6f1; color:#1a4a6e; }
+        .admin-modal .scenery-item-admin .actions .btn-edit:hover { background:#b0d0e6; }
+        .admin-modal .scenery-item-admin .actions .btn-delete { background:#fadbd8; color:#922b21; }
+        .admin-modal .scenery-item-admin .actions .btn-delete:hover { background:#f5b7b1; }
 
-        .toast-container {
-            position: fixed;
-            top: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
-            pointer-events: none;
-        }
-        .toast {
-            background: #1a2a3a;
-            color: #ffffff;
-            padding: 14px 32px;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 500;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.30);
-            opacity: 0;
-            transform: translateY(-20px) scale(0.95);
-            transition: opacity 0.35s ease, transform 0.35s ease;
-            pointer-events: auto;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            white-space: nowrap;
-        }
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-        .toast .toast-icon {
-            font-size: 20px;
-        }
+        .toast-container { position:fixed; top:100px; left:50%; transform:translateX(-50%); z-index:9999; pointer-events:none; }
+        .toast { background:#1a2a3a; color:#ffffff; padding:14px 32px; border-radius:12px; font-size:15px; font-weight:500; box-shadow:0 8px 32px rgba(0,0,0,0.30); opacity:0; transform:translateY(-20px) scale(0.95); transition:opacity 0.35s ease, transform 0.35s ease; pointer-events:auto; display:flex; align-items:center; gap:10px; white-space:nowrap; }
+        .toast.show { opacity:1; transform:translateY(0) scale(1); }
+        .toast .toast-icon { font-size:20px; }
 
-        @media (max-width:992px) {
-            .card-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-            .quick-actions {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            .home-main {
-                padding: 20px 24px 16px;
-            }
-            .navbar {
-                padding: 0 24px;
-                height: 64px;
-            }
-            .navbar .brand {
-                font-size: 18px;
-            }
-            .navbar .brand .brand-sub {
-                display: none;
-            }
-            .hero-banner h1 {
-                font-size: 38px;
-                letter-spacing: 4px;
-            }
-            .welcome-banner {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .welcome-banner .datetime {
-                text-align: left;
-                width: 100%;
-                white-space: normal;
-            }
-            .admin-modal .modal-card {
-                max-width: 95%;
-                padding: 24px 16px;
-            }
-            .quiz-modal .modal-card {
-                max-width: 95%;
-            }
-        }
-        @media (max-width:600px) {
-            .login-card {
-                padding: 28px 18px 24px;
-            }
-            .login-logo h1 {
-                font-size: 22px;
-            }
-            .navbar .user-area .user-info {
-                font-size: 12px;
-                gap: 6px;
-                flex-wrap: wrap;
-                justify-content: flex-end;
-            }
-            .navbar .user-area .user-info .user-name,
-            .navbar .user-area .user-info .user-balance {
-                padding: 3px 12px;
-                font-size: 12px;
-            }
-            .navbar .logout-btn {
-                font-size: 12px;
-                padding: 5px 14px;
-            }
-            .navbar {
-                padding: 0 14px;
-                height: 58px;
-            }
-            .navbar .brand {
-                font-size: 16px;
-                gap: 6px;
-            }
-            .navbar .brand .brand-icon {
-                font-size: 22px;
-            }
-            .hero-banner h1 {
-                font-size: 28px;
-                letter-spacing: 2px;
-            }
-            .hero-banner {
-                padding: 16px 12px;
-            }
-            .quick-actions {
-                grid-template-columns: 1fr 1fr 1fr;
-                gap: 10px;
-            }
-            .quick-action {
-                padding: 16px 6px 14px;
-            }
-            .quick-action .qa-icon {
-                font-size: 26px;
-            }
-            .quick-action .qa-label {
-                font-size: 14px;
-            }
-            .quick-action .qa-desc {
-                font-size: 11px;
-            }
-            .line-card {
-                padding: 14px 16px;
-            }
-            .line-card .line-stations {
-                gap: 2px 10px;
-                padding-left: 10px;
-            }
-            .line-card .line-stations .station {
-                font-size: 13px;
-            }
-            .home-main {
-                padding: 14px 14px 12px;
-            }
-            .welcome-banner {
-                padding: 14px 16px;
-            }
-            .welcome-banner .greeting h2 {
-                font-size: 18px;
-            }
-            .modal-card {
-                padding: 24px 18px 20px;
-            }
-            .modal-card .form-actions {
-                flex-direction: column;
-            }
-            .toast {
-                padding: 12px 20px;
-                font-size: 14px;
-                white-space: normal;
-            }
-            .admin-modal table th,
-            .admin-modal table td {
-                padding: 6px 4px;
-                font-size: 12px;
-            }
-            .admin-modal .table-actions button {
-                font-size: 10px;
-                padding: 2px 8px;
-            }
-            .admin-modal .scenery-item-admin {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .admin-modal .scenery-item-admin .info {
-                flex-wrap: wrap;
-            }
-            .quiz-modal .quiz-body .question-text {
-                font-size: 24px;
-            }
-            .quiz-modal .quiz-body .answer-input {
-                width: 80px;
-                font-size: 22px;
-            }
-        }
-        .text-muted {
-            color: #8a9aaa;
-            font-size: 13px;
-        }
-        .mt-8 {
-            margin-top: 8px;
-        }
-        .flex-center {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .text-center {
-            text-align: center;
-        }
-        .w-full {
-            width: 100%;
-        }
+        @media (max-width:992px) { .card-grid { grid-template-columns:1fr; gap:16px; } .quick-actions { grid-template-columns:repeat(3,1fr); } .home-main { padding:20px 24px 16px; } .navbar { padding:0 24px; height:64px; } .navbar .brand { font-size:18px; } .navbar .brand .brand-sub { display:none; } .hero-banner h1 { font-size:38px; letter-spacing:4px; } .welcome-banner { flex-direction:column; align-items:flex-start; } .welcome-banner .datetime { text-align:left; width:100%; white-space:normal; } .admin-modal .modal-card { max-width:95%; padding:24px 16px; } .quiz-modal .modal-card { max-width:95%; } }
+        @media (max-width:600px) { .login-card { padding:28px 18px 24px; } .login-logo h1 { font-size:22px; } .navbar .user-area .user-info { font-size:12px; gap:6px; flex-wrap:wrap; justify-content:flex-end; } .navbar .user-area .user-info .user-name, .navbar .user-area .user-info .user-balance { padding:3px 12px; font-size:12px; } .navbar .logout-btn { font-size:12px; padding:5px 14px; } .navbar { padding:0 14px; height:58px; } .navbar .brand { font-size:16px; gap:6px; } .navbar .brand .brand-icon { font-size:22px; } .hero-banner h1 { font-size:28px; letter-spacing:2px; } .hero-banner { padding:16px 12px; } .quick-actions { grid-template-columns:1fr 1fr 1fr; gap:10px; } .quick-action { padding:16px 6px 14px; } .quick-action .qa-icon { font-size:26px; } .quick-action .qa-label { font-size:14px; } .quick-action .qa-desc { font-size:11px; } .line-card { padding:14px 16px; } .line-card .line-stations { gap:2px 10px; padding-left:10px; } .line-card .line-stations .station { font-size:13px; } .home-main { padding:14px 14px 12px; } .welcome-banner { padding:14px 16px; } .welcome-banner .greeting h2 { font-size:18px; } .modal-card { padding:24px 18px 20px; } .modal-card .form-actions { flex-direction:column; } .toast { padding:12px 20px; font-size:14px; white-space:normal; } .admin-modal table th, .admin-modal table td { padding:6px 4px; font-size:12px; } .admin-modal .table-actions button { font-size:10px; padding:2px 8px; } .admin-modal .scenery-item-admin { flex-direction:column; align-items:stretch; } .admin-modal .scenery-item-admin .info { flex-wrap:wrap; } .quiz-modal .quiz-body .question-text { font-size:24px; } .quiz-modal .quiz-body .answer-input { width:80px; font-size:22px; } .quiz-start-area .start-btn { font-size:18px; padding:12px 32px; } .quiz-start-area .countdown { font-size:40px; } }
+        .text-muted { color:#8a9aaa; font-size:13px; }
+        .mt-8 { margin-top:8px; }
+        .flex-center { display:flex; align-items:center; gap:6px; }
+        .text-center { text-align:center; }
+        .w-full { width:100%; }
     </style>
 </head>
 <body>
@@ -1145,7 +243,12 @@
             <div class="quiz-body">
                 <div class="question-number" id="questionNumber">第 1 题</div>
                 <div class="question-text" id="questionText">3 + 5 = ?</div>
-                <input type="number" class="answer-input" id="answerInput" placeholder="?" autofocus />
+                <!-- 开始区域 -->
+                <div class="quiz-start-area" id="quizStartArea">
+                    <button class="start-btn" id="startQuizBtn">🚀 开始挑战</button>
+                    <div class="countdown" id="countdownDisplay">3</div>
+                </div>
+                <input type="number" class="answer-input" id="answerInput" placeholder="?" autofocus disabled style="display:none;" />
                 <div class="feedback" id="feedback"></div>
             </div>
             <div class="quiz-footer">
@@ -1268,70 +371,49 @@
             const MAX_ATTEMPTS_PER_DAY = 2;
             const TOTAL_QUESTIONS = 20;
             const TIME_LIMIT = 30;
-            const PASS_SCORE = 16;
+            const PASS_SCORE = 18;  // 修改通关标准为18题
 
             // ==================== 数据操作（调用后端 API） ====================
-            // 登录
             async function loginUser(username, password) {
                 const data = await apiCall('/login', { method: 'POST', body: { username, password } });
                 return data;
             }
-
-            // 注册
             async function registerUser(username, password) {
                 const data = await apiCall('/register', { method: 'POST', body: { username, password } });
                 return data;
             }
-
-            // 获取所有用户（管理员）
             async function fetchAllUsers() {
                 const data = await apiCall('/users');
                 return data;
             }
-
-            // 更新用户
             async function updateUserAPI(username, updates) {
                 const data = await apiCall(`/user/${username}`, { method: 'PUT', body: updates });
                 return data;
             }
-
-            // 删除用户
             async function deleteUserAPI(username) {
                 const data = await apiCall(`/user/${username}`, { method: 'DELETE' });
                 return data;
             }
-
-            // 获取签到状态
             async function fetchSigninStatus(username) {
                 const data = await apiCall(`/signin/${username}`);
                 return data;
             }
-
-            // 更新签到状态
             async function updateSigninStatusAPI(username, updates) {
                 const data = await apiCall(`/signin/${username}`, { method: 'POST', body: updates });
                 return data;
             }
-
-            // 获取风采列表
             async function fetchScenery() {
                 const data = await apiCall('/scenery');
                 return data;
             }
-
-            // 新增风采
             async function addSceneryAPI(item) {
                 const data = await apiCall('/scenery', { method: 'POST', body: item });
                 return data;
             }
-
-            // 更新风采
             async function updateSceneryAPI(id, item) {
                 const data = await apiCall(`/scenery/${id}`, { method: 'PUT', body: item });
                 return data;
             }
-
-            // 删除风采
             async function deleteSceneryAPI(id) {
                 const data = await apiCall(`/scenery/${id}`, { method: 'DELETE' });
                 return data;
@@ -1392,6 +474,10 @@
             const wrongCount = document.getElementById('wrongCount');
             const scoreDisplay = document.getElementById('scoreDisplay');
             const closeQuizBtn = document.getElementById('closeQuizBtn');
+            // 新增元素
+            const startQuizBtn = document.getElementById('startQuizBtn');
+            const countdownDisplay = document.getElementById('countdownDisplay');
+            const quizStartArea = document.getElementById('quizStartArea');
 
             const adminModal = document.getElementById('adminModal');
             const closeAdminBtn = document.getElementById('closeAdminBtn');
@@ -1426,6 +512,7 @@
             let timerInterval = null;
             let quizActive = false;
             let isWaiting = false;
+            let isCountingDown = false;  // 是否在倒计时阶段
 
             // ==================== 工具函数 ====================
             function formatDate(now) {
@@ -1434,10 +521,8 @@
                     d = String(now.getDate()).padStart(2, '0');
                 return y + '年' + m + '月' + d + '日 ' + ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'][now.getDay()];
             }
-
             function formatTime(now) { return String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes())
                     .padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0'); }
-
             function formatBalance(val) { return '¥' + Number(val).toFixed(2); }
 
             function showToast(msg, icon) {
@@ -1485,7 +570,6 @@
                 const text = a + ' ' + symbol + ' ' + b + ' = ?';
                 return { text, answer };
             }
-
             function generateQuizQuestions(count) {
                 const qs = [];
                 for (let i = 0; i < count; i++) qs.push(generateQuestion());
@@ -1528,18 +612,63 @@
                 correctAnswers = 0;
                 wrongAnswers = 0;
                 timer = TIME_LIMIT;
-                quizActive = true;
+                quizActive = false;      // 还未开始答题
                 isWaiting = false;
+                isCountingDown = false;
 
+                // 重置UI
                 quizModal.classList.add('active');
                 renderQuestion();
                 updateStats();
-                startTimer();
-                answerInput.value = '';
-                answerInput.disabled = false;
-                answerInput.focus();
+                // 显示开始按钮，隐藏输入框
+                quizStartArea.style.display = 'block';
+                startQuizBtn.style.display = 'inline-block';
+                countdownDisplay.classList.remove('active');
+                countdownDisplay.style.display = 'none';
+                answerInput.style.display = 'none';
+                answerInput.disabled = true;
                 feedback.textContent = '';
                 feedback.className = 'feedback';
+                quizTimer.textContent = '⏳ ' + TIME_LIMIT + 's';
+                quizTimer.style.color = '#d94a4a';
+                // 清除之前可能残留的计时器
+                stopTimer();
+                if (timerInterval) clearInterval(timerInterval);
+                // 使输入框不可用，等待开始
+                answerInput.value = '';
+                // 移除可能存在的额外结果信息
+                const extra = document.querySelector('.quiz-footer ~ div[style]');
+                if (extra) extra.remove();
+            }
+
+            // 开始挑战：倒计时3秒后正式开始
+            function startQuiz() {
+                if (isCountingDown || quizActive) return;
+                isCountingDown = true;
+                startQuizBtn.style.display = 'none';
+                countdownDisplay.style.display = 'block';
+                countdownDisplay.classList.add('active');
+                let count = 3;
+                countdownDisplay.textContent = count;
+                const cdInterval = setInterval(() => {
+                    count--;
+                    if (count <= 0) {
+                        clearInterval(cdInterval);
+                        countdownDisplay.classList.remove('active');
+                        countdownDisplay.style.display = 'none';
+                        // 正式开始
+                        isCountingDown = false;
+                        quizActive = true;
+                        answerInput.style.display = 'inline-block';
+                        answerInput.disabled = false;
+                        answerInput.focus();
+                        // 开始计时
+                        startTimer();
+                        // 更新进度（已经显示第一题）
+                    } else {
+                        countdownDisplay.textContent = count;
+                    }
+                }, 1000);
             }
 
             function renderQuestion() {
@@ -1549,8 +678,12 @@
                 questionText.textContent = q.text;
                 quizProgress.textContent = (currentIndex + 1) + '/' + TOTAL_QUESTIONS;
                 answerInput.value = '';
-                answerInput.disabled = false;
-                answerInput.focus();
+                if (quizActive) {
+                    answerInput.disabled = false;
+                    answerInput.focus();
+                } else {
+                    answerInput.disabled = true;
+                }
                 feedback.textContent = '';
                 feedback.className = 'feedback';
                 isWaiting = false;
@@ -1569,8 +702,11 @@
                 timerInterval = setInterval(() => {
                     timer--;
                     updateTimerDisplay();
-                    if (timer <= 0) { clearInterval(timerInterval);
-                        timerInterval = null; if (quizActive) finishQuiz(true); }
+                    if (timer <= 0) {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        if (quizActive) finishQuiz(true);
+                    }
                 }, 1000);
             }
 
@@ -1606,79 +742,78 @@
                     if (!quizActive) return;
                     currentIndex++;
                     if (currentIndex >= TOTAL_QUESTIONS) { finishQuiz(false); } else { renderQuestion();
-                        answerInput.disabled = false;
-                        answerInput.focus(); }
+                        if (quizActive) {
+                            answerInput.disabled = false;
+                            answerInput.focus();
+                        } }
                 }, 300);
             }
 
-            // ==================== 修复后的 finishQuiz ====================
             async function finishQuiz(timeout) {
-                if (!quizActive) return;
+                if (!quizActive && !timeout) return;  // 可能已经结束
                 quizActive = false;
                 stopTimer();
                 answerInput.disabled = true;
 
                 let success = false;
-                // 如果已经完成所有题目，则以分数为准，忽略 timeout
-                if (currentIndex >= TOTAL_QUESTIONS) {
+                if (timeout) {
+                    success = false;
+                    feedback.textContent = '⏰ 时间到！';
+                    feedback.className = 'feedback wrong';
+                } else {
                     success = correctAnswers >= PASS_SCORE;
-                } else {
-                    // 未完成：如果超时则失败，否则以分数为准（但未完成且未超时不会调用finishQuiz(false)）
-                    if (timeout) {
-                        success = false;
-                    } else {
-                        success = correctAnswers >= PASS_SCORE;
-                    }
-                }
-
-                // 设置反馈
-                if (success) {
-                    feedback.textContent = '🎉 达标！签到成功！';
-                    feedback.className = 'feedback correct';
-                } else {
-                    if (timeout) {
-                        feedback.textContent = '⏰ 时间到！';
-                        feedback.className = 'feedback wrong';
+                    if (success) {
+                        feedback.textContent = '🎉 达标！签到成功！';
+                        feedback.className = 'feedback correct';
                     } else {
                         feedback.textContent = '😞 未达标（需要 ≥' + PASS_SCORE + ' 题正确）';
                         feedback.className = 'feedback wrong';
                     }
                 }
 
-                // 更新后端状态
+                // 更新签到状态（无论成败都消耗一次机会）
                 try {
                     const status = await fetchSigninStatus(currentUser);
-                    const remaining = status.attempts - 1;
+                    const remaining = Math.max(0, status.attempts - 1);
                     if (success) {
-                        // 加余额
+                        // 1. 获取当前用户余额
                         const allUsers = await fetchAllUsers();
                         const target = allUsers.find(u => u.username === currentUser);
-                        if (target) {
-                            const newBalance = (target.balance || 0) + SIGNIN_AMOUNT;
-                            await updateUserAPI(currentUser, { balance: newBalance });
-                            displayBalance.textContent = formatBalance(newBalance);
-                        }
-                        await updateSigninStatusAPI(currentUser, { signed: true, attempts: remaining });
+                        if (!target) throw new Error('用户不存在');
+                        const newBalance = (target.balance || 0) + SIGNIN_AMOUNT;
+                        // 2. 更新余额
+                        await updateUserAPI(currentUser, { balance: newBalance });
+                        // 3. 更新签到状态：标记已签到，并设置剩余次数（通常置0，因为签到成功当日不再允许）
+                        await updateSigninStatusAPI(currentUser, { signed: true, attempts: 0 });
+                        // 4. 刷新界面余额
+                        displayBalance.textContent = formatBalance(newBalance);
                         showToast('签到成功！获得 ¥' + SIGNIN_AMOUNT, '💰');
                     } else {
+                        // 失败：仅减少尝试次数
                         await updateSigninStatusAPI(currentUser, { attempts: remaining });
                         if (remaining <= 0) showToast('今日机会已用完', '❌');
                         else showToast('还剩 ' + remaining + ' 次机会', 'ℹ️');
                     }
                 } catch (e) {
-                    showToast('更新签到状态失败，请检查网络', '❌');
+                    showToast('更新签到状态失败: ' + e.message, '❌');
                 }
 
+                // 刷新签到入口状态
                 await updateSigninUI();
+
+                // 更新进度显示（显示最终结果）
                 quizProgress.textContent = (currentIndex + 1) + '/' + TOTAL_QUESTIONS;
-                // 移除之前可能遗留的结果信息
-                const oldExtra = document.querySelector('.quiz-footer ~ div[style]');
-                if (oldExtra) oldExtra.remove();
-                const resultMsg = document.createElement('div');
-                resultMsg.style.marginTop = '16px';
-                resultMsg.style.fontSize = '18px';
-                resultMsg.style.fontWeight = '700';
-                resultMsg.style.textAlign = 'center';
+                // 添加结果提示（若之前没有）
+                let resultMsg = document.querySelector('.quiz-footer ~ div[style]');
+                if (!resultMsg) {
+                    resultMsg = document.createElement('div');
+                    resultMsg.style.marginTop = '16px';
+                    resultMsg.style.fontSize = '18px';
+                    resultMsg.style.fontWeight = '700';
+                    resultMsg.style.textAlign = 'center';
+                    const footer = document.querySelector('.quiz-footer');
+                    footer.parentNode.insertBefore(resultMsg, footer.nextSibling);
+                }
                 if (success) {
                     resultMsg.style.color = '#27ae60';
                     resultMsg.textContent = '✅ 签到成功！余额 +' + SIGNIN_AMOUNT;
@@ -1686,20 +821,25 @@
                     resultMsg.style.color = '#e74c3c';
                     resultMsg.textContent = '❌ 签到失败';
                 }
-                const footer = document.querySelector('.quiz-footer');
-                footer.parentNode.insertBefore(resultMsg, footer);
             }
 
             function closeQuizModal() {
                 stopTimer();
                 quizActive = false;
+                isCountingDown = false;
                 quizModal.classList.remove('active');
+                // 移除额外结果信息
                 const extra = document.querySelector('.quiz-footer ~ div[style]');
                 if (extra) extra.remove();
-                answerInput.disabled = false;
+                answerInput.disabled = true;
+                answerInput.style.display = 'none';
                 answerInput.value = '';
                 feedback.textContent = '';
                 feedback.className = 'feedback';
+                quizStartArea.style.display = 'block';
+                startQuizBtn.style.display = 'inline-block';
+                countdownDisplay.classList.remove('active');
+                countdownDisplay.style.display = 'none';
                 if (currentUser) updateSigninUI();
             }
 
@@ -1969,11 +1109,9 @@
                 if (currentTimeEl) currentTimeEl.textContent = formatTime(now);
                 if (currentDateEl) currentDateEl.textContent = formatDate(now);
             }
-
             function startClock() { if (clockInterval) clearInterval(clockInterval);
                 updateClock();
                 clockInterval = setInterval(updateClock, 1000); }
-
             function stopClock() { if (clockInterval) { clearInterval(clockInterval);
                     clockInterval = null; } }
 
@@ -1986,10 +1124,8 @@
                 regError.classList.remove('show');
                 regSuccess.classList.remove('show');
             }
-
             function openRegisterModal() { clearRegisterForm();
                 registerModal.classList.add('active'); }
-
             function closeRegisterModal() { registerModal.classList.remove('active');
                 clearRegisterForm(); }
 
@@ -2045,7 +1181,6 @@
                 forgotSuccess.classList.remove('show');
                 forgotModal.classList.add('active');
             }
-
             function closeForgotModal() { forgotModal.classList.remove('active');
                 forgotError.classList.remove('show');
                 forgotSuccess.classList.remove('show'); }
@@ -2094,7 +1229,7 @@
                 const username = sessionStorage.getItem('metro_session_user');
                 if (username) {
                     try {
-                        await fetchSigninStatus(username);
+                        // 尝试获取用户列表以验证身份
                         const users = await fetchAllUsers();
                         const me = users.find(u => u.username === username);
                         if (me) {
@@ -2149,6 +1284,9 @@
                     else if (action === 'admin') openAdminPanel();
                 });
             });
+
+            // 开始挑战按钮
+            startQuizBtn.addEventListener('click', startQuiz);
 
             answerInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') { e.preventDefault();
