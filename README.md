@@ -6,7 +6,7 @@
     <title>固原地铁 · 售票系统</title>
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet" />
     <style>
-        /* ===== 全局重置 ===== */
+        /* ===== 全局重置（略，与之前完全一致） ===== */
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; background:#e9edf2; min-height:100vh; display:flex; justify-content:center; align-items:center; transition:background 0.3s; }
         #loginPage { width:100%; min-height:100vh; display:flex; justify-content:center; align-items:center; background:linear-gradient(145deg,#0b2a4a 0%,#1a4a6e 100%); padding:20px; }
@@ -70,7 +70,6 @@
         .quiz-modal .quiz-footer { display:flex; justify-content:space-between; align-items:center; padding-top:16px; border-top:2px solid #eef2f7; font-size:14px; color:#5a6a7a; }
         .quiz-modal .quiz-footer .score { font-weight:600; color:#0b2a4a; }
         .quiz-modal .quiz-footer .score span { color:#1a6e9e; }
-        /* 新增开始区域 */
         .quiz-start-area { margin:10px 0 16px; }
         .quiz-start-area .start-btn { padding:14px 48px; font-size:22px; font-weight:700; border-radius:40px; border:none; background:linear-gradient(135deg,#27ae60,#1e8449); color:#fff; cursor:pointer; transition:transform 0.2s, box-shadow 0.2s; box-shadow:0 4px 16px rgba(39,174,96,0.3); }
         .quiz-start-area .start-btn:hover { transform:scale(1.03); box-shadow:0 6px 24px rgba(39,174,96,0.4); }
@@ -129,7 +128,7 @@
         .home-footer strong { color:#1a4a6e; }
 
         /* 管理面板 */
-        .admin-modal .modal-card { max-width:820px; }
+        .admin-modal .modal-card { max-width:900px; }
         .admin-modal .tab-bar { display:flex; gap:4px; border-bottom:2px solid #e0e6ee; margin-bottom:24px; flex-wrap:wrap; }
         .admin-modal .tab-bar .tab-btn { padding:10px 24px; font-size:16px; font-weight:600; border:none; background:transparent; cursor:pointer; color:#5a6a7a; border-bottom:3px solid transparent; transition:color 0.2s, border-color 0.2s; }
         .admin-modal .tab-bar .tab-btn.active { color:#0b2a4a; border-bottom-color:#1a6e9e; }
@@ -138,15 +137,15 @@
         .admin-modal .tab-content.active { display:block; }
         .admin-modal .user-table-wrap { overflow-x:auto; }
         .admin-modal table { width:100%; border-collapse:collapse; font-size:14px; }
-        .admin-modal table th { background:#eef4fa; color:#0b2a4a; font-weight:700; padding:12px 10px; text-align:left; border-bottom:2px solid #d0dae6; }
+        .admin-modal table th { background:#eef4fa; color:#0b2a4a; font-weight:700; padding:12px 10px; text-align:left; border-bottom:2px solid #d0dae6; white-space:nowrap; }
         .admin-modal table td { padding:10px 10px; border-bottom:1px solid #eef2f7; vertical-align:middle; }
         .admin-modal table tr:hover td { background:#f8fafc; }
         .admin-modal .table-actions { display:flex; gap:6px; flex-wrap:wrap; }
         .admin-modal .table-actions button { padding:4px 12px; font-size:12px; border:none; border-radius:6px; font-weight:600; cursor:pointer; transition:background 0.2s; }
-        .admin-modal .btn-edit { background:#d4e6f1; color:#1a4a6e; }
-        .admin-modal .btn-edit:hover { background:#b0d0e6; }
-        .admin-modal .btn-balance { background:#fdebd0; color:#a04000; }
-        .admin-modal .btn-balance:hover { background:#fad7a0; }
+        .admin-modal .btn-reset { background:#fdebd0; color:#a04000; }
+        .admin-modal .btn-reset:hover { background:#fad7a0; }
+        .admin-modal .btn-balance { background:#d4e6f1; color:#1a4a6e; }
+        .admin-modal .btn-balance:hover { background:#b0d0e6; }
         .admin-modal .btn-delete { background:#fadbd8; color:#922b21; }
         .admin-modal .btn-delete:hover { background:#f5b7b1; }
         .admin-modal .add-btn { margin-top:16px; padding:10px 20px; background:#1a6e9e; color:#fff; border:none; border-radius:8px; font-weight:600; cursor:pointer; transition:background 0.2s; }
@@ -180,7 +179,7 @@
 </head>
 <body>
 
-    <!-- 登录页 -->
+    <!-- 登录页（不变） -->
     <div id="loginPage">
         <div class="login-card">
             <div class="login-logo"><span class="icon">🚇</span><h1>固原地铁</h1><p>售票系统 · 运营中心</p></div>
@@ -197,7 +196,7 @@
         </div>
     </div>
 
-    <!-- 注册模态框 -->
+    <!-- 注册模态框（不变） -->
     <div class="modal-overlay register-modal" id="registerModal">
         <div class="modal-card">
             <div class="modal-title">📝 注册新账号</div>
@@ -215,7 +214,7 @@
         </div>
     </div>
 
-    <!-- 忘记密码模态框 -->
+    <!-- 忘记密码模态框（不变） -->
     <div class="modal-overlay" id="forgotModal">
         <div class="modal-card">
             <div class="modal-title">🔑 重置密码</div>
@@ -232,7 +231,7 @@
         </div>
     </div>
 
-    <!-- 签到答题模态框 -->
+    <!-- 签到答题模态框（含延迟开始，与上一版相同） -->
     <div class="modal-overlay quiz-modal" id="quizModal">
         <div class="modal-card">
             <div class="modal-title">⏱️ 速算挑战 · 每日签到</div>
@@ -243,7 +242,6 @@
             <div class="quiz-body">
                 <div class="question-number" id="questionNumber">第 1 题</div>
                 <div class="question-text" id="questionText">3 + 5 = ?</div>
-                <!-- 开始区域 -->
                 <div class="quiz-start-area" id="quizStartArea">
                     <button class="start-btn" id="startQuizBtn">🚀 开始挑战</button>
                     <div class="countdown" id="countdownDisplay">3</div>
@@ -262,7 +260,7 @@
         </div>
     </div>
 
-    <!-- 管理面板 -->
+    <!-- 管理面板（修改了用户表格） -->
     <div class="modal-overlay admin-modal" id="adminModal">
         <div class="modal-card">
             <div class="modal-title">⚙️ 管理面板</div>
@@ -271,8 +269,21 @@
                 <button class="tab-btn" data-tab="scenery">📸 站车风采</button>
             </div>
             <div class="tab-content active" id="tabUsers">
-                <div class="user-table-wrap"><table><thead><tr><th>用户名</th><th>余额</th><th>操作</th></tr></thead><tbody id="userTableBody"></tbody></table></div>
-                <p class="text-muted mt-8">* 管理员可修改密码、余额，注销账号（不能注销自己）</p>
+                <div class="user-table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>用户名</th>
+                                <th>密码</th>
+                                <th>余额</th>
+                                <th>最近登录</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody"></tbody>
+                    </table>
+                </div>
+                <p class="text-muted mt-8">* 管理员可重置普通用户密码（24h内仅一次），修改余额，注销账号（不能注销自己）</p>
             </div>
             <div class="tab-content" id="tabScenery">
                 <div class="scenery-list" id="sceneryAdminList"></div>
@@ -282,7 +293,7 @@
         </div>
     </div>
 
-    <!-- 编辑风采模态框 -->
+    <!-- 编辑风采模态框（不变） -->
     <div class="modal-overlay" id="editSceneryModal">
         <div class="modal-card">
             <div class="modal-title" id="editSceneryTitle">编辑风采</div>
@@ -338,6 +349,7 @@
 
             // ==================== 云端后端 API 配置 ====================
             const API_BASE = 'https://gysubwaygithubio-production.up.railway.app/api';
+            // 若本地测试可改为 'http://localhost:3000/api'
 
             // ==================== API 调用封装 ====================
             async function apiCall(endpoint, options = {}) {
@@ -365,15 +377,13 @@
                 { id: 3, name: '3号线', code: 'M3', color: '#2ecc71', stations: ['汽车站', '商业街', '文化宫', '图书馆', '政务中心', '智慧谷'] },
                 { id: 4, name: '4号线', code: 'M4', color: '#f39c12', stations: ['古雁岭', '新区医院', '实验中学', '万达广场', '行政中心', '固原南站'] }
             ];
-            const VERIFY_QUESTION = '固局更高速度实验列车的车号是？';
             const VERIFY_ANSWER = 'CRH380CM-0304';
             const SIGNIN_AMOUNT = 20;
-            const MAX_ATTEMPTS_PER_DAY = 2;
             const TOTAL_QUESTIONS = 20;
             const TIME_LIMIT = 30;
-            const PASS_SCORE = 18;  // 修改通关标准为18题
+            const PASS_SCORE = 18;
 
-            // ==================== 数据操作（调用后端 API） ====================
+            // ==================== 数据操作 ====================
             async function loginUser(username, password) {
                 const data = await apiCall('/login', { method: 'POST', body: { username, password } });
                 return data;
@@ -388,6 +398,10 @@
             }
             async function updateUserAPI(username, updates) {
                 const data = await apiCall(`/user/${username}`, { method: 'PUT', body: updates });
+                return data;
+            }
+            async function resetPasswordAPI(username) {
+                const data = await apiCall(`/user/${username}/reset`, { method: 'POST' });
                 return data;
             }
             async function deleteUserAPI(username) {
@@ -474,7 +488,6 @@
             const wrongCount = document.getElementById('wrongCount');
             const scoreDisplay = document.getElementById('scoreDisplay');
             const closeQuizBtn = document.getElementById('closeQuizBtn');
-            // 新增元素
             const startQuizBtn = document.getElementById('startQuizBtn');
             const countdownDisplay = document.getElementById('countdownDisplay');
             const quizStartArea = document.getElementById('quizStartArea');
@@ -512,7 +525,7 @@
             let timerInterval = null;
             let quizActive = false;
             let isWaiting = false;
-            let isCountingDown = false;  // 是否在倒计时阶段
+            let isCountingDown = false;
 
             // ==================== 工具函数 ====================
             function formatDate(now) {
@@ -524,6 +537,11 @@
             function formatTime(now) { return String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes())
                     .padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0'); }
             function formatBalance(val) { return '¥' + Number(val).toFixed(2); }
+            function formatDateTime(iso) {
+                if (!iso) return '从未登录';
+                const d = new Date(iso);
+                return d.toLocaleString('zh-CN', { hour12: false });
+            }
 
             function showToast(msg, icon) {
                 icon = icon || 'ℹ️';
@@ -612,15 +630,13 @@
                 correctAnswers = 0;
                 wrongAnswers = 0;
                 timer = TIME_LIMIT;
-                quizActive = false;      // 还未开始答题
+                quizActive = false;
                 isWaiting = false;
                 isCountingDown = false;
 
-                // 重置UI
                 quizModal.classList.add('active');
                 renderQuestion();
                 updateStats();
-                // 显示开始按钮，隐藏输入框
                 quizStartArea.style.display = 'block';
                 startQuizBtn.style.display = 'inline-block';
                 countdownDisplay.classList.remove('active');
@@ -631,17 +647,13 @@
                 feedback.className = 'feedback';
                 quizTimer.textContent = '⏳ ' + TIME_LIMIT + 's';
                 quizTimer.style.color = '#d94a4a';
-                // 清除之前可能残留的计时器
                 stopTimer();
                 if (timerInterval) clearInterval(timerInterval);
-                // 使输入框不可用，等待开始
                 answerInput.value = '';
-                // 移除可能存在的额外结果信息
                 const extra = document.querySelector('.quiz-footer ~ div[style]');
                 if (extra) extra.remove();
             }
 
-            // 开始挑战：倒计时3秒后正式开始
             function startQuiz() {
                 if (isCountingDown || quizActive) return;
                 isCountingDown = true;
@@ -656,15 +668,12 @@
                         clearInterval(cdInterval);
                         countdownDisplay.classList.remove('active');
                         countdownDisplay.style.display = 'none';
-                        // 正式开始
                         isCountingDown = false;
                         quizActive = true;
                         answerInput.style.display = 'inline-block';
                         answerInput.disabled = false;
                         answerInput.focus();
-                        // 开始计时
                         startTimer();
-                        // 更新进度（已经显示第一题）
                     } else {
                         countdownDisplay.textContent = count;
                     }
@@ -750,7 +759,7 @@
             }
 
             async function finishQuiz(timeout) {
-                if (!quizActive && !timeout) return;  // 可能已经结束
+                if (!quizActive && !timeout) return;
                 quizActive = false;
                 stopTimer();
                 answerInput.disabled = true;
@@ -771,25 +780,19 @@
                     }
                 }
 
-                // 更新签到状态（无论成败都消耗一次机会）
                 try {
                     const status = await fetchSigninStatus(currentUser);
                     const remaining = Math.max(0, status.attempts - 1);
                     if (success) {
-                        // 1. 获取当前用户余额
                         const allUsers = await fetchAllUsers();
                         const target = allUsers.find(u => u.username === currentUser);
                         if (!target) throw new Error('用户不存在');
                         const newBalance = (target.balance || 0) + SIGNIN_AMOUNT;
-                        // 2. 更新余额
                         await updateUserAPI(currentUser, { balance: newBalance });
-                        // 3. 更新签到状态：标记已签到，并设置剩余次数（通常置0，因为签到成功当日不再允许）
                         await updateSigninStatusAPI(currentUser, { signed: true, attempts: 0 });
-                        // 4. 刷新界面余额
                         displayBalance.textContent = formatBalance(newBalance);
                         showToast('签到成功！获得 ¥' + SIGNIN_AMOUNT, '💰');
                     } else {
-                        // 失败：仅减少尝试次数
                         await updateSigninStatusAPI(currentUser, { attempts: remaining });
                         if (remaining <= 0) showToast('今日机会已用完', '❌');
                         else showToast('还剩 ' + remaining + ' 次机会', 'ℹ️');
@@ -798,12 +801,8 @@
                     showToast('更新签到状态失败: ' + e.message, '❌');
                 }
 
-                // 刷新签到入口状态
                 await updateSigninUI();
-
-                // 更新进度显示（显示最终结果）
                 quizProgress.textContent = (currentIndex + 1) + '/' + TOTAL_QUESTIONS;
-                // 添加结果提示（若之前没有）
                 let resultMsg = document.querySelector('.quiz-footer ~ div[style]');
                 if (!resultMsg) {
                     resultMsg = document.createElement('div');
@@ -828,7 +827,6 @@
                 quizActive = false;
                 isCountingDown = false;
                 quizModal.classList.remove('active');
-                // 移除额外结果信息
                 const extra = document.querySelector('.quiz-footer ~ div[style]');
                 if (extra) extra.remove();
                 answerInput.disabled = true;
@@ -860,25 +858,33 @@
                 });
             }
 
-            // ==================== 管理面板 - 用户 ====================
+            // ==================== 管理面板 - 用户（新增密码、登录时间、重置功能） ====================
             async function renderUserTable() {
                 try {
                     const users = await fetchAllUsers();
                     userTableBody.innerHTML = '';
                     users.forEach(u => {
                         const tr = document.createElement('tr');
-                        let actions =
-                            `<button class="btn-edit" data-username="${u.username}" data-action="changePwd">改密码</button><button class="btn-balance" data-username="${u.username}" data-action="changeBalance">改余额</button>`;
+                        // 操作按钮：重置（仅非admin）、改余额、注销（仅非admin）
+                        let actions = '';
                         if (u.username !== 'admin') {
-                            actions +=
-                                `<button class="btn-delete" data-username="${u.username}" data-action="delete">注销</button>`;
+                            actions += `<button class="btn-reset" data-username="${u.username}" data-action="reset">重置密码</button>`;
+                        }
+                        actions += `<button class="btn-balance" data-username="${u.username}" data-action="changeBalance">改余额</button>`;
+                        if (u.username !== 'admin') {
+                            actions += `<button class="btn-delete" data-username="${u.username}" data-action="delete">注销</button>`;
                         } else {
                             actions += `<span style="color:#aaa;font-size:12px;">(管理员)</span>`;
                         }
                         tr.innerHTML =
-                            `<td><strong>${u.username}</strong></td><td>${formatBalance(u.balance)}</td><td><div class="table-actions">${actions}</div></td>`;
+                            `<td><strong>${u.username}</strong></td>` +
+                            `<td><code style="background:#f0f0f0;padding:2px 6px;border-radius:4px;">${u.password}</code></td>` +
+                            `<td>${formatBalance(u.balance)}</td>` +
+                            `<td>${formatDateTime(u.lastLogin)}</td>` +
+                            `<td><div class="table-actions">${actions}</div></td>`;
                         userTableBody.appendChild(tr);
                     });
+                    // 绑定事件
                     userTableBody.querySelectorAll('[data-action]').forEach(btn => {
                         btn.addEventListener('click', function() {
                             handleUserAction(this.dataset.action, this.dataset.username);
@@ -890,15 +896,16 @@
             }
 
             async function handleUserAction(action, username) {
-                if (action === 'changePwd') {
-                    const p = prompt('请输入新密码（至少6个字符）：');
-                    if (p === null) return;
-                    if (p.length < 6) { showToast('密码至少6个字符', '⚠️'); return; }
+                if (action === 'reset') {
+                    if (username === 'admin') { showToast('不能重置管理员', '⚠️'); return; }
+                    if (!confirm(`确认将用户 ${username} 的密码重置为 gy123456 吗？（24小时内仅一次）`)) return;
                     try {
-                        await updateUserAPI(username, { password: p });
-                        showToast('密码已修改', '✅');
+                        const result = await resetPasswordAPI(username);
+                        showToast(result.message || '重置成功', '✅');
                         renderUserTable();
-                    } catch (e) { showToast('修改失败', '❌'); }
+                    } catch (e) {
+                        showToast(e.message || '重置失败', '❌');
+                    }
                 } else if (action === 'changeBalance') {
                     const input = prompt('请输入新的余额（数字）：');
                     if (input === null) return;
@@ -1229,7 +1236,6 @@
                 const username = sessionStorage.getItem('metro_session_user');
                 if (username) {
                     try {
-                        // 尝试获取用户列表以验证身份
                         const users = await fetchAllUsers();
                         const me = users.find(u => u.username === username);
                         if (me) {
@@ -1285,7 +1291,6 @@
                 });
             });
 
-            // 开始挑战按钮
             startQuizBtn.addEventListener('click', startQuiz);
 
             answerInput.addEventListener('keydown', function(e) {
