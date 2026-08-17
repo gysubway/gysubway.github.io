@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
-const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -10,7 +9,6 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// ===== 数据文件操作 =====
 const DB_PATH = './db.json';
 
 function initDB() {
@@ -28,9 +26,9 @@ function initDB() {
                 { id: 1, icon: '🏛️', name: '固原站', desc: '固原地铁1号线起点站，集交通、商业、文化于一体的综合枢纽，日均客流量超10万人次。' },
                 { id: 2, icon: '🏙️', name: '人民广场站', desc: '位于城市核心区，2号线与3号线换乘站，毗邻市政府与商业中心，是城市最繁忙的站点之一。' },
                 { id: 3, icon: '🌳', name: '古雁岭站', desc: '4号线站点，毗邻古雁岭生态公园，车站设计融入自然元素，被誉为"最美地铁站"。' },
-                { id: 4, icon: '🚇', name: '固原地铁 A 型车', desc: '6节编组，最高时速80km/h，采用永磁同步电机与节能空调，绿色环保，噪音更低。' },
-                { id: 5, icon: '🛤️', name: '智慧运维系统', desc: '基于大数据与AI的列车智能运维平台，实时监测车辆状态，保障运营安全可靠。' }
-                { id: 6, icon: '🎙️', name: '丹尼尔低音炮模仿', desc: '在部分站点设有丹尼尔模仿机彩蛋，由AI根据声音、动作、着装多方面专业评分，可将评分界面传至手机截图保存。' }
+                { id: 4, icon: '🚄', name: '丹尼尔模仿器', desc: '在部分站点设有丹尼尔低音炮模仿器，AI根据声音、动作、着装多方面评定相似度。' },
+                { id: 5, icon: '🚇', name: '固原地铁 A 型车', desc: '6节编组，最高时速80km/h，采用永磁同步电机与节能空调，绿色环保，噪音更低。' },
+                { id: 6, icon: '🛤️', name: '智慧运维系统', desc: '基于大数据与AI的列车智能运维平台，实时监测车辆状态，保障运营安全可靠。' }
             ],
             signinData: {}
         };
@@ -49,8 +47,6 @@ function writeDB(data) {
 
 initDB();
 
-// ===== API 路由 =====
-
 // 注册
 app.post('/api/register', (req, res) => {
     const { username, password } = req.body;
@@ -58,17 +54,12 @@ app.post('/api/register', (req, res) => {
     if (db.users[username]) {
         return res.status(400).json({ success: false, message: '用户已存在' });
     }
-    db.users[username] = {
-        password,
-        balance: 0,
-        lastLogin: null,
-        lastResetTime: null
-    };
+    db.users[username] = { password, balance: 0, lastLogin: null, lastResetTime: null };
     writeDB(db);
     res.json({ success: true, message: '注册成功' });
 });
 
-// 登录（更新 lastLogin）
+// 登录
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     const db = readDB();
@@ -76,18 +67,17 @@ app.post('/api/login', (req, res) => {
     if (!user || user.password !== password) {
         return res.status(401).json({ success: false, message: '账号或密码错误' });
     }
-    // 记录登录时间
     user.lastLogin = new Date().toISOString();
     writeDB(db);
     res.json({ success: true, username, balance: user.balance });
 });
 
-// 获取所有用户（管理员）— 返回密码、最后登录时间等
+// 获取所有用户
 app.get('/api/users', (req, res) => {
     const db = readDB();
     const users = Object.keys(db.users).map(name => ({
         username: name,
-        password: db.users[name].password,          // 明文密码
+        password: db.users[name].password,
         balance: db.users[name].balance,
         lastLogin: db.users[name].lastLogin || null,
         lastResetTime: db.users[name].lastResetTime || null
@@ -95,10 +85,10 @@ app.get('/api/users', (req, res) => {
     res.json(users);
 });
 
-// 更新用户（仅修改余额，密码修改已由重置接口替代）
+// 更新用户余额（仅余额）
 app.put('/api/user/:username', (req, res) => {
     const { username } = req.params;
-    const { balance } = req.body;   // 只允许改余额
+    const { balance } = req.body;
     const db = readDB();
     if (!db.users[username]) {
         return res.status(404).json({ success: false, message: '用户不存在' });
@@ -108,7 +98,7 @@ app.put('/api/user/:username', (req, res) => {
     res.json({ success: true });
 });
 
-// 重置密码（仅普通用户，24小时限制）
+// 重置密码（24小时限制）
 app.post('/api/user/:username/reset', (req, res) => {
     const { username } = req.params;
     const db = readDB();
@@ -129,14 +119,13 @@ app.post('/api/user/:username/reset', (req, res) => {
             });
         }
     }
-    // 重置密码为 gy123456
     db.users[username].password = 'gy123456';
     db.users[username].lastResetTime = now.toISOString();
     writeDB(db);
     res.json({ success: true, message: '密码已重置为 gy123456' });
 });
 
-// 删除用户（不能删 admin）
+// 删除用户
 app.delete('/api/user/:username', (req, res) => {
     const { username } = req.params;
     if (username === 'admin') {
@@ -151,7 +140,7 @@ app.delete('/api/user/:username', (req, res) => {
     res.json({ success: true });
 });
 
-// 签到相关（保持不变）
+// 签到
 app.get('/api/signin/:username', (req, res) => {
     const { username } = req.params;
     const db = readDB();
@@ -187,7 +176,7 @@ app.post('/api/signin/:username', (req, res) => {
     res.json({ success: true });
 });
 
-// 站车风采（保持不变）
+// 站车风采
 app.get('/api/scenery', (req, res) => {
     const db = readDB();
     res.json(db.scenery);
@@ -224,7 +213,6 @@ app.delete('/api/scenery/:id', (req, res) => {
     res.json({ success: true });
 });
 
-// 启动服务器
 app.listen(PORT, () => {
     console.log(`🚇 固原地铁后端已启动，端口 ${PORT}`);
 });
