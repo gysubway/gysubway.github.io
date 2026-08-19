@@ -731,7 +731,7 @@
                 <div class="elder-label">
                     <span class="elder-icon">🌙</span>
                     <span>长者关怀</span>
-                    <span class="toggle-desc">(放大文字，签到+5s)</span>
+                    <span class="toggle-desc">(放大文字)</span>
                 </div>
                 <div class="toggle-switch" id="elderToggle">
                     <div class="toggle-knob"></div>
@@ -1896,7 +1896,7 @@
             elderToggle.addEventListener('click', function() {
                 const newState = !elderMode;
                 applyElderMode(newState);
-                showToast(newState ? '长者关怀已开启（签到+5s）' : '长者关怀已关闭', newState ? '🌙' : '☀️');
+                showToast(newState ? '长者关怀已开启' : '长者关怀已关闭', newState ? '🌙' : '☀️');
             });
 
             // 注册
