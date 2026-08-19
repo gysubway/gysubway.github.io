@@ -19,7 +19,8 @@ function initDB() {
                     password: 'gysubway2026',
                     balance: 1000000,
                     lastLogin: null,
-                    lastResetTime: null
+                    lastResetTime: null,
+                    avatar: '👤'                 // 新增默认头像
                 }
             },
             scenery: [
@@ -54,12 +55,18 @@ app.post('/api/register', (req, res) => {
     if (db.users[username]) {
         return res.status(400).json({ success: false, message: '用户已存在' });
     }
-    db.users[username] = { password, balance: 0, lastLogin: null, lastResetTime: null };
+    db.users[username] = {
+        password,
+        balance: 0,
+        lastLogin: null,
+        lastResetTime: null,
+        avatar: '👤'                 // 新用户默认头像
+    };
     writeDB(db);
     res.json({ success: true, message: '注册成功' });
 });
 
-// 登录
+// 登录（返回 avatar）
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     const db = readDB();
@@ -69,10 +76,15 @@ app.post('/api/login', (req, res) => {
     }
     user.lastLogin = new Date().toISOString();
     writeDB(db);
-    res.json({ success: true, username, balance: user.balance });
+    res.json({
+        success: true,
+        username,
+        balance: user.balance,
+        avatar: user.avatar || '👤'   // 返回头像
+    });
 });
 
-// 获取所有用户
+// 获取所有用户（含 avatar）
 app.get('/api/users', (req, res) => {
     const db = readDB();
     const users = Object.keys(db.users).map(name => ({
@@ -80,20 +92,22 @@ app.get('/api/users', (req, res) => {
         password: db.users[name].password,
         balance: db.users[name].balance,
         lastLogin: db.users[name].lastLogin || null,
-        lastResetTime: db.users[name].lastResetTime || null
+        lastResetTime: db.users[name].lastResetTime || null,
+        avatar: db.users[name].avatar || '👤'
     }));
     res.json(users);
 });
 
-// 更新用户余额（仅余额）
+// 更新用户信息（支持 balance 和 avatar）
 app.put('/api/user/:username', (req, res) => {
     const { username } = req.params;
-    const { balance } = req.body;
+    const { balance, avatar } = req.body;
     const db = readDB();
     if (!db.users[username]) {
         return res.status(404).json({ success: false, message: '用户不存在' });
     }
     if (balance !== undefined) db.users[username].balance = balance;
+    if (avatar !== undefined) db.users[username].avatar = avatar;
     writeDB(db);
     res.json({ success: true });
 });
@@ -140,7 +154,7 @@ app.delete('/api/user/:username', (req, res) => {
     res.json({ success: true });
 });
 
-// 签到
+// 签到状态
 app.get('/api/signin/:username', (req, res) => {
     const { username } = req.params;
     const db = readDB();
