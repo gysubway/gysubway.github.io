@@ -127,13 +127,51 @@
         .distance-modal .dist-table td { padding:6px 10px; border-bottom:1px solid #eef2f7; }
         .distance-modal .dist-table tr:nth-child(even) { background:#f8fafc; }
 
-        .ticket-modal .modal-card { max-width:700px; }
+        .ticket-modal .modal-card { max-width:720px; }
         .ticket-result { background:#f8fafc; border-radius:12px; padding:16px 20px; margin-top:16px; border:1px solid #dce3ec; }
         .ticket-result .path { font-size:16px; color:#0b2a4a; margin-bottom:6px; word-break:break-all; }
         .ticket-result .path span { background:#eef4fa; padding:2px 8px; border-radius:12px; margin:0 2px; }
         .ticket-result .path .arrow { color:#8a9aaa; margin:0 4px; }
         .ticket-result .detail { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-top:8px; font-size:15px; color:#1a2a3a; }
         .ticket-result .detail .price { font-weight:700; color:#d94a4a; font-size:18px; }
+        .scheme-item {
+            border:1px solid #e0e6ee;
+            border-radius:12px;
+            padding:14px 16px;
+            margin-top:12px;
+            background:#ffffff;
+        }
+        .scheme-item .scheme-header {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:6px;
+        }
+        .scheme-item .scheme-header .scheme-label { font-weight:700; color:#0b2a4a; }
+        .scheme-item .line-badge {
+            display:inline-block;
+            padding:2px 12px;
+            border-radius:20px;
+            color:#fff;
+            font-weight:600;
+            font-size:14px;
+            margin:2px 2px;
+        }
+        .scheme-item .line-arrow { color:#8a9aaa; margin:0 4px; font-weight:300; }
+        .scheme-item .scheme-info { font-size:13px; color:#5a6a7a; margin-top:4px; }
+        .scheme-item .buy-btn {
+            margin-top:8px;
+            padding:6px 20px;
+            background:#27ae60;
+            color:#fff;
+            border:none;
+            border-radius:8px;
+            font-weight:600;
+            cursor:pointer;
+            transition:background 0.2s;
+        }
+        .scheme-item .buy-btn:hover { background:#1e8449; }
+        .scheme-item .buy-btn:disabled { opacity:0.6; cursor:not-allowed; }
 
         /* ===== 签到答题 ===== */
         .quiz-modal .modal-card { max-width:600px; }
@@ -301,7 +339,7 @@
             display:none;
             flex:1;
             padding:28px 40px 20px;
-            max-width:640px;
+            max-width:720px;
             margin:0 auto;
             width:100%;
             flex-direction:column;
@@ -433,6 +471,55 @@
         }
         .my-elder-toggle .toggle-switch.active .toggle-knob { transform:translateX(26px); }
         .my-elder-toggle .toggle-desc { font-size:13px; color:#8a9aaa; margin-left:4px; }
+
+        /* 我的订单 */
+        .my-orders-section {
+            margin-top:20px;
+            border-top:2px solid #e0e6ee;
+            padding-top:18px;
+        }
+        .my-orders-section .orders-title {
+            font-size:20px;
+            font-weight:700;
+            color:#0b2a4a;
+            margin-bottom:12px;
+        }
+        .order-item {
+            background:#f8fafc;
+            border-radius:12px;
+            padding:14px 16px;
+            margin-bottom:10px;
+            border:1px solid #eef2f7;
+        }
+        .order-item .order-header {
+            display:flex;
+            justify-content:space-between;
+            font-size:14px;
+            color:#5a6a7a;
+        }
+        .order-item .order-lines {
+            margin:6px 0;
+        }
+        .order-item .order-lines .line-badge {
+            display:inline-block;
+            padding:2px 12px;
+            border-radius:20px;
+            color:#fff;
+            font-weight:600;
+            font-size:13px;
+            margin:2px 2px;
+        }
+        .order-item .order-lines .line-arrow { color:#8a9aaa; margin:0 4px; }
+        .order-item .order-fare {
+            font-weight:700;
+            color:#d94a4a;
+            font-size:16px;
+        }
+        .order-item .order-date {
+            font-size:12px;
+            color:#8a9aaa;
+        }
+        .no-orders { color:#8a9aaa; text-align:center; padding:20px 0; }
 
         /* ===== 管理面板 ===== */
         .admin-modal .modal-card { max-width:900px; }
@@ -795,6 +882,13 @@
                     <div class="toggle-knob"></div>
                 </div>
             </div>
+            <!-- 我的订单 -->
+            <div class="my-orders-section">
+                <div class="orders-title">📋 我的订单</div>
+                <div id="ordersContainer">
+                    <div class="no-orders">暂无订单</div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -892,19 +986,27 @@
                 allStationsSet.add(v);
             }
 
+            // 同时建立边到线路的映射（用于线路换乘显示）
+            const edgeToLine = {};
+
             for (const [lineName, data] of Object.entries(LINE_METRO)) {
                 const sts = data.stations;
                 const dists = data.distances;
                 const n = sts.length;
                 for (let i = 0; i < n - 1; i++) {
+                    const key = [sts[i], sts[i + 1]].sort().join('|');
+                    // 若多条线路共用一段，保留一条即可（通常不会）
+                    if (!edgeToLine[key]) edgeToLine[key] = lineName;
                     addEdge(sts[i], sts[i + 1], dists[i]);
                 }
                 if (data.isLoop && n > 1) {
+                    const key = [sts[n - 1], sts[0]].sort().join('|');
+                    if (!edgeToLine[key]) edgeToLine[key] = lineName;
                     addEdge(sts[n - 1], sts[0], dists[n - 1]);
                 }
             }
 
-            const allStations = Array.from(allStationsSet).sort();
+            const allStations = Array.from(allStationsSet).sort((a, b) => a.localeCompare(b, 'zh'));
 
             // ==================== Dijkstra ====================
             function dijkstra(start, end) {
@@ -944,6 +1046,75 @@
                     cur = prev[cur];
                 }
                 return { path, totalDistance: dist[end] };
+            }
+
+            // ==================== 寻找多条路径（K-最短路径简化版） ====================
+            // 使用DFS搜索，限制深度和距离，选取前几条
+            function findAlternativePaths(start, end, maxPaths = 3) {
+                // 先找最短路径
+                const shortest = dijkstra(start, end);
+                if (!shortest) return [];
+                const shortestDist = shortest.totalDistance;
+                // 允许的距离上浮比例（20%）
+                const maxDist = shortestDist * 1.3;
+
+                const results = [];
+                // DFS
+                const visited = new Set();
+                const path = [start];
+                let found = 0;
+
+                function dfs(current, dist) {
+                    if (found >= maxPaths) return;
+                    if (dist > maxDist) return;
+                    if (current === end) {
+                        results.push({ path: [...path], totalDistance: dist });
+                        found++;
+                        return;
+                    }
+                    if (path.length > 20) return; // 防止过长
+                    for (const [next, w] of Object.entries(graph[current])) {
+                        if (!visited.has(next)) {
+                            visited.add(next);
+                            path.push(next);
+                            dfs(next, dist + w);
+                            path.pop();
+                            visited.delete(next);
+                            if (found >= maxPaths) return;
+                        }
+                    }
+                }
+
+                visited.add(start);
+                dfs(start, 0);
+                // 按距离排序
+                results.sort((a, b) => a.totalDistance - b.totalDistance);
+                // 去除重复路径（站点序列相同）
+                const unique = [];
+                const seen = new Set();
+                for (const r of results) {
+                    const key = r.path.join('|');
+                    if (!seen.has(key)) {
+                        seen.add(key);
+                        unique.push(r);
+                    }
+                }
+                // 返回前maxPaths条
+                return unique.slice(0, maxPaths);
+            }
+
+            // ==================== 提取线路换乘信息 ====================
+            function getLinesFromPath(path) {
+                if (path.length < 2) return [];
+                const lines = [];
+                for (let i = 0; i < path.length - 1; i++) {
+                    const key = [path[i], path[i + 1]].sort().join('|');
+                    const line = edgeToLine[key] || '未知';
+                    if (lines.length === 0 || lines[lines.length - 1] !== line) {
+                        lines.push(line);
+                    }
+                }
+                return lines;
             }
 
             // ==================== 票价计算 ====================
@@ -1026,6 +1197,17 @@
                 return data;
             }
 
+            // ===== 订单相关API =====
+            async function getOrders(username) {
+                const data = await apiCall(`/orders/${username}`);
+                return data;
+            }
+            async function createOrder(username, orderData) {
+                const data = await apiCall('/order', { method: 'POST', body: { username, ...orderData } });
+                return data;
+            }
+            // 后端会管理订单的日期过滤，前端不需要关心清理
+
             // ==================== DOM 引用 ====================
             const loginPage = document.getElementById('loginPage');
             const homePage = document.getElementById('homePage');
@@ -1056,6 +1238,7 @@
             const myLogoutBtn = document.getElementById('myLogoutBtn');
             const myDeleteAccountBtn = document.getElementById('myDeleteAccountBtn');
             const elderToggle = document.getElementById('elderToggle');
+            const ordersContainer = document.getElementById('ordersContainer');
 
             // 注册
             const registerModal = document.getElementById('registerModal');
@@ -1267,6 +1450,7 @@
                 myPage.style.display = 'flex';
                 myPage.classList.add('active');
                 refreshMyInfo();
+                refreshOrders();
             }
 
             async function refreshMyInfo() {
@@ -1291,6 +1475,42 @@
                     greetingUser.textContent = me.username;
                 } catch (e) {
                     showToast('刷新信息失败', '❌');
+                }
+            }
+
+            // ==================== 订单 ====================
+            async function refreshOrders() {
+                if (!currentUser) return;
+                try {
+                    const orders = await getOrders(currentUser);
+                    if (!orders || orders.length === 0) {
+                        ordersContainer.innerHTML = '<div class="no-orders">暂无订单</div>';
+                        return;
+                    }
+                    let html = '';
+                    orders.forEach(order => {
+                        // order: { from, to, fare, lines, date, id }
+                        const linesArr = order.lines || [];
+                        let lineHtml = linesArr.map((l, idx) => {
+                            const color = LINE_COLORS[l] || '#888';
+                            const span = `<span class="line-badge" style="background:${color};">${l}</span>`;
+                            if (idx < linesArr.length - 1) return span + '<span class="line-arrow"> → </span>';
+                            return span;
+                        }).join('');
+                        html += `
+                            <div class="order-item">
+                                <div class="order-header">
+                                    <span>${order.from} → ${order.to}</span>
+                                    <span class="order-fare">${formatBalance(order.fare)}</span>
+                                </div>
+                                <div class="order-lines">${lineHtml}</div>
+                                <div class="order-date">📅 ${order.date}  ·  当日有效</div>
+                            </div>
+                        `;
+                    });
+                    ordersContainer.innerHTML = html;
+                } catch (e) {
+                    showToast('加载订单失败', '❌');
                 }
             }
 
@@ -1836,7 +2056,6 @@
                 distanceModal.classList.add('active');
                 distResult.innerHTML = '<p class="text-muted" style="text-align:center;padding:20px 0;">请选择线路查看相邻站距</p>';
                 distLineSelect.value = '';
-                // 填充下拉选项
                 distLineSelect.innerHTML = '<option value="">-- 请选择 --</option>';
                 lineNames.forEach(name => {
                     const opt = document.createElement('option');
@@ -1879,10 +2098,11 @@
                 ticketResult.innerHTML = '';
                 ticketStart.value = '';
                 ticketEnd.value = '';
-                // 填充下拉选项
+                // 填充站点下拉，按拼音排序
+                const sortedStations = [...allStations].sort((a, b) => a.localeCompare(b, 'zh'));
                 ticketStart.innerHTML = '<option value="">-- 请选择 --</option>';
                 ticketEnd.innerHTML = '<option value="">-- 请选择 --</option>';
-                allStations.forEach(st => {
+                sortedStations.forEach(st => {
                     const opt1 = document.createElement('option');
                     opt1.value = st;
                     opt1.textContent = st;
@@ -1909,28 +2129,90 @@
                     ticketResult.innerHTML = '<p style="color:#d94a4a;">起点和终点不能相同</p>';
                     return;
                 }
-                const result = dijkstra(start, end);
-                if (!result) {
+
+                // 查找多条路径
+                const paths = findAlternativePaths(start, end, 3);
+                if (!paths || paths.length === 0) {
                     ticketResult.innerHTML = '<p style="color:#d94a4a;">未找到路径，可能线路不连通</p>';
                     return;
                 }
-                const { path, totalDistance } = result;
-                const fare = calculateFare(totalDistance);
-                const km = (totalDistance / 1000).toFixed(2);
-                let pathHtml = path.map((s, i) => {
-                    if (i < path.length - 1) return `<span>${s}</span><span class="arrow"> → </span>`;
-                    else return `<span>${s}</span>`;
-                }).join('');
-                const html = `
-                    <div class="ticket-result">
-                        <div class="path">${pathHtml}</div>
-                        <div class="detail">
-                            <span>总里程：<strong>${km} km</strong></span>
-                            <span>票价：<span class="price">${fare} 元</span></span>
+
+                let html = '';
+                paths.forEach((p, idx) => {
+                    const lines = getLinesFromPath(p.path);
+                    const fare = calculateFare(p.totalDistance);
+                    const km = (p.totalDistance / 1000).toFixed(2);
+                    // 线路徽章
+                    let lineHtml = lines.map((l, li) => {
+                        const color = LINE_COLORS[l] || '#888';
+                        const span = `<span class="line-badge" style="background:${color};">${l}</span>`;
+                        if (li < lines.length - 1) return span + '<span class="line-arrow"> → </span>';
+                        return span;
+                    }).join('');
+                    const label = idx === 0 ? '⭐ 推荐方案' : `方案 ${idx+1}`;
+                    const isRecommended = idx === 0 ? ' (依据里程推荐)' : '';
+                    html += `
+                        <div class="scheme-item">
+                            <div class="scheme-header">
+                                <span class="scheme-label">${label}${isRecommended}</span>
+                                <span class="price" style="font-weight:700;color:#d94a4a;">${fare} 元</span>
+                            </div>
+                            <div class="scheme-lines">${lineHtml}</div>
+                            <div class="scheme-info">里程：${km} km  ·  换乘 ${lines.length-1} 次</div>
+                            <button class="buy-btn" data-from="${start}" data-to="${end}" data-fare="${fare}" data-lines='${JSON.stringify(lines)}' data-path='${JSON.stringify(p.path)}'>立即购买</button>
                         </div>
-                    </div>
-                `;
+                    `;
+                });
+
                 ticketResult.innerHTML = html;
+                // 绑定购买事件
+                ticketResult.querySelectorAll('.buy-btn').forEach(btn => {
+                    btn.addEventListener('click', async function() {
+                        await handleBuyTicket(this);
+                    });
+                });
+            }
+
+            async function handleBuyTicket(btn) {
+                if (!currentUser) { showToast('请先登录', '⚠️'); return; }
+                const from = btn.dataset.from;
+                const to = btn.dataset.to;
+                const fare = parseInt(btn.dataset.fare);
+                const lines = JSON.parse(btn.dataset.lines);
+                const path = JSON.parse(btn.dataset.path);
+
+                // 检查余额
+                try {
+                    const users = await fetchAllUsers();
+                    const me = users.find(u => u.username === currentUser);
+                    if (!me) throw new Error('用户不存在');
+                    if (me.balance < fare) {
+                        showToast('余额不足，请先充值', '❌');
+                        return;
+                    }
+                    // 创建订单
+                    const orderData = {
+                        from,
+                        to,
+                        fare,
+                        lines,
+                        path
+                    };
+                    const result = await createOrder(currentUser, orderData);
+                    if (result.success) {
+                        showToast('购票成功！请查看“我的订单”', '🎫');
+                        refreshMyInfo();
+                        refreshOrders();
+                        // 禁用按钮防止重复购买
+                        btn.disabled = true;
+                        btn.textContent = '已购买';
+                        btn.style.opacity = '0.6';
+                    } else {
+                        showToast(result.message || '购票失败', '❌');
+                    }
+                } catch (e) {
+                    showToast('购票失败: ' + e.message, '❌');
+                }
             }
 
             // ==================== 登录 / 登出 ====================
@@ -1976,6 +2258,7 @@
                 startClock();
                 loadElderMode();
                 refreshMyInfo();
+                refreshOrders();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 showToast('欢迎回来，' + username + '！', '👋');
             }
@@ -2141,6 +2424,7 @@
                             startClock();
                             loadElderMode();
                             refreshMyInfo();
+                            refreshOrders();
                             return true;
                         } else {
                             sessionStorage.removeItem('metro_session_user');
