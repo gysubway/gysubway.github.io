@@ -69,7 +69,7 @@
         .login-footer .forgot-link { display:inline-block; margin-top:4px; color:#7a8a9e; font-size:13px; cursor:pointer; transition:color 0.2s; text-decoration:underline; }
         .login-footer .forgot-link:hover { color:#1a6e9e; }
 
-        /* ===== 模态框通用（仅保留注册、忘记密码、管理、答题等） ===== */
+        /* ===== 模态框通用 ===== */
         .modal-overlay {
             display:none;
             position:fixed;
@@ -636,7 +636,16 @@
             <div class="tab-content active" id="tabUsers">
                 <div class="user-table-wrap">
                     <table>
-                        <thead><tr><th>用户名</th><th>密码</th><th>余额</th><th>最近登录</th><th>操作</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>头像</th>
+                                <th>用户名</th>
+                                <th>密码</th>
+                                <th>余额</th>
+                                <th>最近登录</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
                         <tbody id="userTableBody"></tbody>
                     </table>
                 </div>
@@ -1075,7 +1084,7 @@
                     if (!me) { showToast('获取用户信息失败', '❌'); return; }
                     myUsername.textContent = me.username;
                     myBalance.textContent = formatBalance(me.balance);
-                    // === 管理员隐藏注销按钮 ===
+                    // 管理员隐藏注销按钮
                     if (me.username === 'admin') {
                         myDeleteAccountBtn.style.display = 'none';
                     } else {
@@ -1109,7 +1118,7 @@
             }
 
             function startDeleteCountdown() {
-                // === 管理员不可注销 ===
+                // 管理员不可注销
                 if (currentUser === 'admin') {
                     showToast('管理员不可注销', '⛔');
                     return;
@@ -1293,10 +1302,6 @@
             }
 
             function updateTimerDisplay() {
-                const displayTime = elderMode ? TIME_LIMIT_ELDER : TIME_LIMIT_DEFAULT;
-                // 实际剩余时间可能小于显示时间，但我们只显示设定值（界面保持显示总时长，不显示倒计时数值，或者显示剩余值？）
-                // 更合理：显示剩余秒数，且根据模式显示不同的初始值。
-                // 但是此处我们显示当前剩余时间（timer变量）
                 quizTimer.textContent = '⏳ ' + timer + 's';
                 quizTimer.style.color = '#d94a4a';
             }
@@ -1443,6 +1448,15 @@
                     userTableBody.innerHTML = '';
                     users.forEach(u => {
                         const tr = document.createElement('tr');
+                        // 头像列
+                        let avatarHtml = '';
+                        if (u.avatar && u.avatar.startsWith('data:image')) {
+                            avatarHtml =
+                                `<img src="${u.avatar}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;" alt="头像" />`;
+                        } else {
+                            avatarHtml = `<span style="font-size:24px;">👤</span>`;
+                        }
+                        // 操作按钮
                         let actions = '';
                         if (u.username !== 'admin') {
                             actions += `<button class="btn-reset" data-username="${u.username}" data-action="reset">重置密码</button>`;
@@ -1454,6 +1468,7 @@
                             actions += `<span style="color:#aaa;font-size:12px;">(管理员)</span>`;
                         }
                         tr.innerHTML =
+                            `<td>${avatarHtml}</td>` +
                             `<td><strong>${u.username}</strong></td>` +
                             `<td><code style="background:#f0f0f0;padding:2px 6px;border-radius:4px;">${u.password}</code></td>` +
                             `<td>${formatBalance(u.balance)}</td>` +
@@ -1953,12 +1968,10 @@
             loginUsername.addEventListener('focus', function() { loginError.classList.remove('show'); });
             loginPassword.addEventListener('focus', function() { loginError.classList.remove('show'); });
 
-            // 修正 startQuiz 函数（上面已定义，但为了确保使用正确的 timer 初始值，重新定义）
-            // 覆盖原来的 startQuiz
+            // 修正 startQuiz 函数（覆盖原函数）
             const originalStartQuiz = startQuiz;
             startQuiz = function() {
                 if (isCountingDown || quizActive) return;
-                // 确保 timer 是最新值
                 timer = getTimeLimit();
                 updateTimerDisplay();
                 isCountingDown = true;
@@ -1984,6 +1997,7 @@
                     }
                 }, 1000);
             };
+
             // ==================== 初始化 ====================
             (async function init() {
                 const hasSession = await checkSession();
