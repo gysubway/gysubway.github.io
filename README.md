@@ -1075,6 +1075,12 @@
                     if (!me) { showToast('获取用户信息失败', '❌'); return; }
                     myUsername.textContent = me.username;
                     myBalance.textContent = formatBalance(me.balance);
+                    // === 管理员隐藏注销按钮 ===
+                    if (me.username === 'admin') {
+                        myDeleteAccountBtn.style.display = 'none';
+                    } else {
+                        myDeleteAccountBtn.style.display = 'block';
+                    }
                     // 头像
                     if (me.avatar) {
                         updateAvatarUI(me.avatar);
@@ -1103,6 +1109,11 @@
             }
 
             function startDeleteCountdown() {
+                // === 管理员不可注销 ===
+                if (currentUser === 'admin') {
+                    showToast('管理员不可注销', '⛔');
+                    return;
+                }
                 if (deleteCountdownInterval) return;
                 deleteCountdown = 5;
                 myDeleteAccountBtn.disabled = true;
