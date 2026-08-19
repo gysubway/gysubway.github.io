@@ -97,11 +97,11 @@
         .modal-card .modal-title { font-size:24px; font-weight:700; color:#0b2a4a; text-align:center; margin-bottom:24px; letter-spacing:1px; }
         .modal-card .form-group { margin-bottom:18px; }
         .modal-card label { display:block; font-size:14px; font-weight:600; color:#2c3e50; margin-bottom:5px; }
-        .modal-card input[type="text"], .modal-card input[type="password"], .modal-card input[type="number"] {
+        .modal-card input[type="text"], .modal-card input[type="password"], .modal-card input[type="number"], .modal-card select {
             width:100%; padding:12px 16px; font-size:15px; border:2px solid #dce3ec; border-radius:10px;
             background:#f8fafc; transition:border-color 0.25s; outline:none; color:#1a2a3a;
         }
-        .modal-card input:focus { border-color:#1a6e9e; background:#ffffff; }
+        .modal-card input:focus, .modal-card select:focus { border-color:#1a6e9e; background:#ffffff; }
         .modal-card .form-actions { display:flex; gap:12px; margin-top:20px; }
         .modal-card .form-actions button { flex:1; padding:14px; font-size:16px; font-weight:700; border:none; border-radius:10px; cursor:pointer; transition:background 0.25s, transform 0.15s; }
         .modal-card .btn-primary { background:linear-gradient(135deg,#1a6e9e,#0b4a72); color:#ffffff; }
@@ -119,6 +119,21 @@
             background:#eef4fa; padding:12px 16px; border-radius:10px; font-size:15px; color:#0b2a4a;
             margin-bottom:10px; border-left:4px solid #1a6e9e; font-weight:500;
         }
+
+        /* ===== 站距查询 & 购票模态框特殊样式 ===== */
+        .distance-modal .modal-card { max-width:700px; }
+        .distance-modal .dist-table { width:100%; border-collapse:collapse; margin-top:12px; }
+        .distance-modal .dist-table th { background:#eef4fa; padding:8px 10px; text-align:left; font-weight:600; color:#0b2a4a; border-bottom:2px solid #d0dae6; }
+        .distance-modal .dist-table td { padding:6px 10px; border-bottom:1px solid #eef2f7; }
+        .distance-modal .dist-table tr:nth-child(even) { background:#f8fafc; }
+
+        .ticket-modal .modal-card { max-width:700px; }
+        .ticket-result { background:#f8fafc; border-radius:12px; padding:16px 20px; margin-top:16px; border:1px solid #dce3ec; }
+        .ticket-result .path { font-size:16px; color:#0b2a4a; margin-bottom:6px; word-break:break-all; }
+        .ticket-result .path span { background:#eef4fa; padding:2px 8px; border-radius:12px; margin:0 2px; }
+        .ticket-result .path .arrow { color:#8a9aaa; margin:0 4px; }
+        .ticket-result .detail { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-top:8px; font-size:15px; color:#1a2a3a; }
+        .ticket-result .detail .price { font-weight:700; color:#d94a4a; font-size:18px; }
 
         /* ===== 签到答题 ===== */
         .quiz-modal .modal-card { max-width:600px; }
@@ -497,6 +512,7 @@
             .welcome-banner .datetime { text-align:left; width:100%; white-space:normal; }
             .admin-modal .modal-card { max-width:95%; padding:24px 16px; }
             .quiz-modal .modal-card { max-width:95%; }
+            .distance-modal .modal-card, .ticket-modal .modal-card { max-width:95%; }
         }
         @media (max-width:600px) {
             .login-card { padding:28px 18px 24px; }
@@ -672,6 +688,39 @@
         </div>
     </div>
 
+    <!-- ===== 站距查询模态框 ===== -->
+    <div class="modal-overlay distance-modal" id="distanceModal">
+        <div class="modal-card">
+            <div class="modal-title">📏 站距查询</div>
+            <div class="form-group">
+                <label for="distLineSelect">选择线路</label>
+                <select id="distLineSelect"><option value="">-- 请选择 --</option></select>
+            </div>
+            <div id="distResult">
+                <p class="text-muted" style="text-align:center;padding:20px 0;">请选择线路查看相邻站距</p>
+            </div>
+            <div class="form-actions"><button class="btn-cancel" id="closeDistBtn" style="flex:1;">关闭</button></div>
+        </div>
+    </div>
+
+    <!-- ===== 购票模态框 ===== -->
+    <div class="modal-overlay ticket-modal" id="ticketModal">
+        <div class="modal-card">
+            <div class="modal-title">🎟️ 购买车票</div>
+            <div class="form-group">
+                <label for="ticketStart">起点站</label>
+                <select id="ticketStart"><option value="">-- 请选择 --</option></select>
+            </div>
+            <div class="form-group">
+                <label for="ticketEnd">终点站</label>
+                <select id="ticketEnd"><option value="">-- 请选择 --</option></select>
+            </div>
+            <button class="btn-primary" id="ticketQueryBtn" style="width:100%;padding:12px;border:none;border-radius:10px;font-weight:700;cursor:pointer;">查询路线及票价</button>
+            <div id="ticketResult" style="margin-top:16px;"></div>
+            <div class="form-actions"><button class="btn-cancel" id="closeTicketBtn" style="flex:1;">关闭</button></div>
+        </div>
+    </div>
+
     <!-- ===== 首页 ===== -->
     <div id="homePage">
         <!-- 导航栏 -->
@@ -698,8 +747,8 @@
             <div class="card-grid" id="lineGrid"></div>
             <div class="section-title" style="margin-top:6px;">🎫 快捷功能<span class="title-line"></span></div>
             <div class="quick-actions" id="quickActions">
-                <div class="quick-action" data-action="ticket"><span class="qa-icon">🎟️</span><div class="qa-label">购票</div><div class="qa-desc">即将开放</div></div>
-                <div class="quick-action" data-action="line"><span class="qa-icon">🗺️</span><div class="qa-label">线路查询</div><div class="qa-desc">即将开放</div></div>
+                <div class="quick-action" data-action="ticket"><span class="qa-icon">🎟️</span><div class="qa-label">购票</div><div class="qa-desc">智能路径规划</div></div>
+                <div class="quick-action" data-action="distance"><span class="qa-icon">📏</span><div class="qa-label">站距查询</div><div class="qa-desc">相邻站点距离</div></div>
                 <div class="quick-action" data-action="scenery"><span class="qa-icon">📸</span><div class="qa-label">站车风采</div><div class="qa-desc">点击欣赏</div></div>
                 <div class="quick-action signin-action" data-action="signin" id="signinEntry">
                     <span class="qa-icon">⌨️</span><div class="qa-label">每日签到</div>
@@ -779,13 +828,147 @@
                 return data;
             }
 
-            // ==================== 常量 ====================
-            const LINE_DATA = [
-                { id: 1, name: '1号线', code: 'M1', color: '#e74c3c', stations: ['火车站', '市政府', '人民广场', '大学城', '科技园', '体育中心'] },
-                { id: 2, name: '2号线', code: 'M2', color: '#3498db', stations: ['机场', '会展中心', '市中心', '体育馆', '高铁站', '生态园'] },
-                { id: 3, name: '3号线', code: 'M3', color: '#2ecc71', stations: ['汽车站', '商业街', '文化宫', '图书馆', '政务中心', '智慧谷'] },
-                { id: 4, name: '4号线', code: 'M4', color: '#f39c12', stations: ['古雁岭', '新区医院', '实验中学', '万达广场', '行政中心', '固原南站'] }
-            ];
+            // ==================== 里程数据定义（含3A/3B李公村站） ====================
+            const LINE_COLORS = {
+                '1号线': '#4A86E8',
+                '2号线': '#07D507',
+                '3A号线': '#FF2424',
+                '3B号线': '#FF2424',
+                '西山机场线': '#FCDD68'
+            };
+
+            const LINE_METRO = {
+                '1号线': {
+                    stations: ['固原站', '文安门', '太庙', '凤霞门', '水北庄', '清景门', '银拱门', '太和门', '东红门', '东红门西', '乾泰殿', '龙云门', '西海', '武定门', '十六里庄', '西华门', '紫辉门', '钟楼', '才广门', '德源门', '东华门'],
+                    distances: [1790, 1840, 1140, 1470, 1700, 1360, 1520, 1230, 1120, 1760, 1760, 1120, 1170, 1780, 1840, 2060,
+                        1920, 1940, 1460, 2420, 1220
+                    ],
+                    isLoop: true
+                },
+                '2号线': {
+                    stations: ['颐和山庄', '龙成', '地桥', '钟楼', '鼓楼', '红楼西', '兰清园', '工艺美术馆', '金华路', '太和门', '太和南街', '清景南街',
+                        '草甸', '九里河', '皇陵', '南市', '东湖', '源江第一桥', '水苑桥', '滨水度假中心', '西虹影城'
+                    ],
+                    distances: [1060, 1040, 1090, 820, 980, 1680, 1120, 980, 1740, 2130, 1460, 1100, 1580, 1040, 2270, 1220,
+                        960, 1040, 2670, 2290
+                    ],
+                    isLoop: false
+                },
+                '3A号线': {
+                    stations: ['李公村', '解放路', '西市', '固原植物园', '武外甘水桥', '武定门', '武定街', '兰清西路', '兰清园', '地定门西', '地定门东',
+                        '文安门', '锦绣江滨', '相府西', '相府', '柳树庄', '五柳桥', '五柳桥北', '老火车站', '远大路', '红丰东路', '桃花源景区'
+                    ],
+                    distances: [2500, 2320, 1760, 3220, 930, 1970, 1200, 1200, 1940, 1760, 1660, 1840, 1150, 1070, 2220, 830,
+                        960, 1140, 1140, 1950, 1980
+                    ],
+                    isLoop: false
+                },
+                '3B号线': {
+                    stations: ['李公村', '解放路', '西市', '固原植物园', '武外甘水桥', '武定门', '武定街', '兰清西路', '兰清园', '地定门西', '地定门东',
+                        '文安门', '锦绣江滨', '相府西', '相府', '东市', '狐坪西', '锦平', '栖雀里', '固安博物馆', '水城路'
+                    ],
+                    distances: [2500, 2320, 1760, 3220, 930, 1970, 1200, 1200, 1940, 1760, 1660, 1840, 1150, 1070, 2850, 1150,
+                        1120, 1570, 1550, 1790
+                    ],
+                    isLoop: false
+                },
+                '西山机场线': {
+                    stations: ['西虹影城', '罗镇', '西山机场'],
+                    distances: [11360, 12850],
+                    isLoop: false
+                }
+            };
+
+            // ==================== 构建图 ====================
+            const graph = {};
+            const allStationsSet = new Set();
+
+            function addEdge(u, v, w) {
+                if (!graph[u]) graph[u] = {};
+                if (!graph[v]) graph[v] = {};
+                if (graph[u][v] === undefined || w < graph[u][v]) graph[u][v] = w;
+                if (graph[v][u] === undefined || w < graph[v][u]) graph[v][u] = w;
+                allStationsSet.add(u);
+                allStationsSet.add(v);
+            }
+
+            for (const [lineName, data] of Object.entries(LINE_METRO)) {
+                const sts = data.stations;
+                const dists = data.distances;
+                const n = sts.length;
+                for (let i = 0; i < n - 1; i++) {
+                    addEdge(sts[i], sts[i + 1], dists[i]);
+                }
+                if (data.isLoop && n > 1) {
+                    addEdge(sts[n - 1], sts[0], dists[n - 1]);
+                }
+            }
+
+            const allStations = Array.from(allStationsSet).sort();
+
+            // ==================== Dijkstra ====================
+            function dijkstra(start, end) {
+                if (!graph[start] || !graph[end]) return null;
+                const dist = {};
+                const prev = {};
+                const visited = {};
+                const pq = [];
+                for (const node of allStations) {
+                    dist[node] = Infinity;
+                    prev[node] = null;
+                }
+                dist[start] = 0;
+                pq.push({ node: start, d: 0 });
+                while (pq.length > 0) {
+                    pq.sort((a, b) => a.d - b.d);
+                    const { node: u, d: du } = pq.shift();
+                    if (visited[u]) continue;
+                    visited[u] = true;
+                    if (u === end) break;
+                    for (const [v, w] of Object.entries(graph[u])) {
+                        if (!visited[v]) {
+                            const nd = du + w;
+                            if (nd < dist[v]) {
+                                dist[v] = nd;
+                                prev[v] = u;
+                                pq.push({ node: v, d: nd });
+                            }
+                        }
+                    }
+                }
+                if (dist[end] === Infinity) return null;
+                const path = [];
+                let cur = end;
+                while (cur !== null) {
+                    path.unshift(cur);
+                    cur = prev[cur];
+                }
+                return { path, totalDistance: dist[end] };
+            }
+
+            // ==================== 票价计算 ====================
+            function calculateFare(distanceMeters) {
+                const km = distanceMeters / 1000;
+                if (km <= 6) return 2;
+                if (km <= 12) return 3;
+                if (km <= 22) return 4;
+                if (km <= 32) return 5;
+                const extra = km - 32;
+                const add = Math.ceil(extra / 15);
+                return 5 + add;
+            }
+
+            // ==================== 线路展示数据 ====================
+            const lineNames = Object.keys(LINE_METRO);
+            const lineDisplay = lineNames.map(name => ({
+                id: name,
+                name: name,
+                color: LINE_COLORS[name] || '#888888',
+                stations: LINE_METRO[name].stations,
+                isLoop: LINE_METRO[name].isLoop || false
+            }));
+
+            // ==================== 常量（签到答题等） ====================
             const VERIFY_ANSWER = 'CRH380CM-0304';
             const SIGNIN_AMOUNT = 20;
             const TOTAL_QUESTIONS = 20;
@@ -793,7 +976,7 @@
             const TIME_LIMIT_ELDER = 35;
             const PASS_SCORE = 18;
 
-            // ==================== 数据操作 ====================
+            // ==================== 数据操作（API） ====================
             async function loginUser(username, password) {
                 const data = await apiCall('/login', { method: 'POST', body: { username, password } });
                 return data;
@@ -938,10 +1121,23 @@
             const editSceneryErrorMessage = document.getElementById('editSceneryErrorMessage');
             const editSceneryTitle = document.getElementById('editSceneryTitle');
 
+            // 站距查询 & 购票
+            const distanceModal = document.getElementById('distanceModal');
+            const distLineSelect = document.getElementById('distLineSelect');
+            const distResult = document.getElementById('distResult');
+            const closeDistBtn = document.getElementById('closeDistBtn');
+
+            const ticketModal = document.getElementById('ticketModal');
+            const ticketStart = document.getElementById('ticketStart');
+            const ticketEnd = document.getElementById('ticketEnd');
+            const ticketResult = document.getElementById('ticketResult');
+            const ticketQueryBtn = document.getElementById('ticketQueryBtn');
+            const closeTicketBtn = document.getElementById('closeTicketBtn');
+
             const toastContainer = document.getElementById('toastContainer');
 
             let currentUser = null;
-            let currentAvatar = ''; // 存储图片的 base64 或空
+            let currentAvatar = '';
             let clockInterval = null;
             let elderMode = false;
             let deleteCountdown = 0;
@@ -993,6 +1189,8 @@
                 editSceneryModal.classList.remove('active');
                 forgotModal.classList.remove('active');
                 quizModal.classList.remove('active');
+                distanceModal.classList.remove('active');
+                ticketModal.classList.remove('active');
             }
 
             // ==================== 长者关怀 ====================
@@ -1001,7 +1199,6 @@
                 document.body.classList.toggle('elder-mode', enabled);
                 elderToggle.classList.toggle('active', enabled);
                 localStorage.setItem('metro_elder_mode', enabled ? '1' : '0');
-                // 如果签到答题界面打开，更新计时器显示
                 if (quizModal.classList.contains('active')) {
                     updateTimerDisplay();
                 }
@@ -1019,14 +1216,12 @@
             function updateAvatarUI(avatarData) {
                 currentAvatar = avatarData || '';
                 if (avatarData && avatarData.startsWith('data:image')) {
-                    // 显示图片
                     navAvatarImg.src = avatarData;
                     navAvatarImg.style.display = 'inline-block';
                     myAvatarImg.src = avatarData;
                     myAvatarImg.style.display = 'block';
                     myAvatarPlaceholder.style.display = 'none';
                 } else {
-                    // 无图片，显示占位符
                     navAvatarImg.style.display = 'none';
                     myAvatarImg.style.display = 'none';
                     myAvatarPlaceholder.style.display = 'block';
@@ -1057,13 +1252,12 @@
                 reader.readAsDataURL(file);
             }
 
-            // ==================== 切换页面（首页/我的） ====================
+            // ==================== 页面切换 ====================
             function showHomePage() {
                 homeMain.classList.remove('hidden');
                 myPage.classList.remove('active');
                 myPage.style.display = 'none';
                 homeMain.style.display = 'block';
-                // 重置注销倒计时
                 resetDeleteButton();
             }
 
@@ -1072,7 +1266,6 @@
                 homeMain.style.display = 'none';
                 myPage.style.display = 'flex';
                 myPage.classList.add('active');
-                // 刷新用户信息
                 refreshMyInfo();
             }
 
@@ -1084,19 +1277,16 @@
                     if (!me) { showToast('获取用户信息失败', '❌'); return; }
                     myUsername.textContent = me.username;
                     myBalance.textContent = formatBalance(me.balance);
-                    // 管理员隐藏注销按钮
                     if (me.username === 'admin') {
                         myDeleteAccountBtn.style.display = 'none';
                     } else {
                         myDeleteAccountBtn.style.display = 'block';
                     }
-                    // 头像
                     if (me.avatar) {
                         updateAvatarUI(me.avatar);
                     } else {
                         updateAvatarUI('');
                     }
-                    // 导航栏用户名
                     navUsername.textContent = me.username;
                     greetingUser.textContent = me.username;
                 } catch (e) {
@@ -1118,7 +1308,6 @@
             }
 
             function startDeleteCountdown() {
-                // 管理员不可注销
                 if (currentUser === 'admin') {
                     showToast('管理员不可注销', '⛔');
                     return;
@@ -1165,7 +1354,6 @@
                 }
             }
 
-            // ==================== 退出登录 ====================
             function handleMyLogout() {
                 if (confirm('确定要退出登录吗？')) {
                     resetDeleteButton();
@@ -1224,7 +1412,7 @@
                 answerInput.disabled = true;
                 feedback.textContent = '';
                 feedback.className = 'feedback';
-                updateTimerDisplay(); // 显示当前设定时间
+                updateTimerDisplay();
                 stopTimer();
                 if (timerInterval) clearInterval(timerInterval);
                 answerInput.value = '';
@@ -1372,7 +1560,6 @@
                         const newBalance = (target.balance || 0) + SIGNIN_AMOUNT;
                         await updateUserAPI(currentUser, { balance: newBalance });
                         await updateSigninStatusAPI(currentUser, { signed: true, attempts: 0 });
-                        // 更新“我的”余额
                         refreshMyInfo();
                         showToast('签到成功！获得 ¥' + SIGNIN_AMOUNT, '💰');
                     } else {
@@ -1424,19 +1611,22 @@
                 if (currentUser) updateSigninUI();
             }
 
-            // ==================== 渲染线路 ====================
+            // ==================== 渲染线路（真实数据） ====================
             function renderLines() {
                 if (!lineGrid) return;
                 lineGrid.innerHTML = '';
-                LINE_DATA.forEach(line => {
+                lineDisplay.forEach(line => {
                     const card = document.createElement('div');
                     card.className = 'line-card';
                     const stationsHtml = line.stations.map((s, idx) => {
                         let arrow = (idx < line.stations.length - 1) ? ' <span class="dir-icon">→</span> ' : '';
+                        if (line.isLoop && idx === line.stations.length - 1) {
+                            arrow = ' <span class="dir-icon">↺</span> ';
+                        }
                         return '<span class="station">' + s + arrow + '</span>';
                     }).join('');
                     card.innerHTML =
-                        `<div class="line-header"><div class="line-color" style="background:${line.color};"></div><span class="line-name">${line.name}<span class="line-code">${line.code}</span></span></div><div class="line-stations">${stationsHtml}</div>`;
+                        `<div class="line-header"><div class="line-color" style="background:${line.color};"></div><span class="line-name">${line.name}<span class="line-code">${line.isLoop ? '环线' : ''}</span></span></div><div class="line-stations">${stationsHtml}</div>`;
                     lineGrid.appendChild(card);
                 });
             }
@@ -1448,7 +1638,6 @@
                     userTableBody.innerHTML = '';
                     users.forEach(u => {
                         const tr = document.createElement('tr');
-                        // 头像列
                         let avatarHtml = '';
                         if (u.avatar && u.avatar.startsWith('data:image')) {
                             avatarHtml =
@@ -1456,7 +1645,6 @@
                         } else {
                             avatarHtml = `<span style="font-size:24px;">👤</span>`;
                         }
-                        // 操作按钮
                         let actions = '';
                         if (u.username !== 'admin') {
                             actions += `<button class="btn-reset" data-username="${u.username}" data-action="reset">重置密码</button>`;
@@ -1643,6 +1831,108 @@
                 if (tabName === 'scenery') renderSceneryAdmin();
             }
 
+            // ==================== 站距查询 ====================
+            function openDistanceModal() {
+                distanceModal.classList.add('active');
+                distResult.innerHTML = '<p class="text-muted" style="text-align:center;padding:20px 0;">请选择线路查看相邻站距</p>';
+                distLineSelect.value = '';
+                // 填充下拉选项
+                distLineSelect.innerHTML = '<option value="">-- 请选择 --</option>';
+                lineNames.forEach(name => {
+                    const opt = document.createElement('option');
+                    opt.value = name;
+                    opt.textContent = name;
+                    distLineSelect.appendChild(opt);
+                });
+            }
+
+            function closeDistanceModal() {
+                distanceModal.classList.remove('active');
+            }
+
+            function handleDistLineChange() {
+                const lineName = distLineSelect.value;
+                if (!lineName) {
+                    distResult.innerHTML = '<p class="text-muted" style="text-align:center;padding:20px 0;">请选择线路查看相邻站距</p>';
+                    return;
+                }
+                const data = LINE_METRO[lineName];
+                if (!data) return;
+                const sts = data.stations;
+                const dists = data.distances;
+                const isLoop = data.isLoop || false;
+                let html = '<table class="dist-table"><thead><tr><th>区间</th><th>距离（米）</th></tr></thead><tbody>';
+                const n = sts.length;
+                for (let i = 0; i < n - 1; i++) {
+                    html += `<tr><td>${sts[i]} → ${sts[i+1]}</td><td>${dists[i]}</td></tr>`;
+                }
+                if (isLoop && n > 1) {
+                    html += `<tr><td>${sts[n-1]} → ${sts[0]}</td><td>${dists[n-1]}</td></tr>`;
+                }
+                html += '</tbody></table>';
+                distResult.innerHTML = html;
+            }
+
+            // ==================== 购票 ====================
+            function openTicketModal() {
+                ticketModal.classList.add('active');
+                ticketResult.innerHTML = '';
+                ticketStart.value = '';
+                ticketEnd.value = '';
+                // 填充下拉选项
+                ticketStart.innerHTML = '<option value="">-- 请选择 --</option>';
+                ticketEnd.innerHTML = '<option value="">-- 请选择 --</option>';
+                allStations.forEach(st => {
+                    const opt1 = document.createElement('option');
+                    opt1.value = st;
+                    opt1.textContent = st;
+                    ticketStart.appendChild(opt1);
+                    const opt2 = document.createElement('option');
+                    opt2.value = st;
+                    opt2.textContent = st;
+                    ticketEnd.appendChild(opt2);
+                });
+            }
+
+            function closeTicketModal() {
+                ticketModal.classList.remove('active');
+            }
+
+            function handleTicketQuery() {
+                const start = ticketStart.value;
+                const end = ticketEnd.value;
+                if (!start || !end) {
+                    ticketResult.innerHTML = '<p style="color:#d94a4a;">请选择起点和终点</p>';
+                    return;
+                }
+                if (start === end) {
+                    ticketResult.innerHTML = '<p style="color:#d94a4a;">起点和终点不能相同</p>';
+                    return;
+                }
+                const result = dijkstra(start, end);
+                if (!result) {
+                    ticketResult.innerHTML = '<p style="color:#d94a4a;">未找到路径，可能线路不连通</p>';
+                    return;
+                }
+                const { path, totalDistance } = result;
+                const fare = calculateFare(totalDistance);
+                const km = (totalDistance / 1000).toFixed(2);
+                let pathHtml = path.map((s, i) => {
+                    if (i < path.length - 1) return `<span>${s}</span><span class="arrow"> → </span>`;
+                    else return `<span>${s}</span>`;
+                }).join('');
+                const html = `
+                    <div class="ticket-result">
+                        <div class="path">${pathHtml}</div>
+                        <div class="detail">
+                            <span>总里程：<strong>${km} km</strong></span>
+                            <span>票价：<span class="price">${fare} 元</span></span>
+                        </div>
+                    </div>
+                `;
+                ticketResult.innerHTML = html;
+            }
+
             // ==================== 登录 / 登出 ====================
             async function handleLogin(e) {
                 e.preventDefault();
@@ -1672,23 +1962,19 @@
                 sessionStorage.setItem('metro_session_user', username);
                 loginPage.style.display = 'none';
                 homePage.style.display = 'flex';
-                // 更新导航
                 navUsername.textContent = username;
                 greetingUser.textContent = username;
-                // 头像
                 if (avatar) {
                     updateAvatarUI(avatar);
                 } else {
                     updateAvatarUI('');
                 }
-                // 显示首页
                 showHomePage();
                 adminEntry.style.display = (username === 'admin') ? 'block' : 'none';
                 updateSigninUI();
                 renderLines();
                 startClock();
                 loadElderMode();
-                // 刷新“我的”信息（后台加载）
                 refreshMyInfo();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 showToast('欢迎回来，' + username + '！', '👋');
@@ -1873,15 +2159,13 @@
             loginPassword.addEventListener('keydown', function(e) { if (e.key === 'Enter') loginForm.dispatchEvent(new Event(
                         'submit')); });
 
-            // 点击用户名打开“我的”
             userNameClick.addEventListener('click', showMyPage);
 
-            // 快捷功能
             document.querySelectorAll('.quick-action[data-action]').forEach(el => {
                 el.addEventListener('click', function() {
                     const action = this.dataset.action;
-                    if (action === 'ticket') showToast('购票功能开发中，敬请期待！', '🎟️');
-                    else if (action === 'line') showToast('线路查询功能开发中，敬请期待！', '🗺️');
+                    if (action === 'ticket') openTicketModal();
+                    else if (action === 'distance') openDistanceModal();
                     else if (action === 'scenery') openSceneryViewer();
                     else if (action === 'signin') openQuizModal();
                     else if (action === 'admin') openAdminPanel();
@@ -1889,10 +2173,8 @@
                 });
             });
 
-            // 我的页面 - 返回首页
             myBackBtn.addEventListener('click', showHomePage);
 
-            // 头像上传
             avatarWrapper.addEventListener('click', function() {
                 if (!currentUser) return;
                 avatarInput.click();
@@ -1901,13 +2183,10 @@
                 if (this.files && this.files[0]) {
                     handleAvatarUpload(this.files[0]);
                 }
-                this.value = ''; // 重置，允许重复选择同一文件
+                this.value = '';
             });
 
-            // 退出登录
             myLogoutBtn.addEventListener('click', handleMyLogout);
-
-            // 注销账号（初始点击触发倒计时）
             myDeleteAccountBtn.addEventListener('click', function() {
                 if (this.disabled) return;
                 if (deleteCountdownInterval) return;
@@ -1918,7 +2197,6 @@
                 startDeleteCountdown();
             });
 
-            // 长者关怀开关
             elderToggle.addEventListener('click', function() {
                 const newState = !elderMode;
                 applyElderMode(newState);
@@ -1941,7 +2219,6 @@
 
             // 答题
             startQuizBtn.addEventListener('click', function() {
-                // 开始前确保计时器显示正确的时间
                 timer = getTimeLimit();
                 updateTimerDisplay();
                 startQuiz();
@@ -1964,11 +2241,18 @@
             saveSceneryBtn.addEventListener('click', saveSceneryItem);
             editSceneryModal.addEventListener('click', function(e) { if (e.target === this) closeEditScenery(); });
 
-            // 登录框清除错误
+            // 站距 & 购票
+            distLineSelect.addEventListener('change', handleDistLineChange);
+            closeDistBtn.addEventListener('click', closeDistanceModal);
+            distanceModal.addEventListener('click', function(e) { if (e.target === this) closeDistanceModal(); });
+            ticketQueryBtn.addEventListener('click', handleTicketQuery);
+            closeTicketBtn.addEventListener('click', closeTicketModal);
+            ticketModal.addEventListener('click', function(e) { if (e.target === this) closeTicketModal(); });
+
             loginUsername.addEventListener('focus', function() { loginError.classList.remove('show'); });
             loginPassword.addEventListener('focus', function() { loginError.classList.remove('show'); });
 
-            // 修正 startQuiz 函数（覆盖原函数）
+            // 修正 startQuiz 函数
             const originalStartQuiz = startQuiz;
             startQuiz = function() {
                 if (isCountingDown || quizActive) return;
