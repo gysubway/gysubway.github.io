@@ -6,11 +6,41 @@
     <title>固原地铁 · 售票系统</title>
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet" />
     <style>
-        /* ===== 全局重置（略，与之前完全一致） ===== */
+        /* ===== 全局重置 ===== */
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; background:#e9edf2; min-height:100vh; display:flex; justify-content:center; align-items:center; transition:background 0.3s; }
-        #loginPage { width:100%; min-height:100vh; display:flex; justify-content:center; align-items:center; background:linear-gradient(145deg,#0b2a4a 0%,#1a4a6e 100%); padding:20px; }
-        .login-card { background:#ffffff; border-radius:24px; padding:44px 40px 36px; width:100%; max-width:420px; box-shadow:0 25px 60px rgba(0,20,40,0.45); transition:transform 0.25s ease; }
+        body {
+            font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+            background:#e9edf2;
+            min-height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            transition:background 0.3s;
+        }
+
+        /* ===== 长者关怀模式 ===== */
+        body.elder-mode { zoom:1.3; }
+        @-moz-document url-prefix() { body.elder-mode { transform:scale(1.3); transform-origin:top left; width:76.92%; margin:0 auto; } }
+
+        /* ===== 登录页 ===== */
+        #loginPage {
+            width:100%;
+            min-height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            background:linear-gradient(145deg,#0b2a4a 0%,#1a4a6e 100%);
+            padding:20px;
+        }
+        .login-card {
+            background:#ffffff;
+            border-radius:24px;
+            padding:44px 40px 36px;
+            width:100%;
+            max-width:420px;
+            box-shadow:0 25px 60px rgba(0,20,40,0.45);
+            transition:transform 0.25s ease;
+        }
         .login-card:hover { transform:translateY(-2px); }
         .login-logo { text-align:center; margin-bottom:28px; }
         .login-logo .icon { font-size:44px; line-height:1; display:block; margin-bottom:6px; }
@@ -18,9 +48,16 @@
         .login-logo p { font-size:14px; color:#7a8a9e; margin-top:2px; letter-spacing:1px; }
         .login-form .form-group { margin-bottom:20px; }
         .login-form label { display:block; font-size:14px; font-weight:600; color:#2c3e50; margin-bottom:6px; letter-spacing:0.5px; }
-        .login-form input[type="text"], .login-form input[type="password"] { width:100%; padding:14px 18px; font-size:16px; border:2px solid #dce3ec; border-radius:12px; background:#f8fafc; transition:border-color 0.25s, box-shadow 0.25s; outline:none; color:#1a2a3a; }
+        .login-form input[type="text"], .login-form input[type="password"] {
+            width:100%; padding:14px 18px; font-size:16px; border:2px solid #dce3ec; border-radius:12px;
+            background:#f8fafc; transition:border-color 0.25s, box-shadow 0.25s; outline:none; color:#1a2a3a;
+        }
         .login-form input:focus { border-color:#1a6e9e; box-shadow:0 0 0 4px rgba(26,110,158,0.12); background:#ffffff; }
-        .login-btn { width:100%; padding:16px; font-size:18px; font-weight:700; color:#ffffff; background:linear-gradient(135deg,#1a6e9e,#0b4a72); border:none; border-radius:12px; cursor:pointer; transition:background 0.25s, transform 0.15s, box-shadow 0.25s; letter-spacing:2px; margin-top:4px; }
+        .login-btn {
+            width:100%; padding:16px; font-size:18px; font-weight:700; color:#ffffff;
+            background:linear-gradient(135deg,#1a6e9e,#0b4a72); border:none; border-radius:12px;
+            cursor:pointer; transition:background 0.25s, transform 0.15s, box-shadow 0.25s; letter-spacing:2px; margin-top:4px;
+        }
         .login-btn:hover { background:linear-gradient(135deg,#1f7eb2,#0e5580); box-shadow:0 8px 24px rgba(26,110,158,0.30); transform:translateY(-1px); }
         .login-btn:active { transform:scale(0.98); }
         .login-error { margin-top:16px; padding:12px 16px; background:#fef2f0; border-left:4px solid #d94a4a; border-radius:8px; color:#b33a3a; font-size:14px; display:none; align-items:center; gap:8px; }
@@ -31,14 +68,39 @@
         .login-footer .register-link:hover { color:#0b4a72; }
         .login-footer .forgot-link { display:inline-block; margin-top:4px; color:#7a8a9e; font-size:13px; cursor:pointer; transition:color 0.2s; text-decoration:underline; }
         .login-footer .forgot-link:hover { color:#1a6e9e; }
-        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); backdrop-filter:blur(4px); z-index:999; justify-content:center; align-items:center; padding:20px; animation:fadeIn 0.25s ease; }
+
+        /* ===== 模态框通用（仅保留注册、忘记密码、管理、答题等） ===== */
+        .modal-overlay {
+            display:none;
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.55);
+            backdrop-filter:blur(4px);
+            z-index:999;
+            justify-content:center;
+            align-items:center;
+            padding:20px;
+            animation:fadeIn 0.25s ease;
+        }
         .modal-overlay.active { display:flex; }
         @keyframes fadeIn { from{opacity:0; transform:scale(0.96);} to{opacity:1; transform:scale(1);} }
-        .modal-card { background:#ffffff; border-radius:24px; padding:36px 32px 32px; width:100%; max-width:580px; box-shadow:0 30px 80px rgba(0,0,0,0.45); max-height:90vh; overflow-y:auto; }
+        .modal-card {
+            background:#ffffff;
+            border-radius:24px;
+            padding:36px 32px 32px;
+            width:100%;
+            max-width:580px;
+            box-shadow:0 30px 80px rgba(0,0,0,0.45);
+            max-height:90vh;
+            overflow-y:auto;
+        }
         .modal-card .modal-title { font-size:24px; font-weight:700; color:#0b2a4a; text-align:center; margin-bottom:24px; letter-spacing:1px; }
         .modal-card .form-group { margin-bottom:18px; }
         .modal-card label { display:block; font-size:14px; font-weight:600; color:#2c3e50; margin-bottom:5px; }
-        .modal-card input[type="text"], .modal-card input[type="password"], .modal-card input[type="number"] { width:100%; padding:12px 16px; font-size:15px; border:2px solid #dce3ec; border-radius:10px; background:#f8fafc; transition:border-color 0.25s; outline:none; color:#1a2a3a; }
+        .modal-card input[type="text"], .modal-card input[type="password"], .modal-card input[type="number"] {
+            width:100%; padding:12px 16px; font-size:15px; border:2px solid #dce3ec; border-radius:10px;
+            background:#f8fafc; transition:border-color 0.25s; outline:none; color:#1a2a3a;
+        }
         .modal-card input:focus { border-color:#1a6e9e; background:#ffffff; }
         .modal-card .form-actions { display:flex; gap:12px; margin-top:20px; }
         .modal-card .form-actions button { flex:1; padding:14px; font-size:16px; font-weight:700; border:none; border-radius:10px; cursor:pointer; transition:background 0.25s, transform 0.15s; }
@@ -52,9 +114,13 @@
         .modal-card .modal-error.show { display:flex; }
         .modal-card .modal-success { margin-top:14px; padding:10px 14px; background:#ecf9f0; border-left:4px solid #2ecc71; border-radius:6px; color:#1a7a4a; font-size:14px; display:none; align-items:center; gap:8px; }
         .modal-card .modal-success.show { display:flex; }
-        .register-modal .verify-question { background:#eef4fa; padding:12px 16px; border-radius:10px; font-size:15px; color:#0b2a4a; margin-bottom:10px; border-left:4px solid #1a6e9e; font-weight:500; }
 
-        /* 签到答题 */
+        .register-modal .verify-question, .forgot-modal .verify-question {
+            background:#eef4fa; padding:12px 16px; border-radius:10px; font-size:15px; color:#0b2a4a;
+            margin-bottom:10px; border-left:4px solid #1a6e9e; font-weight:500;
+        }
+
+        /* ===== 签到答题 ===== */
         .quiz-modal .modal-card { max-width:600px; }
         .quiz-modal .quiz-header { display:flex; justify-content:space-between; font-size:18px; font-weight:600; color:#0b2a4a; padding:0 4px 16px 4px; border-bottom:2px solid #eef2f7; }
         .quiz-modal .quiz-header .timer { color:#d94a4a; }
@@ -76,31 +142,105 @@
         .quiz-start-area .countdown { font-size:56px; font-weight:900; color:#1a6e9e; letter-spacing:4px; display:none; }
         .quiz-start-area .countdown.active { display:block; }
 
-        /* 首页 */
-        #homePage { display:none; width:100%; min-height:100vh; background:#eef2f7; flex-direction:column; }
-        .navbar { background:linear-gradient(135deg,#0b2a4a,#1a4a6e); padding:0 40px; height:72px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 20px rgba(0,0,0,0.15); position:sticky; top:0; z-index:100; flex-shrink:0; }
+        /* ===== 首页布局 ===== */
+        #homePage {
+            display:none;
+            width:100%;
+            min-height:100vh;
+            background:#eef2f7;
+            flex-direction:column;
+        }
+        .navbar {
+            background:linear-gradient(135deg,#0b2a4a,#1a4a6e);
+            padding:0 40px;
+            height:72px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            box-shadow:0 4px 20px rgba(0,0,0,0.15);
+            position:sticky;
+            top:0;
+            z-index:100;
+            flex-shrink:0;
+        }
         .navbar .brand { display:flex; align-items:center; gap:12px; color:#ffffff; font-size:22px; font-weight:700; letter-spacing:1px; }
         .navbar .brand .brand-icon { font-size:30px; line-height:1; }
         .navbar .brand .brand-sub { font-size:13px; font-weight:400; opacity:0.7; margin-left:4px; }
         .navbar .user-area { display:flex; align-items:center; gap:16px; flex-wrap:wrap; justify-content:flex-end; }
         .navbar .user-area .user-info { display:flex; align-items:center; gap:12px; color:#ffffff; font-size:14px; }
-        .navbar .user-area .user-info .user-name { font-weight:600; background:rgba(255,255,255,0.12); padding:5px 16px; border-radius:30px; display:flex; align-items:center; gap:6px; }
-        .navbar .user-area .user-info .user-balance { background:rgba(255,215,0,0.20); padding:5px 16px; border-radius:30px; display:flex; align-items:center; gap:4px; color:#ffd700; font-weight:600; }
-        .navbar .logout-btn { background:rgba(255,255,255,0.10); border:1.5px solid rgba(255,255,255,0.25); color:#ffffff; padding:7px 22px; border-radius:30px; font-size:14px; font-weight:600; cursor:pointer; transition:background 0.25s, border-color 0.25s; letter-spacing:0.5px; white-space:nowrap; }
-        .navbar .logout-btn:hover { background:rgba(255,255,255,0.20); border-color:rgba(255,255,255,0.45); }
-        .hero-banner { background:#c0392b; background:linear-gradient(135deg,#b71c1c,#c0392b); padding:24px 20px; text-align:center; border-bottom:4px solid #922b21; box-shadow:0 4px 20px rgba(192,57,43,0.25); flex-shrink:0; }
+        .navbar .user-area .user-info .user-name {
+            font-weight:600;
+            background:rgba(255,255,255,0.12);
+            padding:5px 16px;
+            border-radius:30px;
+            display:flex;
+            align-items:center;
+            gap:8px;
+            cursor:pointer;
+            transition:background 0.2s;
+            user-select:none;
+        }
+        .navbar .user-area .user-info .user-name:hover { background:rgba(255,255,255,0.22); }
+        .navbar .user-area .user-info .user-name .avatar-img {
+            width:28px;
+            height:28px;
+            border-radius:50%;
+            object-fit:cover;
+            border:1px solid rgba(255,255,255,0.3);
+        }
+
+        .hero-banner {
+            background:linear-gradient(135deg,#b71c1c,#c0392b);
+            padding:24px 20px;
+            text-align:center;
+            border-bottom:4px solid #922b21;
+            box-shadow:0 4px 20px rgba(192,57,43,0.25);
+            flex-shrink:0;
+        }
         .hero-banner h1 { font-family:'Ma Shan Zheng','华文行楷','STXingkai','KaiTi',cursive; font-size:52px; color:#ffffff; letter-spacing:8px; text-shadow:0 2px 12px rgba(0,0,0,0.20); font-weight:400; line-height:1.2; }
-        .home-main { flex:1; padding:28px 40px 20px; max-width:1280px; margin:0 auto; width:100%; }
-        .welcome-banner { background:linear-gradient(135deg,#ffffff,#f5f9ff); border-radius:20px; padding:22px 30px; margin-bottom:28px; box-shadow:0 2px 12px rgba(0,0,0,0.04); border:1px solid rgba(255,255,255,0.6); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
+
+        /* ===== 主内容区（首页） ===== */
+        #homeMain {
+            flex:1;
+            padding:28px 40px 20px;
+            max-width:1280px;
+            margin:0 auto;
+            width:100%;
+            display:block;
+        }
+        #homeMain.hidden { display:none; }
+
+        .welcome-banner {
+            background:linear-gradient(135deg,#ffffff,#f5f9ff);
+            border-radius:20px;
+            padding:22px 30px;
+            margin-bottom:28px;
+            box-shadow:0 2px 12px rgba(0,0,0,0.04);
+            border:1px solid rgba(255,255,255,0.6);
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            flex-wrap:wrap;
+            gap:12px;
+        }
         .welcome-banner .greeting h2 { font-size:22px; font-weight:700; color:#0b2a4a; }
         .welcome-banner .greeting h2 .highlight { color:#1a6e9e; }
         .welcome-banner .greeting p { color:#5a6a7a; font-size:14px; margin-top:2px; }
         .welcome-banner .datetime { text-align:right; color:#3a5a7a; font-size:15px; background:#eef4fa; padding:8px 20px; border-radius:40px; font-weight:500; white-space:nowrap; }
         .welcome-banner .datetime .time { font-size:20px; font-weight:700; color:#0b2a4a; margin-right:6px; }
+
         .section-title { font-size:18px; font-weight:700; color:#1a2a3a; margin-bottom:14px; display:flex; align-items:center; gap:10px; }
         .section-title .title-line { flex:1; height:2px; background:linear-gradient(to right,#d0dae6,transparent); }
+
         .card-grid { display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-bottom:28px; }
-        .line-card { background:#ffffff; border-radius:18px; padding:20px 24px 18px; box-shadow:0 2px 12px rgba(0,0,0,0.04); border:1px solid #eef2f7; transition:box-shadow 0.2s, transform 0.2s; }
+        .line-card {
+            background:#ffffff;
+            border-radius:18px;
+            padding:20px 24px 18px;
+            box-shadow:0 2px 12px rgba(0,0,0,0.04);
+            border:1px solid #eef2f7;
+            transition:box-shadow 0.2s, transform 0.2s;
+        }
         .line-card:hover { box-shadow:0 8px 28px rgba(0,20,40,0.08); transform:translateY(-2px); }
         .line-card .line-header { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
         .line-card .line-color { width:6px; height:30px; border-radius:6px; flex-shrink:0; }
@@ -111,8 +251,19 @@
         .line-card .line-stations .station::after { content:"·"; color:#b0c4d8; margin-left:10px; }
         .line-card .line-stations .station:last-child::after { content:""; margin:0; }
         .line-card .line-stations .station .dir-icon { font-size:12px; color:#8a9aaa; margin:0 2px; }
-        .quick-actions { display:grid; grid-template-columns:repeat(5,1fr); gap:16px; margin-bottom:8px; }
-        .quick-action { background:#ffffff; border-radius:16px; padding:24px 12px 20px; text-align:center; box-shadow:0 2px 12px rgba(0,0,0,0.04); border:1px solid #eef2f7; cursor:pointer; transition:box-shadow 0.2s, transform 0.2s, border-color 0.2s; user-select:none; }
+
+        .quick-actions { display:grid; grid-template-columns:repeat(6,1fr); gap:16px; margin-bottom:8px; }
+        .quick-action {
+            background:#ffffff;
+            border-radius:16px;
+            padding:24px 12px 20px;
+            text-align:center;
+            box-shadow:0 2px 12px rgba(0,0,0,0.04);
+            border:1px solid #eef2f7;
+            cursor:pointer;
+            transition:box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+            user-select:none;
+        }
         .quick-action:hover { box-shadow:0 8px 28px rgba(0,20,40,0.10); transform:translateY(-3px); border-color:#c8d8e8; }
         .quick-action:active { transform:scale(0.97); }
         .quick-action .qa-icon { font-size:34px; display:block; margin-bottom:8px; }
@@ -124,10 +275,151 @@
         .quick-action.signin-action:hover { border-color:#1e8449; }
         .quick-action.signin-action.disabled { opacity:0.6; cursor:not-allowed; filter:grayscale(0.3); }
         .quick-action.signin-action.disabled:hover { transform:none; box-shadow:0 2px 12px rgba(0,0,0,0.04); border-color:#eef2f7; }
+        .quick-action.my-action { border-color:#8e44ad; background:#f4ecf7; }
+        .quick-action.my-action:hover { border-color:#6c3483; }
+
         .home-footer { text-align:center; padding:20px 20px 8px; color:#8a9aaa; font-size:13px; border-top:1px solid #e0e6ee; margin-top:12px; }
         .home-footer strong { color:#1a4a6e; }
 
-        /* 管理面板 */
+        /* ===== “我的”页面 ===== */
+        #myPage {
+            display:none;
+            flex:1;
+            padding:28px 40px 20px;
+            max-width:640px;
+            margin:0 auto;
+            width:100%;
+            flex-direction:column;
+        }
+        #myPage.active { display:flex; }
+        #myPage .my-header {
+            display:flex;
+            align-items:center;
+            gap:16px;
+            margin-bottom:24px;
+        }
+        #myPage .my-header .back-btn {
+            background:#eef2f7;
+            border:none;
+            border-radius:30px;
+            padding:8px 20px;
+            font-size:16px;
+            font-weight:600;
+            color:#1a2a3a;
+            cursor:pointer;
+            transition:background 0.2s;
+        }
+        #myPage .my-header .back-btn:hover { background:#dce3ec; }
+        #myPage .my-header .my-title { font-size:26px; font-weight:700; color:#0b2a4a; }
+
+        .my-avatar-section {
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            margin-bottom:28px;
+        }
+        .my-avatar-section .avatar-wrapper {
+            position:relative;
+            cursor:pointer;
+            width:120px;
+            height:120px;
+            border-radius:50%;
+            overflow:hidden;
+            border:4px solid #dce3ec;
+            background:#f0f4fa;
+            transition:border-color 0.2s;
+        }
+        .my-avatar-section .avatar-wrapper:hover { border-color:#1a6e9e; }
+        .my-avatar-section .avatar-wrapper img {
+            width:100%;
+            height:100%;
+            object-fit:cover;
+            display:block;
+        }
+        .my-avatar-section .avatar-wrapper .avatar-placeholder {
+            font-size:64px;
+            line-height:120px;
+            text-align:center;
+            color:#8a9aaa;
+        }
+        .my-avatar-section .avatar-hint { font-size:14px; color:#8a9aaa; margin-top:8px; }
+        #avatarInput { display:none; }
+
+        .my-info-row {
+            display:flex;
+            justify-content:space-between;
+            padding:14px 0;
+            border-bottom:1px solid #eef2f7;
+            font-size:17px;
+        }
+        .my-info-row .label { color:#5a6a7a; }
+        .my-info-row .value { font-weight:600; color:#0b2a4a; }
+        .my-info-row .value .balance-amount { color:#1a6e9e; }
+
+        .my-action-btns {
+            display:flex;
+            gap:12px;
+            margin:24px 0 20px;
+        }
+        .my-action-btns button {
+            flex:1;
+            padding:14px;
+            font-size:17px;
+            font-weight:600;
+            border:none;
+            border-radius:12px;
+            cursor:pointer;
+            transition:background 0.25s, transform 0.15s;
+        }
+        .my-action-btns .btn-logout { background:#eef2f7; color:#4a5a6a; }
+        .my-action-btns .btn-logout:hover { background:#dce3ec; }
+        .my-action-btns .btn-delete-account { background:#fadbd8; color:#922b21; }
+        .my-action-btns .btn-delete-account:hover:not(:disabled) { background:#f5b7b1; }
+        .my-action-btns .btn-delete-account:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+
+        .my-elder-toggle {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:16px 0;
+            border-top:1px solid #eef2f7;
+            margin-top:6px;
+        }
+        .my-elder-toggle .elder-label {
+            display:flex;
+            align-items:center;
+            gap:12px;
+            font-size:17px;
+            font-weight:600;
+            color:#0b2a4a;
+        }
+        .my-elder-toggle .elder-label .elder-icon { font-size:28px; }
+        .my-elder-toggle .toggle-switch {
+            position:relative;
+            width:56px;
+            height:30px;
+            background:#dce3ec;
+            border-radius:15px;
+            cursor:pointer;
+            transition:background 0.3s;
+            flex-shrink:0;
+        }
+        .my-elder-toggle .toggle-switch.active { background:#1a6e9e; }
+        .my-elder-toggle .toggle-switch .toggle-knob {
+            position:absolute;
+            top:3px;
+            left:3px;
+            width:24px;
+            height:24px;
+            background:#ffffff;
+            border-radius:50%;
+            transition:transform 0.3s;
+            box-shadow:0 2px 6px rgba(0,0,0,0.15);
+        }
+        .my-elder-toggle .toggle-switch.active .toggle-knob { transform:translateX(26px); }
+        .my-elder-toggle .toggle-desc { font-size:13px; color:#8a9aaa; margin-left:4px; }
+
+        /* ===== 管理面板 ===== */
         .admin-modal .modal-card { max-width:900px; }
         .admin-modal .tab-bar { display:flex; gap:4px; border-bottom:2px solid #e0e6ee; margin-bottom:24px; flex-wrap:wrap; }
         .admin-modal .tab-bar .tab-btn { padding:10px 24px; font-size:16px; font-weight:600; border:none; background:transparent; cursor:pointer; color:#5a6a7a; border-bottom:3px solid transparent; transition:color 0.2s, border-color 0.2s; }
@@ -163,13 +455,86 @@
         .admin-modal .scenery-item-admin .actions .btn-delete { background:#fadbd8; color:#922b21; }
         .admin-modal .scenery-item-admin .actions .btn-delete:hover { background:#f5b7b1; }
 
-        .toast-container { position:fixed; top:100px; left:50%; transform:translateX(-50%); z-index:9999; pointer-events:none; }
-        .toast { background:#1a2a3a; color:#ffffff; padding:14px 32px; border-radius:12px; font-size:15px; font-weight:500; box-shadow:0 8px 32px rgba(0,0,0,0.30); opacity:0; transform:translateY(-20px) scale(0.95); transition:opacity 0.35s ease, transform 0.35s ease; pointer-events:auto; display:flex; align-items:center; gap:10px; white-space:nowrap; }
+        /* ===== Toast ===== */
+        .toast-container {
+            position:fixed;
+            top:100px;
+            left:50%;
+            transform:translateX(-50%);
+            z-index:9999;
+            pointer-events:none;
+        }
+        .toast {
+            background:#1a2a3a;
+            color:#ffffff;
+            padding:14px 32px;
+            border-radius:12px;
+            font-size:15px;
+            font-weight:500;
+            box-shadow:0 8px 32px rgba(0,0,0,0.30);
+            opacity:0;
+            transform:translateY(-20px) scale(0.95);
+            transition:opacity 0.35s ease, transform 0.35s ease;
+            pointer-events:auto;
+            display:flex;
+            align-items:center;
+            gap:10px;
+            white-space:nowrap;
+        }
         .toast.show { opacity:1; transform:translateY(0) scale(1); }
         .toast .toast-icon { font-size:20px; }
 
-        @media (max-width:992px) { .card-grid { grid-template-columns:1fr; gap:16px; } .quick-actions { grid-template-columns:repeat(3,1fr); } .home-main { padding:20px 24px 16px; } .navbar { padding:0 24px; height:64px; } .navbar .brand { font-size:18px; } .navbar .brand .brand-sub { display:none; } .hero-banner h1 { font-size:38px; letter-spacing:4px; } .welcome-banner { flex-direction:column; align-items:flex-start; } .welcome-banner .datetime { text-align:left; width:100%; white-space:normal; } .admin-modal .modal-card { max-width:95%; padding:24px 16px; } .quiz-modal .modal-card { max-width:95%; } }
-        @media (max-width:600px) { .login-card { padding:28px 18px 24px; } .login-logo h1 { font-size:22px; } .navbar .user-area .user-info { font-size:12px; gap:6px; flex-wrap:wrap; justify-content:flex-end; } .navbar .user-area .user-info .user-name, .navbar .user-area .user-info .user-balance { padding:3px 12px; font-size:12px; } .navbar .logout-btn { font-size:12px; padding:5px 14px; } .navbar { padding:0 14px; height:58px; } .navbar .brand { font-size:16px; gap:6px; } .navbar .brand .brand-icon { font-size:22px; } .hero-banner h1 { font-size:28px; letter-spacing:2px; } .hero-banner { padding:16px 12px; } .quick-actions { grid-template-columns:1fr 1fr 1fr; gap:10px; } .quick-action { padding:16px 6px 14px; } .quick-action .qa-icon { font-size:26px; } .quick-action .qa-label { font-size:14px; } .quick-action .qa-desc { font-size:11px; } .line-card { padding:14px 16px; } .line-card .line-stations { gap:2px 10px; padding-left:10px; } .line-card .line-stations .station { font-size:13px; } .home-main { padding:14px 14px 12px; } .welcome-banner { padding:14px 16px; } .welcome-banner .greeting h2 { font-size:18px; } .modal-card { padding:24px 18px 20px; } .modal-card .form-actions { flex-direction:column; } .toast { padding:12px 20px; font-size:14px; white-space:normal; } .admin-modal table th, .admin-modal table td { padding:6px 4px; font-size:12px; } .admin-modal .table-actions button { font-size:10px; padding:2px 8px; } .admin-modal .scenery-item-admin { flex-direction:column; align-items:stretch; } .admin-modal .scenery-item-admin .info { flex-wrap:wrap; } .quiz-modal .quiz-body .question-text { font-size:24px; } .quiz-modal .quiz-body .answer-input { width:80px; font-size:22px; } .quiz-start-area .start-btn { font-size:18px; padding:12px 32px; } .quiz-start-area .countdown { font-size:40px; } }
+        /* ===== 响应式 ===== */
+        @media (max-width:992px) {
+            .card-grid { grid-template-columns:1fr; gap:16px; }
+            .quick-actions { grid-template-columns:repeat(3,1fr); }
+            #homeMain, #myPage { padding:20px 24px 16px; }
+            .navbar { padding:0 24px; height:64px; }
+            .navbar .brand { font-size:18px; }
+            .navbar .brand .brand-sub { display:none; }
+            .hero-banner h1 { font-size:38px; letter-spacing:4px; }
+            .welcome-banner { flex-direction:column; align-items:flex-start; }
+            .welcome-banner .datetime { text-align:left; width:100%; white-space:normal; }
+            .admin-modal .modal-card { max-width:95%; padding:24px 16px; }
+            .quiz-modal .modal-card { max-width:95%; }
+        }
+        @media (max-width:600px) {
+            .login-card { padding:28px 18px 24px; }
+            .login-logo h1 { font-size:22px; }
+            .navbar .user-area .user-info { font-size:12px; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+            .navbar .user-area .user-info .user-name { padding:3px 12px; font-size:12px; }
+            .navbar { padding:0 14px; height:58px; }
+            .navbar .brand { font-size:16px; gap:6px; }
+            .navbar .brand .brand-icon { font-size:22px; }
+            .hero-banner h1 { font-size:28px; letter-spacing:2px; }
+            .hero-banner { padding:16px 12px; }
+            .quick-actions { grid-template-columns:1fr 1fr 1fr; gap:10px; }
+            .quick-action { padding:16px 6px 14px; }
+            .quick-action .qa-icon { font-size:26px; }
+            .quick-action .qa-label { font-size:14px; }
+            .quick-action .qa-desc { font-size:11px; }
+            .line-card { padding:14px 16px; }
+            .line-card .line-stations { gap:2px 10px; padding-left:10px; }
+            .line-card .line-stations .station { font-size:13px; }
+            #homeMain, #myPage { padding:14px 14px 12px; }
+            .welcome-banner { padding:14px 16px; }
+            .welcome-banner .greeting h2 { font-size:18px; }
+            .modal-card { padding:24px 18px 20px; }
+            .modal-card .form-actions { flex-direction:column; }
+            .toast { padding:12px 20px; font-size:14px; white-space:normal; }
+            .admin-modal table th, .admin-modal table td { padding:6px 4px; font-size:12px; }
+            .admin-modal .table-actions button { font-size:10px; padding:2px 8px; }
+            .admin-modal .scenery-item-admin { flex-direction:column; align-items:stretch; }
+            .admin-modal .scenery-item-admin .info { flex-wrap:wrap; }
+            .quiz-modal .quiz-body .question-text { font-size:24px; }
+            .quiz-modal .quiz-body .answer-input { width:80px; font-size:22px; }
+            .quiz-start-area .start-btn { font-size:18px; padding:12px 32px; }
+            .quiz-start-area .countdown { font-size:40px; }
+            .my-action-btns { flex-direction:column; }
+            .my-avatar-section .avatar-wrapper { width:90px; height:90px; }
+            .my-avatar-section .avatar-wrapper .avatar-placeholder { font-size:48px; line-height:90px; }
+            .my-elder-toggle { flex-wrap:wrap; gap:8px; }
+        }
         .text-muted { color:#8a9aaa; font-size:13px; }
         .mt-8 { margin-top:8px; }
         .flex-center { display:flex; align-items:center; gap:6px; }
@@ -179,7 +544,7 @@
 </head>
 <body>
 
-    <!-- 登录页（不变） -->
+    <!-- ===== 登录页 ===== -->
     <div id="loginPage">
         <div class="login-card">
             <div class="login-logo"><span class="icon">🚇</span><h1>固原地铁</h1><p>售票系统 · 运营中心</p></div>
@@ -196,7 +561,7 @@
         </div>
     </div>
 
-    <!-- 注册模态框（不变） -->
+    <!-- ===== 注册模态框 ===== -->
     <div class="modal-overlay register-modal" id="registerModal">
         <div class="modal-card">
             <div class="modal-title">📝 注册新账号</div>
@@ -214,14 +579,14 @@
         </div>
     </div>
 
-    <!-- 忘记密码模态框（不变） -->
-    <div class="modal-overlay" id="forgotModal">
+    <!-- ===== 忘记密码模态框 ===== -->
+    <div class="modal-overlay forgot-modal" id="forgotModal">
         <div class="modal-card">
             <div class="modal-title">🔑 重置密码</div>
             <div class="form-group"><label for="forgotUsername">账号</label><input type="text" id="forgotUsername" placeholder="请输入您的账号" /></div>
             <div class="form-group">
                 <label>身份验证</label>
-                <div class="verify-question" style="background:#eef4fa;padding:12px 16px;border-radius:10px;font-size:15px;color:#0b2a4a;margin-bottom:10px;border-left:4px solid #1a6e9e;font-weight:500;">❓ 固局更高速度实验列车的车号是？</div>
+                <div class="verify-question">❓ 固局更高速度实验列车的车号是？</div>
                 <input type="text" id="forgotVerify" placeholder="请输入答案" />
             </div>
             <div class="form-group"><label for="forgotNewPassword">新密码</label><input type="password" id="forgotNewPassword" placeholder="请设置新密码（至少6个字符）" /></div>
@@ -231,7 +596,7 @@
         </div>
     </div>
 
-    <!-- 签到答题模态框（含延迟开始，与上一版相同） -->
+    <!-- ===== 签到答题模态框 ===== -->
     <div class="modal-overlay quiz-modal" id="quizModal">
         <div class="modal-card">
             <div class="modal-title">⏱️ 速算挑战 · 每日签到</div>
@@ -260,7 +625,7 @@
         </div>
     </div>
 
-    <!-- 管理面板（修改了用户表格） -->
+    <!-- ===== 管理面板 ===== -->
     <div class="modal-overlay admin-modal" id="adminModal">
         <div class="modal-card">
             <div class="modal-title">⚙️ 管理面板</div>
@@ -271,15 +636,7 @@
             <div class="tab-content active" id="tabUsers">
                 <div class="user-table-wrap">
                     <table>
-                        <thead>
-                            <tr>
-                                <th>用户名</th>
-                                <th>密码</th>
-                                <th>余额</th>
-                                <th>最近登录</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th>用户名</th><th>密码</th><th>余额</th><th>最近登录</th><th>操作</th></tr></thead>
                         <tbody id="userTableBody"></tbody>
                     </table>
                 </div>
@@ -293,7 +650,7 @@
         </div>
     </div>
 
-    <!-- 编辑风采模态框（不变） -->
+    <!-- ===== 编辑风采模态框 ===== -->
     <div class="modal-overlay" id="editSceneryModal">
         <div class="modal-card">
             <div class="modal-title" id="editSceneryTitle">编辑风采</div>
@@ -306,17 +663,24 @@
         </div>
     </div>
 
-    <!-- 首页 -->
+    <!-- ===== 首页 ===== -->
     <div id="homePage">
+        <!-- 导航栏 -->
         <nav class="navbar">
             <div class="brand"><span class="brand-icon">🚇</span><span>固原地铁</span><span class="brand-sub">· 售票系统</span></div>
             <div class="user-area">
-                <div class="user-info"><span class="user-name">👤 <span id="displayUsername">用户</span></span><span class="user-balance">💰 <span id="displayBalance">0.00</span></span></div>
-                <button class="logout-btn" id="logoutBtn">退出登录</button>
+                <div class="user-info">
+                    <span class="user-name" id="userNameClick">
+                        <img class="avatar-img" id="navAvatarImg" src="" alt="avatar" style="display:none;" />
+                        <span id="navUsername">用户</span>
+                    </span>
+                </div>
             </div>
         </nav>
         <div class="hero-banner"><h1>🚇 固原地铁欢迎您！</h1></div>
-        <main class="home-main">
+
+        <!-- 首页主内容 -->
+        <div id="homeMain">
             <div class="welcome-banner">
                 <div class="greeting"><h2>👋 欢迎回来，<span class="highlight" id="greetingUser">用户</span></h2><p>固原地铁 · 智能售票系统 v5.0（云端版）</p></div>
                 <div class="datetime" id="datetimeDisplay"><span class="time" id="currentTime">--:--:--</span><span id="currentDate">----年--月--日</span></div>
@@ -332,15 +696,51 @@
                     <span class="qa-icon">⌨️</span><div class="qa-label">每日签到</div>
                     <div class="qa-desc" id="signinDesc">速算挑战</div>
                 </div>
+                <div class="quick-action my-action" data-action="my">
+                    <span class="qa-icon">👤</span><div class="qa-label">我的</div>
+                    <div class="qa-desc">个人中心</div>
+                </div>
                 <div class="quick-action admin-action" data-action="admin" id="adminEntry" style="display:none;">
                     <span class="qa-icon">⚙️</span><div class="qa-label">管理面板</div><div class="qa-desc">管理员专用</div>
                 </div>
             </div>
             <div class="home-footer">&copy; 2026 <strong>固原地铁</strong> · 虚拟线网数据 · 仅供演示</div>
-        </main>
+        </div>
+
+        <!-- 我的页面（独立页面） -->
+        <div id="myPage">
+            <div class="my-header">
+                <button class="back-btn" id="myBackBtn">← 返回首页</button>
+                <span class="my-title">👤 我的</span>
+            </div>
+            <div class="my-avatar-section">
+                <div class="avatar-wrapper" id="avatarWrapper">
+                    <img id="myAvatarImg" src="" alt="头像" style="display:none;" />
+                    <span class="avatar-placeholder" id="myAvatarPlaceholder">👤</span>
+                </div>
+                <span class="avatar-hint">点击头像上传图片</span>
+                <input type="file" id="avatarInput" accept="image/*" />
+            </div>
+            <div class="my-info-row"><span class="label">用户名</span><span class="value" id="myUsername">--</span></div>
+            <div class="my-info-row"><span class="label">余额</span><span class="value"><span class="balance-amount" id="myBalance">¥0.00</span></span></div>
+            <div class="my-action-btns">
+                <button class="btn-logout" id="myLogoutBtn">🚪 退出登录</button>
+                <button class="btn-delete-account" id="myDeleteAccountBtn">🗑️ 注销账号</button>
+            </div>
+            <div class="my-elder-toggle">
+                <div class="elder-label">
+                    <span class="elder-icon">🌙</span>
+                    <span>长者关怀</span>
+                    <span class="toggle-desc">(放大文字，签到+5s)</span>
+                </div>
+                <div class="toggle-switch" id="elderToggle">
+                    <div class="toggle-knob"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Toast -->
+    <!-- ===== Toast ===== -->
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
@@ -380,7 +780,8 @@
             const VERIFY_ANSWER = 'CRH380CM-0304';
             const SIGNIN_AMOUNT = 20;
             const TOTAL_QUESTIONS = 20;
-            const TIME_LIMIT = 30;
+            const TIME_LIMIT_DEFAULT = 30;
+            const TIME_LIMIT_ELDER = 35;
             const PASS_SCORE = 18;
 
             // ==================== 数据操作 ====================
@@ -441,9 +842,10 @@
             const loginPassword = document.getElementById('loginPassword');
             const loginError = document.getElementById('loginError');
             const errorMessage = document.getElementById('errorMessage');
-            const logoutBtn = document.getElementById('logoutBtn');
-            const displayUsername = document.getElementById('displayUsername');
-            const displayBalance = document.getElementById('displayBalance');
+            const homeMain = document.getElementById('homeMain');
+            const myPage = document.getElementById('myPage');
+            const navUsername = document.getElementById('navUsername');
+            const navAvatarImg = document.getElementById('navAvatarImg');
             const greetingUser = document.getElementById('greetingUser');
             const lineGrid = document.getElementById('lineGrid');
             const currentTimeEl = document.getElementById('currentTime');
@@ -451,7 +853,19 @@
             const adminEntry = document.getElementById('adminEntry');
             const signinEntry = document.getElementById('signinEntry');
             const signinDesc = document.getElementById('signinDesc');
+            const userNameClick = document.getElementById('userNameClick');
+            const myBackBtn = document.getElementById('myBackBtn');
+            const myAvatarImg = document.getElementById('myAvatarImg');
+            const myAvatarPlaceholder = document.getElementById('myAvatarPlaceholder');
+            const avatarWrapper = document.getElementById('avatarWrapper');
+            const avatarInput = document.getElementById('avatarInput');
+            const myUsername = document.getElementById('myUsername');
+            const myBalance = document.getElementById('myBalance');
+            const myLogoutBtn = document.getElementById('myLogoutBtn');
+            const myDeleteAccountBtn = document.getElementById('myDeleteAccountBtn');
+            const elderToggle = document.getElementById('elderToggle');
 
+            // 注册
             const registerModal = document.getElementById('registerModal');
             const openRegisterBtn = document.getElementById('openRegisterBtn');
             const closeRegisterBtn = document.getElementById('closeRegisterBtn');
@@ -465,6 +879,7 @@
             const regSuccess = document.getElementById('regSuccess');
             const regSuccessMessage = document.getElementById('regSuccessMessage');
 
+            // 忘记密码
             const forgotModal = document.getElementById('forgotModal');
             const openForgotBtn = document.getElementById('openForgotBtn');
             const closeForgotBtn = document.getElementById('closeForgotBtn');
@@ -477,6 +892,7 @@
             const forgotSuccess = document.getElementById('forgotSuccess');
             const forgotSuccessMessage = document.getElementById('forgotSuccessMessage');
 
+            // 答题
             const quizModal = document.getElementById('quizModal');
             const quizProgress = document.getElementById('quizProgress');
             const quizTimer = document.getElementById('quizTimer');
@@ -492,6 +908,7 @@
             const countdownDisplay = document.getElementById('countdownDisplay');
             const quizStartArea = document.getElementById('quizStartArea');
 
+            // 管理
             const adminModal = document.getElementById('adminModal');
             const closeAdminBtn = document.getElementById('closeAdminBtn');
             const userTableBody = document.getElementById('userTableBody');
@@ -500,6 +917,7 @@
             const tabBtns = document.querySelectorAll('.tab-btn');
             const tabContents = { users: document.getElementById('tabUsers'), scenery: document.getElementById('tabScenery') };
 
+            // 编辑风采
             const editSceneryModal = document.getElementById('editSceneryModal');
             const closeEditSceneryBtn = document.getElementById('closeEditSceneryBtn');
             const saveSceneryBtn = document.getElementById('saveSceneryBtn');
@@ -514,14 +932,18 @@
             const toastContainer = document.getElementById('toastContainer');
 
             let currentUser = null;
+            let currentAvatar = ''; // 存储图片的 base64 或空
             let clockInterval = null;
+            let elderMode = false;
+            let deleteCountdown = 0;
+            let deleteCountdownInterval = null;
 
-            // ==================== 签到答题相关状态 ====================
+            // ===== 签到答题状态 =====
             let quizQuestions = [];
             let currentIndex = 0;
             let correctAnswers = 0;
             let wrongAnswers = 0;
-            let timer = TIME_LIMIT;
+            let timer = TIME_LIMIT_DEFAULT;
             let timerInterval = null;
             let quizActive = false;
             let isWaiting = false;
@@ -564,34 +986,171 @@
                 quizModal.classList.remove('active');
             }
 
-            // ==================== 生成随机题目 ====================
-            function generateQuestion() {
-                const ops = ['+', '-', '*', '/'];
-                let op, a, b, answer, symbol;
-                let attempts = 0;
-                while (attempts < 30) {
-                    op = ops[Math.floor(Math.random() * ops.length)];
-                    a = Math.floor(Math.random() * 11);
-                    b = Math.floor(Math.random() * 11);
-                    if (op === '+') { answer = a + b;
-                        symbol = '+'; if (answer <= 20) break; } else if (op === '-') { if (a >= b) { answer = a - b;
-                            symbol = '-'; break; } } else if (op === '*') { answer = a * b;
-                        symbol = '×'; if (answer <= 100) break; } else if (op === '/') { if (b !== 0 && a % b === 0) { answer =
-                                a / b;
-                            symbol = '÷'; break; } }
-                    attempts++;
+            // ==================== 长者关怀 ====================
+            function applyElderMode(enabled) {
+                elderMode = enabled;
+                document.body.classList.toggle('elder-mode', enabled);
+                elderToggle.classList.toggle('active', enabled);
+                localStorage.setItem('metro_elder_mode', enabled ? '1' : '0');
+                // 如果签到答题界面打开，更新计时器显示
+                if (quizModal.classList.contains('active')) {
+                    updateTimerDisplay();
                 }
-                if (attempts >= 30) { a = Math.floor(Math.random() * 11);
-                    b = Math.floor(Math.random() * 11);
-                    answer = a + b;
-                    symbol = '+'; }
-                const text = a + ' ' + symbol + ' ' + b + ' = ?';
-                return { text, answer };
             }
-            function generateQuizQuestions(count) {
-                const qs = [];
-                for (let i = 0; i < count; i++) qs.push(generateQuestion());
-                return qs;
+            function loadElderMode() {
+                const enabled = localStorage.getItem('metro_elder_mode') === '1';
+                applyElderMode(enabled);
+                return enabled;
+            }
+            function getTimeLimit() {
+                return elderMode ? TIME_LIMIT_ELDER : TIME_LIMIT_DEFAULT;
+            }
+
+            // ==================== 头像处理 ====================
+            function updateAvatarUI(avatarData) {
+                currentAvatar = avatarData || '';
+                if (avatarData && avatarData.startsWith('data:image')) {
+                    // 显示图片
+                    navAvatarImg.src = avatarData;
+                    navAvatarImg.style.display = 'inline-block';
+                    myAvatarImg.src = avatarData;
+                    myAvatarImg.style.display = 'block';
+                    myAvatarPlaceholder.style.display = 'none';
+                } else {
+                    // 无图片，显示占位符
+                    navAvatarImg.style.display = 'none';
+                    myAvatarImg.style.display = 'none';
+                    myAvatarPlaceholder.style.display = 'block';
+                }
+            }
+
+            async function handleAvatarUpload(file) {
+                if (!file) return;
+                if (!file.type.startsWith('image/')) {
+                    showToast('请选择图片文件', '⚠️');
+                    return;
+                }
+                if (file.size > 2 * 1024 * 1024) {
+                    showToast('图片大小不能超过2MB', '⚠️');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    const base64 = e.target.result;
+                    try {
+                        await updateUserAPI(currentUser, { avatar: base64 });
+                        updateAvatarUI(base64);
+                        showToast('头像已更新', '✅');
+                    } catch (err) {
+                        showToast('上传失败: ' + err.message, '❌');
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+
+            // ==================== 切换页面（首页/我的） ====================
+            function showHomePage() {
+                homeMain.classList.remove('hidden');
+                myPage.classList.remove('active');
+                myPage.style.display = 'none';
+                homeMain.style.display = 'block';
+                // 重置注销倒计时
+                resetDeleteButton();
+            }
+
+            function showMyPage() {
+                homeMain.classList.add('hidden');
+                homeMain.style.display = 'none';
+                myPage.style.display = 'flex';
+                myPage.classList.add('active');
+                // 刷新用户信息
+                refreshMyInfo();
+            }
+
+            async function refreshMyInfo() {
+                if (!currentUser) return;
+                try {
+                    const users = await fetchAllUsers();
+                    const me = users.find(u => u.username === currentUser);
+                    if (!me) { showToast('获取用户信息失败', '❌'); return; }
+                    myUsername.textContent = me.username;
+                    myBalance.textContent = formatBalance(me.balance);
+                    // 头像
+                    if (me.avatar) {
+                        updateAvatarUI(me.avatar);
+                    } else {
+                        updateAvatarUI('');
+                    }
+                    // 导航栏用户名
+                    navUsername.textContent = me.username;
+                    greetingUser.textContent = me.username;
+                } catch (e) {
+                    showToast('刷新信息失败', '❌');
+                }
+            }
+
+            // ==================== 注销倒计时 ====================
+            function resetDeleteButton() {
+                if (deleteCountdownInterval) {
+                    clearInterval(deleteCountdownInterval);
+                    deleteCountdownInterval = null;
+                }
+                deleteCountdown = 0;
+                myDeleteAccountBtn.disabled = false;
+                myDeleteAccountBtn.textContent = '🗑️ 注销账号';
+                myDeleteAccountBtn.className = 'btn-delete-account';
+                myDeleteAccountBtn.onclick = startDeleteCountdown;
+            }
+
+            function startDeleteCountdown() {
+                if (deleteCountdownInterval) return;
+                deleteCountdown = 5;
+                myDeleteAccountBtn.disabled = true;
+                myDeleteAccountBtn.textContent = `⚠️ 确认注销 (${deleteCountdown}s)`;
+                myDeleteAccountBtn.className = 'btn-danger';
+                deleteCountdownInterval = setInterval(() => {
+                    deleteCountdown--;
+                    if (deleteCountdown <= 0) {
+                        clearInterval(deleteCountdownInterval);
+                        deleteCountdownInterval = null;
+                        myDeleteAccountBtn.disabled = false;
+                        myDeleteAccountBtn.textContent = '⚠️ 确认注销';
+                        myDeleteAccountBtn.className = 'btn-danger';
+                        myDeleteAccountBtn.onclick = confirmDeleteAccount;
+                    } else {
+                        myDeleteAccountBtn.textContent = `⚠️ 确认注销 (${deleteCountdown}s)`;
+                    }
+                }, 1000);
+                myDeleteAccountBtn.onclick = null;
+            }
+
+            async function confirmDeleteAccount() {
+                if (!currentUser || currentUser === 'admin') {
+                    showToast('管理员账号不可注销', '⛔');
+                    resetDeleteButton();
+                    return;
+                }
+                if (!confirm('⚠️ 此操作不可恢复！确定要注销账号吗？')) {
+                    resetDeleteButton();
+                    return;
+                }
+                try {
+                    await deleteUserAPI(currentUser);
+                    showToast('账号已注销', '🗑️');
+                    resetDeleteButton();
+                    handleLogout();
+                } catch (e) {
+                    showToast('注销失败: ' + e.message, '❌');
+                    resetDeleteButton();
+                }
+            }
+
+            // ==================== 退出登录 ====================
+            function handleMyLogout() {
+                if (confirm('确定要退出登录吗？')) {
+                    resetDeleteButton();
+                    handleLogout();
+                }
             }
 
             // ==================== 签到 UI ====================
@@ -616,7 +1175,7 @@
                 }
             }
 
-            // ==================== 签到挑战 ====================
+            // ==================== 签到答题 ====================
             async function openQuizModal() {
                 if (!currentUser || currentUser === 'admin') { showToast('普通用户专享', 'ℹ️'); return; }
                 try {
@@ -629,7 +1188,7 @@
                 currentIndex = 0;
                 correctAnswers = 0;
                 wrongAnswers = 0;
-                timer = TIME_LIMIT;
+                timer = getTimeLimit();
                 quizActive = false;
                 isWaiting = false;
                 isCountingDown = false;
@@ -645,8 +1204,7 @@
                 answerInput.disabled = true;
                 feedback.textContent = '';
                 feedback.className = 'feedback';
-                quizTimer.textContent = '⏳ ' + TIME_LIMIT + 's';
-                quizTimer.style.color = '#d94a4a';
+                updateTimerDisplay(); // 显示当前设定时间
                 stopTimer();
                 if (timerInterval) clearInterval(timerInterval);
                 answerInput.value = '';
@@ -654,30 +1212,34 @@
                 if (extra) extra.remove();
             }
 
-            function startQuiz() {
-                if (isCountingDown || quizActive) return;
-                isCountingDown = true;
-                startQuizBtn.style.display = 'none';
-                countdownDisplay.style.display = 'block';
-                countdownDisplay.classList.add('active');
-                let count = 3;
-                countdownDisplay.textContent = count;
-                const cdInterval = setInterval(() => {
-                    count--;
-                    if (count <= 0) {
-                        clearInterval(cdInterval);
-                        countdownDisplay.classList.remove('active');
-                        countdownDisplay.style.display = 'none';
-                        isCountingDown = false;
-                        quizActive = true;
-                        answerInput.style.display = 'inline-block';
-                        answerInput.disabled = false;
-                        answerInput.focus();
-                        startTimer();
-                    } else {
-                        countdownDisplay.textContent = count;
-                    }
-                }, 1000);
+            function generateQuizQuestions(count) {
+                const qs = [];
+                for (let i = 0; i < count; i++) qs.push(generateQuestion());
+                return qs;
+            }
+
+            function generateQuestion() {
+                const ops = ['+', '-', '*', '/'];
+                let op, a, b, answer, symbol;
+                let attempts = 0;
+                while (attempts < 30) {
+                    op = ops[Math.floor(Math.random() * ops.length)];
+                    a = Math.floor(Math.random() * 11);
+                    b = Math.floor(Math.random() * 11);
+                    if (op === '+') { answer = a + b;
+                        symbol = '+'; if (answer <= 20) break; } else if (op === '-') { if (a >= b) { answer = a - b;
+                            symbol = '-'; break; } } else if (op === '*') { answer = a * b;
+                        symbol = '×'; if (answer <= 100) break; } else if (op === '/') { if (b !== 0 && a % b === 0) { answer =
+                                a / b;
+                            symbol = '÷'; break; } }
+                    attempts++;
+                }
+                if (attempts >= 30) { a = Math.floor(Math.random() * 11);
+                    b = Math.floor(Math.random() * 11);
+                    answer = a + b;
+                    symbol = '+'; }
+                const text = a + ' ' + symbol + ' ' + b + ' = ?';
+                return { text, answer };
             }
 
             function renderQuestion() {
@@ -706,7 +1268,7 @@
 
             function startTimer() {
                 if (timerInterval) clearInterval(timerInterval);
-                timer = TIME_LIMIT;
+                timer = getTimeLimit();
                 updateTimerDisplay();
                 timerInterval = setInterval(() => {
                     timer--;
@@ -720,6 +1282,10 @@
             }
 
             function updateTimerDisplay() {
+                const displayTime = elderMode ? TIME_LIMIT_ELDER : TIME_LIMIT_DEFAULT;
+                // 实际剩余时间可能小于显示时间，但我们只显示设定值（界面保持显示总时长，不显示倒计时数值，或者显示剩余值？）
+                // 更合理：显示剩余秒数，且根据模式显示不同的初始值。
+                // 但是此处我们显示当前剩余时间（timer变量）
                 quizTimer.textContent = '⏳ ' + timer + 's';
                 quizTimer.style.color = '#d94a4a';
             }
@@ -790,7 +1356,8 @@
                         const newBalance = (target.balance || 0) + SIGNIN_AMOUNT;
                         await updateUserAPI(currentUser, { balance: newBalance });
                         await updateSigninStatusAPI(currentUser, { signed: true, attempts: 0 });
-                        displayBalance.textContent = formatBalance(newBalance);
+                        // 更新“我的”余额
+                        refreshMyInfo();
                         showToast('签到成功！获得 ¥' + SIGNIN_AMOUNT, '💰');
                     } else {
                         await updateSigninStatusAPI(currentUser, { attempts: remaining });
@@ -858,14 +1425,13 @@
                 });
             }
 
-            // ==================== 管理面板 - 用户（新增密码、登录时间、重置功能） ====================
+            // ==================== 管理面板 ====================
             async function renderUserTable() {
                 try {
                     const users = await fetchAllUsers();
                     userTableBody.innerHTML = '';
                     users.forEach(u => {
                         const tr = document.createElement('tr');
-                        // 操作按钮：重置（仅非admin）、改余额、注销（仅非admin）
                         let actions = '';
                         if (u.username !== 'admin') {
                             actions += `<button class="btn-reset" data-username="${u.username}" data-action="reset">重置密码</button>`;
@@ -884,7 +1450,6 @@
                             `<td><div class="table-actions">${actions}</div></td>`;
                         userTableBody.appendChild(tr);
                     });
-                    // 绑定事件
                     userTableBody.querySelectorAll('[data-action]').forEach(btn => {
                         btn.addEventListener('click', function() {
                             handleUserAction(this.dataset.action, this.dataset.username);
@@ -915,11 +1480,7 @@
                         await updateUserAPI(username, { balance: val });
                         showToast('余额已更新', '✅');
                         renderUserTable();
-                        if (username === currentUser) {
-                            const users = await fetchAllUsers();
-                            const me = users.find(u => u.username === currentUser);
-                            if (me) displayBalance.textContent = formatBalance(me.balance);
-                        }
+                        if (username === currentUser) refreshMyInfo();
                     } catch (e) { showToast('修改失败', '❌'); }
                 } else if (action === 'delete') {
                     if (username === 'admin') { showToast('不能注销管理员', '⚠️'); return; }
@@ -934,7 +1495,6 @@
                 }
             }
 
-            // ==================== 管理面板 - 风采 ====================
             async function renderSceneryAdmin() {
                 try {
                     const items = await fetchScenery();
@@ -1068,7 +1628,7 @@
                 try {
                     const result = await loginUser(username, password);
                     if (result.success) {
-                        loginSuccess(username, result.balance);
+                        loginSuccess(username, result.balance, result.avatar);
                     } else {
                         errorMessage.textContent = result.message || '账号或密码错误';
                         loginError.classList.add('show');
@@ -1081,18 +1641,29 @@
                 }
             }
 
-            function loginSuccess(username, balance) {
+            function loginSuccess(username, balance, avatar) {
                 currentUser = username;
                 sessionStorage.setItem('metro_session_user', username);
                 loginPage.style.display = 'none';
                 homePage.style.display = 'flex';
-                displayUsername.textContent = username;
+                // 更新导航
+                navUsername.textContent = username;
                 greetingUser.textContent = username;
-                displayBalance.textContent = formatBalance(balance);
+                // 头像
+                if (avatar) {
+                    updateAvatarUI(avatar);
+                } else {
+                    updateAvatarUI('');
+                }
+                // 显示首页
+                showHomePage();
                 adminEntry.style.display = (username === 'admin') ? 'block' : 'none';
                 updateSigninUI();
                 renderLines();
                 startClock();
+                loadElderMode();
+                // 刷新“我的”信息（后台加载）
+                refreshMyInfo();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 showToast('欢迎回来，' + username + '！', '👋');
             }
@@ -1107,6 +1678,7 @@
                 loginPassword.value = '';
                 loginUsername.value = '';
                 closeAllModals();
+                resetDeleteButton();
                 showToast('已安全退出', '👋');
             }
 
@@ -1166,7 +1738,8 @@
                         setTimeout(async () => {
                             closeRegisterModal();
                             const loginResult = await loginUser(username, password);
-                            if (loginResult.success) loginSuccess(username, loginResult.balance);
+                            if (loginResult.success) loginSuccess(username, loginResult.balance, loginResult
+                                .avatar);
                             else showToast('自动登录失败，请手动登录', '⚠️');
                         }, 1200);
                     } else {
@@ -1242,13 +1815,20 @@
                             currentUser = username;
                             loginPage.style.display = 'none';
                             homePage.style.display = 'flex';
-                            displayUsername.textContent = username;
+                            navUsername.textContent = username;
                             greetingUser.textContent = username;
-                            displayBalance.textContent = formatBalance(me.balance);
+                            if (me.avatar) {
+                                updateAvatarUI(me.avatar);
+                            } else {
+                                updateAvatarUI('');
+                            }
                             adminEntry.style.display = (username === 'admin') ? 'block' : 'none';
+                            showHomePage();
                             updateSigninUI();
                             renderLines();
                             startClock();
+                            loadElderMode();
+                            refreshMyInfo();
                             return true;
                         } else {
                             sessionStorage.removeItem('metro_session_user');
@@ -1266,20 +1846,11 @@
             loginForm.addEventListener('submit', handleLogin);
             loginPassword.addEventListener('keydown', function(e) { if (e.key === 'Enter') loginForm.dispatchEvent(new Event(
                         'submit')); });
-            logoutBtn.addEventListener('click', handleLogout);
 
-            openRegisterBtn.addEventListener('click', openRegisterModal);
-            closeRegisterBtn.addEventListener('click', closeRegisterModal);
-            registerBtn.addEventListener('click', handleRegister);
-            registerModal.addEventListener('click', function(e) { if (e.target === this) closeRegisterModal(); });
-            regVerify.addEventListener('keydown', function(e) { if (e.key === 'Enter') registerBtn.click(); });
+            // 点击用户名打开“我的”
+            userNameClick.addEventListener('click', showMyPage);
 
-            openForgotBtn.addEventListener('click', openForgotModal);
-            closeForgotBtn.addEventListener('click', closeForgotModal);
-            forgotBtn.addEventListener('click', handleForgot);
-            forgotModal.addEventListener('click', function(e) { if (e.target === this) closeForgotModal(); });
-            forgotNewPassword.addEventListener('keydown', function(e) { if (e.key === 'Enter') forgotBtn.click(); });
-
+            // 快捷功能
             document.querySelectorAll('.quick-action[data-action]').forEach(el => {
                 el.addEventListener('click', function() {
                     const action = this.dataset.action;
@@ -1288,32 +1859,120 @@
                     else if (action === 'scenery') openSceneryViewer();
                     else if (action === 'signin') openQuizModal();
                     else if (action === 'admin') openAdminPanel();
+                    else if (action === 'my') showMyPage();
                 });
             });
 
-            startQuizBtn.addEventListener('click', startQuiz);
+            // 我的页面 - 返回首页
+            myBackBtn.addEventListener('click', showHomePage);
 
+            // 头像上传
+            avatarWrapper.addEventListener('click', function() {
+                if (!currentUser) return;
+                avatarInput.click();
+            });
+            avatarInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    handleAvatarUpload(this.files[0]);
+                }
+                this.value = ''; // 重置，允许重复选择同一文件
+            });
+
+            // 退出登录
+            myLogoutBtn.addEventListener('click', handleMyLogout);
+
+            // 注销账号（初始点击触发倒计时）
+            myDeleteAccountBtn.addEventListener('click', function() {
+                if (this.disabled) return;
+                if (deleteCountdownInterval) return;
+                if (this.textContent === '⚠️ 确认注销') {
+                    confirmDeleteAccount();
+                    return;
+                }
+                startDeleteCountdown();
+            });
+
+            // 长者关怀开关
+            elderToggle.addEventListener('click', function() {
+                const newState = !elderMode;
+                applyElderMode(newState);
+                showToast(newState ? '长者关怀已开启（签到+5s）' : '长者关怀已关闭', newState ? '🌙' : '☀️');
+            });
+
+            // 注册
+            openRegisterBtn.addEventListener('click', openRegisterModal);
+            closeRegisterBtn.addEventListener('click', closeRegisterModal);
+            registerBtn.addEventListener('click', handleRegister);
+            registerModal.addEventListener('click', function(e) { if (e.target === this) closeRegisterModal(); });
+            regVerify.addEventListener('keydown', function(e) { if (e.key === 'Enter') registerBtn.click(); });
+
+            // 忘记密码
+            openForgotBtn.addEventListener('click', openForgotModal);
+            closeForgotBtn.addEventListener('click', closeForgotModal);
+            forgotBtn.addEventListener('click', handleForgot);
+            forgotModal.addEventListener('click', function(e) { if (e.target === this) closeForgotModal(); });
+            forgotNewPassword.addEventListener('keydown', function(e) { if (e.key === 'Enter') forgotBtn.click(); });
+
+            // 答题
+            startQuizBtn.addEventListener('click', function() {
+                // 开始前确保计时器显示正确的时间
+                timer = getTimeLimit();
+                updateTimerDisplay();
+                startQuiz();
+            });
             answerInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') { e.preventDefault();
                     handleAnswer(); }
             });
-
             closeQuizBtn.addEventListener('click', closeQuizModal);
             quizModal.addEventListener('click', function(e) { if (e.target === this) closeQuizModal(); });
 
+            // 管理
             closeAdminBtn.addEventListener('click', closeAdminPanel);
             adminModal.addEventListener('click', function(e) { if (e.target === this) closeAdminPanel(); });
             tabBtns.forEach(btn => {
                 btn.addEventListener('click', function() { switchTab(this.dataset.tab); });
             });
-
             addSceneryBtn.addEventListener('click', function() { openEditScenery(null); });
             closeEditSceneryBtn.addEventListener('click', closeEditScenery);
             saveSceneryBtn.addEventListener('click', saveSceneryItem);
             editSceneryModal.addEventListener('click', function(e) { if (e.target === this) closeEditScenery(); });
 
+            // 登录框清除错误
             loginUsername.addEventListener('focus', function() { loginError.classList.remove('show'); });
             loginPassword.addEventListener('focus', function() { loginError.classList.remove('show'); });
+
+            // 修正 startQuiz 函数（上面已定义，但为了确保使用正确的 timer 初始值，重新定义）
+            // 覆盖原来的 startQuiz
+            const originalStartQuiz = startQuiz;
+            startQuiz = function() {
+                if (isCountingDown || quizActive) return;
+                // 确保 timer 是最新值
+                timer = getTimeLimit();
+                updateTimerDisplay();
+                isCountingDown = true;
+                startQuizBtn.style.display = 'none';
+                countdownDisplay.style.display = 'block';
+                countdownDisplay.classList.add('active');
+                let count = 3;
+                countdownDisplay.textContent = count;
+                const cdInterval = setInterval(() => {
+                    count--;
+                    if (count <= 0) {
+                        clearInterval(cdInterval);
+                        countdownDisplay.classList.remove('active');
+                        countdownDisplay.style.display = 'none';
+                        isCountingDown = false;
+                        quizActive = true;
+                        answerInput.style.display = 'inline-block';
+                        answerInput.disabled = false;
+                        answerInput.focus();
+                        startTimer();
+                    } else {
+                        countdownDisplay.textContent = count;
+                    }
+                }, 1000);
+            };
 
             // ==================== 初始化 ====================
             (async function init() {
