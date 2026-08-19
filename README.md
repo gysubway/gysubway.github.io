@@ -1973,7 +1973,6 @@
                     }
                 }, 1000);
             };
-
             // ==================== 初始化 ====================
             (async function init() {
                 const hasSession = await checkSession();
