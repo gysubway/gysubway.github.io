@@ -7,7 +7,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '10mb' })); // 支持较大的 base64 图片
 
 const DB_PATH = './db.json';
 
@@ -20,7 +20,7 @@ function initDB() {
                     balance: 1000000,
                     lastLogin: null,
                     lastResetTime: null,
-                    avatar: '👤'                 // 新增默认头像
+                    avatar: ''
                 }
             },
             scenery: [
@@ -60,13 +60,13 @@ app.post('/api/register', (req, res) => {
         balance: 0,
         lastLogin: null,
         lastResetTime: null,
-        avatar: '👤'                 // 新用户默认头像
+        avatar: ''
     };
     writeDB(db);
     res.json({ success: true, message: '注册成功' });
 });
 
-// 登录（返回 avatar）
+// 登录
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     const db = readDB();
@@ -80,11 +80,11 @@ app.post('/api/login', (req, res) => {
         success: true,
         username,
         balance: user.balance,
-        avatar: user.avatar || '👤'   // 返回头像
+        avatar: user.avatar || ''
     });
 });
 
-// 获取所有用户（含 avatar）
+// 获取所有用户
 app.get('/api/users', (req, res) => {
     const db = readDB();
     const users = Object.keys(db.users).map(name => ({
@@ -93,12 +93,12 @@ app.get('/api/users', (req, res) => {
         balance: db.users[name].balance,
         lastLogin: db.users[name].lastLogin || null,
         lastResetTime: db.users[name].lastResetTime || null,
-        avatar: db.users[name].avatar || '👤'
+        avatar: db.users[name].avatar || ''
     }));
     res.json(users);
 });
 
-// 更新用户信息（支持 balance 和 avatar）
+// 更新用户（支持 balance 和 avatar）
 app.put('/api/user/:username', (req, res) => {
     const { username } = req.params;
     const { balance, avatar } = req.body;
