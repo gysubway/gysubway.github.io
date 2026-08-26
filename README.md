@@ -1107,7 +1107,7 @@
 
             const allStations = Array.from(allStationsSet).sort((a, b) => a.localeCompare(b, 'zh'));
 
-            // ==================== 获取路径的线路显示序列（修正支线拆分） ====================
+            // ==================== 获取路径的线路显示序列 ====================
             function getLinesFromPath(path) {
                 if (path.length < 2) return [];
                 const segments = [];
@@ -1117,7 +1117,6 @@
                     const branch = edgeBranch[key] || '';
                     segments.push({ main, branch });
                 }
-                // 合并连续相同 (main, branch) 的段
                 const merged = [];
                 let current = null;
                 for (const seg of segments) {
@@ -1210,13 +1209,11 @@
                 return null;
             }
 
-            // ==================== 单段最短路径（用于分段） ====================
+            // ==================== 单段最短路径 ====================
             function getShortestPath(start, end) {
                 if (!graph[start] || !graph[end]) return null;
-                // 先尝试 Dijkstra
                 const result = dijkstra(start, end);
                 if (result) return result;
-                // 备用 BFS
                 return bfsFindPath(start, end);
             }
 
@@ -1232,7 +1229,7 @@
                 return 5 + add;
             }
 
-            // ==================== 线路展示数据（修改3B号线显示） ====================
+            // ==================== 线路展示数据 ====================
             const lineNames = Object.keys(LINE_METRO);
             const lineDisplay = lineNames.map(name => {
                 let stations = LINE_METRO[name].stations;
@@ -1465,6 +1462,7 @@
             let elderMode = false;
             let deleteCountdown = 0;
             let deleteCountdownInterval = null;
+            let isNetworkError = false; // 标记网络错误
 
             // ===== 签到答题状态 =====
             let quizQuestions = [];
@@ -1613,8 +1611,10 @@
                     }
                     navUsername.textContent = me.username;
                     greetingUser.textContent = me.username;
+                    isNetworkError = false;
                 } catch (e) {
-                    showToast('刷新信息失败', '❌');
+                    showToast('刷新信息失败，网络异常', '⚠️');
+                    isNetworkError = true;
                 }
             }
 
@@ -1649,7 +1649,7 @@
                     });
                     ordersContainer.innerHTML = html;
                 } catch (e) {
-                    showToast('加载订单失败', '❌');
+                    showToast('加载订单失败，网络异常', '⚠️');
                 }
             }
 
@@ -1970,7 +1970,7 @@
                 if (currentUser) updateSigninUI();
             }
 
-            // ==================== 渲染线路（修改3B号线显示） ====================
+            // ==================== 渲染线路 ====================
             function renderLines() {
                 if (!lineGrid) return;
                 lineGrid.innerHTML = '';
@@ -2238,10 +2238,8 @@
                 ticketResult.innerHTML = '';
                 ticketStart.value = '';
                 ticketEnd.value = '';
-                // 清空途经点
                 waypointsContainer.innerHTML = '';
                 addWaypointBtn.disabled = false;
-                // 填充站点下拉
                 const sortedStations = [...allStations].sort((a, b) => a.localeCompare(b, 'zh'));
                 ticketStart.innerHTML = '<option value="">-- 请选择 --</option>';
                 ticketEnd.innerHTML = '<option value="">-- 请选择 --</option>';
@@ -2255,11 +2253,9 @@
                     opt2.textContent = st;
                     ticketEnd.appendChild(opt2);
                 });
-                // 初始化已选站点集合（用于途经点过滤）
                 updateWaypointOptions();
             }
 
-            // 更新所有途经点下拉的可用选项（排除起点、终点及其他途经点）
             function updateWaypointOptions() {
                 const start = ticketStart.value;
                 const end = ticketEnd.value;
@@ -2269,7 +2265,6 @@
                     if (sel.value) selectedWaypoints.push(sel.value);
                 });
                 const exclude = new Set([start, end, ...selectedWaypoints]);
-                // 对所有途经点下拉重新填充
                 waypointSelects.forEach(sel => {
                     const currentVal = sel.value;
                     sel.innerHTML = '<option value="">-- 请选择 --</option>';
@@ -2283,15 +2278,16 @@
                         }
                     });
                 });
-                // 更新添加按钮状态
-                const count = waypointSelects.length;
+                const count = document.querySelectorAll('.waypoint-row').length;
                 addWaypointBtn.disabled = count >= MAX_WAYPOINTS;
             }
 
-            // 添加途经点行
             function addWaypointRow() {
                 const count = document.querySelectorAll('.waypoint-row').length;
-                if (count >= MAX_WAYPOINTS) return;
+                if (count >= MAX_WAYPOINTS) {
+                    showToast('最多添加5个途经点', '⚠️');
+                    return;
+                }
                 const row = document.createElement('div');
                 row.className = 'waypoint-row';
                 const select = document.createElement('select');
@@ -2310,7 +2306,6 @@
                 removeBtn.addEventListener('click', function() {
                     row.remove();
                     updateWaypointOptions();
-                    // 检查添加按钮状态
                     const rows = document.querySelectorAll('.waypoint-row');
                     addWaypointBtn.disabled = rows.length >= MAX_WAYPOINTS;
                 });
@@ -2324,23 +2319,19 @@
                 addWaypointBtn.disabled = document.querySelectorAll('.waypoint-row').length >= MAX_WAYPOINTS;
             }
 
-            // 获取途经点数组（去空）
             function getWaypoints() {
                 const selects = document.querySelectorAll('.waypoint-select');
                 const wps = [];
                 selects.forEach(sel => {
                     if (sel.value) wps.push(sel.value);
                 });
-                // 去重
                 return [...new Set(wps)];
             }
 
-            // 构建完整路径（分段）
             function buildFullPath(start, waypoints, end) {
-                const fullPath = [];
-                let totalDist = 0;
-                const segments = [];
                 const sequence = [start, ...waypoints, end];
+                const segments = [];
+                let totalDist = 0;
                 for (let i = 0; i < sequence.length - 1; i++) {
                     const from = sequence[i];
                     const to = sequence[i + 1];
@@ -2351,7 +2342,6 @@
                     segments.push({ from, to, path: result.path, dist: result.totalDistance });
                     totalDist += result.totalDistance;
                 }
-                // 拼接路径（去重首尾）
                 if (segments.length === 0) return { error: '无效分段' };
                 let mergedPath = [];
                 for (let i = 0; i < segments.length; i++) {
@@ -2359,14 +2349,12 @@
                     if (i === 0) {
                         mergedPath = segPath.slice();
                     } else {
-                        // 跳过第一个元素（因为与前一段末尾相同）
                         mergedPath = mergedPath.concat(segPath.slice(1));
                     }
                 }
                 return { fullPath: mergedPath, totalDistance: totalDist, segments };
             }
 
-            // ==================== 购票查询 ====================
             function handleTicketQuery() {
                 const start = ticketStart.value;
                 const end = ticketEnd.value;
@@ -2379,7 +2367,6 @@
                     ticketResult.innerHTML = '<p style="color:#d94a4a;">起点和终点不能相同</p>';
                     return;
                 }
-                // 检查途经点是否包含起点或终点
                 for (const wp of waypoints) {
                     if (wp === start) {
                         ticketResult.innerHTML = '<p style="color:#d94a4a;">途经点不能与起点相同</p>';
@@ -2391,7 +2378,6 @@
                     }
                 }
 
-                // 1. 计算票价（按无途经点最短里程）
                 const directResult = getShortestPath(start, end);
                 if (!directResult) {
                     ticketResult.innerHTML = '<p style="color:#d94a4a;">起点和终点之间不连通</p>';
@@ -2399,7 +2385,6 @@
                 }
                 const fare = calculateFare(directResult.totalDistance);
 
-                // 2. 分段计算路径
                 const buildResult = buildFullPath(start, waypoints, end);
                 if (buildResult.error) {
                     ticketResult.innerHTML = `<p style="color:#d94a4a;">${buildResult.error}</p>`;
@@ -2407,13 +2392,11 @@
                 }
                 const { fullPath, totalDistance, segments } = buildResult;
 
-                // 3. 获取线路序列
                 const lines = getLinesFromPath(fullPath);
                 const transfers = lines.length - 1;
                 const km = (totalDistance / 1000).toFixed(2);
                 const directKm = (directResult.totalDistance / 1000).toFixed(2);
 
-                // 4. 构建显示
                 let lineHtml = lines.map((l, idx) => {
                     const color = LINE_COLORS[l] || '#888';
                     const span = `<span class="line-badge" style="background:${color};">${l}</span>`;
@@ -2421,7 +2404,6 @@
                     return span;
                 }).join('');
 
-                // 若有途经点，显示路径详情
                 let pathDetail = '';
                 if (waypoints.length > 0) {
                     const sequence = [start, ...waypoints, end];
@@ -2484,7 +2466,6 @@
                             refreshMyInfo();
                         }
                     } catch (apiError) {
-                        // 本地降级
                         const localKey = 'metro_orders_' + currentUser;
                         let orders = [];
                         const existing = localStorage.getItem(localKey);
@@ -2536,6 +2517,8 @@
             function loginSuccess(username, balance, avatar) {
                 currentUser = username;
                 sessionStorage.setItem('metro_session_user', username);
+                // 缓存到 localStorage 以便网络恢复时使用
+                localStorage.setItem('metro_user_cache', JSON.stringify({ username, balance, avatar }));
                 loginPage.style.display = 'none';
                 homePage.style.display = 'flex';
                 navUsername.textContent = username;
@@ -2560,6 +2543,7 @@
             function handleLogout() {
                 currentUser = null;
                 sessionStorage.removeItem('metro_session_user');
+                localStorage.removeItem('metro_user_cache');
                 stopClock();
                 homePage.style.display = 'none';
                 loginPage.style.display = 'flex';
@@ -2693,7 +2677,7 @@
                 }
             }
 
-            // ==================== 检查登录状态 ====================
+            // ==================== 检查登录状态（容错处理） ====================
             async function checkSession() {
                 const username = sessionStorage.getItem('metro_session_user');
                 if (username) {
@@ -2725,6 +2709,45 @@
                             return false;
                         }
                     } catch (e) {
+                        // 网络异常，尝试从 localStorage 恢复缓存数据
+                        const cached = localStorage.getItem('metro_user_cache');
+                        if (cached) {
+                            try {
+                                const data = JSON.parse(cached);
+                                if (data.username === username) {
+                                    // 使用缓存数据，保持登录状态
+                                    currentUser = username;
+                                    loginPage.style.display = 'none';
+                                    homePage.style.display = 'flex';
+                                    navUsername.textContent = username;
+                                    greetingUser.textContent = username;
+                                    if (data.avatar) {
+                                        updateAvatarUI(data.avatar);
+                                    } else {
+                                        updateAvatarUI('');
+                                    }
+                                    adminEntry.style.display = (username === 'admin') ? 'block' : 'none';
+                                    showHomePage();
+                                    updateSigninUI();
+                                    renderLines();
+                                    startClock();
+                                    loadElderMode();
+                                    // 显示缓存余额（可能不是最新）
+                                    myBalance.textContent = formatBalance(data.balance || 0);
+                                    showToast('网络连接异常，使用缓存数据，部分功能可能受限', '⚠️');
+                                    // 异步重新尝试获取最新数据
+                                    setTimeout(() => {
+                                        refreshMyInfo();
+                                        refreshOrders();
+                                    }, 3000);
+                                    return true;
+                                }
+                            } catch (cacheError) {
+                                // 缓存无效
+                            }
+                        }
+                        // 无缓存，提示并退登
+                        showToast('网络连接异常，请检查网络后重试', '❌');
                         sessionStorage.removeItem('metro_session_user');
                         return false;
                     }
@@ -2827,7 +2850,6 @@
             closeTicketBtn.addEventListener('click', closeTicketModal);
             ticketModal.addEventListener('click', function(e) { if (e.target === this) closeTicketModal(); });
             addWaypointBtn.addEventListener('click', addWaypointRow);
-            // 起始/终点变化时更新途经点选项
             ticketStart.addEventListener('change', updateWaypointOptions);
             ticketEnd.addEventListener('change', updateWaypointOptions);
 
