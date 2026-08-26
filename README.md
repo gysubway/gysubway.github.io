@@ -1054,43 +1054,41 @@
 
             // ==================== 获取路径的线路显示序列（合并同主线，根据是否含支线决定显示名） ====================
             function getLinesFromPath(path) {
-                if (path.length < 2) return [];
-                // 收集每段的主线名和支线标识
-                const segments = [];
-                for (let i = 0; i < path.length - 1; i++) {
-                    const key = [path[i], path[i + 1]].sort().join('|');
-                    const main = edgeMainLine[key] || '未知';
-                    const branch = edgeBranch[key] || '';
-                    segments.push({ main, branch });
-                }
-                // 合并连续相同主线的段
-                const merged = [];
-                let current = null;
-                for (const seg of segments) {
-                    if (!current || current.main !== seg.main) {
-                        if (current) merged.push(current);
-                        current = { main: seg.main, hasBranch: seg.branch !== '', branches: new Set() };
-                    }
-                    if (seg.branch) current.branches.add(seg.branch);
-                    if (seg.branch !== '') current.hasBranch = true;
-                }
-                if (current) merged.push(current);
+    if (path.length < 2) return [];
+    const segments = [];
+    for (let i = 0; i < path.length - 1; i++) {
+        const key = [path[i], path[i + 1]].sort().join('|');
+        const main = edgeMainLine[key] || '未知';
+        const branch = edgeBranch[key] || '';
+        segments.push({ main, branch });
+    }
+    // 合并连续相同 (main, branch) 的段
+    const merged = [];
+    let current = null;
+    for (const seg of segments) {
+        if (!current || current.main !== seg.main || current.branch !== seg.branch) {
+            if (current) merged.push(current);
+            current = { main: seg.main, branch: seg.branch };
+        }
+    }
+    if (current) merged.push(current);
 
-                // 生成显示名
-                const result = [];
-                for (const item of merged) {
-                    let displayName = item.main;
-                    // 如果该段有支线，则追加支线标识（取第一个，通常只有一个）
-                    if (item.hasBranch && item.branches.size > 0) {
-                        // 按照规则，如果同时有A和B则取A？实际不会同时出现
-                        const branchChar = Array.from(item.branches)[0];
-                        displayName = item.main.replace('号线', '') + branchChar + '号线';
-                    }
-                    result.push(displayName);
-                }
-                return result;
+    // 生成显示名
+    const result = [];
+    for (const item of merged) {
+        let displayName = item.main;
+        if (item.branch) {
+            // 如果主线是'3号线'且支线为A或B，显示为'3A号线'或'3B号线'
+            if (item.main === '3号线') {
+                displayName = '3' + item.branch + '号线';
+            } else {
+                displayName = item.main + ' ' + item.branch; // 备用
             }
-
+        }
+        result.push(displayName);
+    }
+    return result;
+}
             // ==================== Dijkstra 算法 ====================
             function dijkstra(start, end) {
                 if (!graph[start] || !graph[end]) return null;
