@@ -1465,7 +1465,6 @@
             let elderMode = false;
             let deleteCountdown = 0;
             let deleteCountdownInterval = null;
-            let isNetworkError = false;
 
             // ===== 签到答题状态 =====
             let quizQuestions = [];
@@ -1614,10 +1613,8 @@
                     }
                     navUsername.textContent = me.username;
                     greetingUser.textContent = me.username;
-                    isNetworkError = false;
                 } catch (e) {
                     showToast('刷新信息失败，网络异常', '⚠️');
-                    isNetworkError = true;
                 }
             }
 
@@ -2381,9 +2378,7 @@
                 const km = (totalDistance / 1000).toFixed(2);
                 const directKm = (directResult.totalDistance / 1000).toFixed(2);
 
-                // 4. 生成方案展示（尽量提供2~3个方案）
-                // 由于当前只有一条路径（经过途经点），我们直接展示该路径，并说明票价依据
-                // 但为了满足“至少2个方案”的要求，我们可以比较“不经途经点”的路线，显示为备选方案
+                // 4. 生成方案
                 let html = '';
 
                 // 方案1：当前路径（推荐）
