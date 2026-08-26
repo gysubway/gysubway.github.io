@@ -1462,7 +1462,7 @@
             let elderMode = false;
             let deleteCountdown = 0;
             let deleteCountdownInterval = null;
-            let isNetworkError = false; // 标记网络错误
+            let isNetworkError = false;
 
             // ===== 签到答题状态 =====
             let quizQuestions = [];
@@ -2517,8 +2517,7 @@
             function loginSuccess(username, balance, avatar) {
                 currentUser = username;
                 sessionStorage.setItem('metro_session_user', username);
-                // 缓存到 localStorage 以便网络恢复时使用
-                localStorage.setItem('metro_user_cache', JSON.stringify({ username, balance, avatar }));
+                localStorage.setItem('metro_user_cache', JSON.stringify({ username, balance, avatar: avatar || '' }));
                 loginPage.style.display = 'none';
                 homePage.style.display = 'flex';
                 navUsername.textContent = username;
@@ -2677,82 +2676,69 @@
                 }
             }
 
-            // ==================== 检查登录状态（容错处理） ====================
+            // ==================== 检查登录状态（容错） ====================
             async function checkSession() {
                 const username = sessionStorage.getItem('metro_session_user');
-                if (username) {
-                    try {
-                        const users = await fetchAllUsers();
-                        const me = users.find(u => u.username === username);
-                        if (me) {
-                            currentUser = username;
-                            loginPage.style.display = 'none';
-                            homePage.style.display = 'flex';
-                            navUsername.textContent = username;
-                            greetingUser.textContent = username;
-                            if (me.avatar) {
-                                updateAvatarUI(me.avatar);
-                            } else {
-                                updateAvatarUI('');
-                            }
-                            adminEntry.style.display = (username === 'admin') ? 'block' : 'none';
-                            showHomePage();
-                            updateSigninUI();
-                            renderLines();
-                            startClock();
-                            loadElderMode();
-                            refreshMyInfo();
-                            refreshOrders();
-                            return true;
-                        } else {
-                            sessionStorage.removeItem('metro_session_user');
-                            return false;
-                        }
-                    } catch (e) {
-                        // 网络异常，尝试从 localStorage 恢复缓存数据
-                        const cached = localStorage.getItem('metro_user_cache');
-                        if (cached) {
-                            try {
-                                const data = JSON.parse(cached);
-                                if (data.username === username) {
-                                    // 使用缓存数据，保持登录状态
-                                    currentUser = username;
-                                    loginPage.style.display = 'none';
-                                    homePage.style.display = 'flex';
-                                    navUsername.textContent = username;
-                                    greetingUser.textContent = username;
-                                    if (data.avatar) {
-                                        updateAvatarUI(data.avatar);
-                                    } else {
-                                        updateAvatarUI('');
-                                    }
-                                    adminEntry.style.display = (username === 'admin') ? 'block' : 'none';
-                                    showHomePage();
-                                    updateSigninUI();
-                                    renderLines();
-                                    startClock();
-                                    loadElderMode();
-                                    // 显示缓存余额（可能不是最新）
-                                    myBalance.textContent = formatBalance(data.balance || 0);
-                                    showToast('网络连接异常，使用缓存数据，部分功能可能受限', '⚠️');
-                                    // 异步重新尝试获取最新数据
-                                    setTimeout(() => {
-                                        refreshMyInfo();
-                                        refreshOrders();
-                                    }, 3000);
-                                    return true;
-                                }
-                            } catch (cacheError) {
-                                // 缓存无效
-                            }
-                        }
-                        // 无缓存，提示并退登
-                        showToast('网络连接异常，请检查网络后重试', '❌');
+                if (!username) return false;
+
+                try {
+                    const users = await fetchAllUsers();
+                    const me = users.find(u => u.username === username);
+                    if (me) {
+                        localStorage.setItem('metro_user_cache', JSON.stringify({
+                            username: me.username,
+                            balance: me.balance,
+                            avatar: me.avatar || ''
+                        }));
+                        return applyUserData(me);
+                    } else {
                         sessionStorage.removeItem('metro_session_user');
                         return false;
                     }
+                } catch (e) {
+                    console.warn('网络请求失败，尝试从缓存恢复:', e);
+                    const cached = localStorage.getItem('metro_user_cache');
+                    if (cached) {
+                        try {
+                            const data = JSON.parse(cached);
+                            if (data.username === username) {
+                                const fakeMe = {
+                                    username: data.username,
+                                    balance: data.balance || 0,
+                                    avatar: data.avatar || ''
+                                };
+                                return applyUserData(fakeMe);
+                            }
+                        } catch (cacheErr) {
+                            console.error('缓存解析失败:', cacheErr);
+                        }
+                    }
+                    sessionStorage.removeItem('metro_session_user');
+                    return false;
                 }
-                return false;
+            }
+
+            function applyUserData(userData) {
+                currentUser = userData.username;
+                loginPage.style.display = 'none';
+                homePage.style.display = 'flex';
+                navUsername.textContent = userData.username;
+                greetingUser.textContent = userData.username;
+                if (userData.avatar) {
+                    updateAvatarUI(userData.avatar);
+                } else {
+                    updateAvatarUI('');
+                }
+                adminEntry.style.display = (userData.username === 'admin') ? 'block' : 'none';
+                showHomePage();
+                updateSigninUI();
+                renderLines();
+                startClock();
+                loadElderMode();
+                refreshMyInfo();
+                refreshOrders();
+                showToast('欢迎回来，' + userData.username + '！', '👋');
+                return true;
             }
 
             // ==================== 事件绑定 ====================
@@ -2852,6 +2838,19 @@
             addWaypointBtn.addEventListener('click', addWaypointRow);
             ticketStart.addEventListener('change', updateWaypointOptions);
             ticketEnd.addEventListener('change', updateWaypointOptions);
+
+            // 使用事件委托处理动态添加的移除按钮
+            waypointsContainer.addEventListener('click', function(e) {
+                if (e.target.classList.contains('remove-waypoint')) {
+                    const row = e.target.closest('.waypoint-row');
+                    if (row) {
+                        row.remove();
+                        updateWaypointOptions();
+                        const rows = document.querySelectorAll('.waypoint-row');
+                        addWaypointBtn.disabled = rows.length >= MAX_WAYPOINTS;
+                    }
+                }
+            });
 
             loginUsername.addEventListener('focus', function() { loginError.classList.remove('show'); });
             loginPassword.addEventListener('focus', function() { loginError.classList.remove('show'); });
