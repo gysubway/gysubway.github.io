@@ -861,9 +861,7 @@
             </div>
             <button class="btn-primary" id="ticketQueryBtn" style="width:100%;padding:12px;border:none;border-radius:10px;font-weight:700;cursor:pointer;">查询路线及票价</button>
             <div id="ticketResult" style="margin-top:16px;"></div>
-            <div class="form-actions">
-                <button class="btn-cancel" id="closeTicketBtn" style="flex:1;">关闭</button>
-            </div>
+            <div class="form-actions"><button class="btn-cancel" id="closeTicketBtn" style="flex:1;">关闭</button></div>
         </div>
     </div>
 
@@ -1109,7 +1107,7 @@
 
             const allStations = Array.from(allStationsSet).sort((a, b) => a.localeCompare(b, 'zh'));
 
-            // ==================== 获取路径的线路显示序列 ====================
+            // ==================== 获取路径的线路显示序列（修正支线拆分） ====================
             function getLinesFromPath(path) {
                 if (path.length < 2) return [];
                 const segments = [];
@@ -1119,7 +1117,7 @@
                     const branch = edgeBranch[key] || '';
                     segments.push({ main, branch });
                 }
-                // 合并连续 (main, branch) 相同的段
+                // 合并连续相同 (main, branch) 的段
                 const merged = [];
                 let current = null;
                 for (const seg of segments) {
@@ -1129,7 +1127,7 @@
                     }
                 }
                 if (current) merged.push(current);
-                // 生成显示名
+
                 const result = [];
                 for (const item of merged) {
                     let displayName = item.main;
@@ -1212,11 +1210,13 @@
                 return null;
             }
 
-            // ==================== 单段最短路径 ====================
+            // ==================== 单段最短路径（用于分段） ====================
             function getShortestPath(start, end) {
                 if (!graph[start] || !graph[end]) return null;
+                // 先尝试 Dijkstra
                 const result = dijkstra(start, end);
                 if (result) return result;
+                // 备用 BFS
                 return bfsFindPath(start, end);
             }
 
@@ -1232,7 +1232,7 @@
                 return 5 + add;
             }
 
-            // ==================== 线路展示数据 ====================
+            // ==================== 线路展示数据（修改3B号线显示） ====================
             const lineNames = Object.keys(LINE_METRO);
             const lineDisplay = lineNames.map(name => {
                 let stations = LINE_METRO[name].stations;
@@ -1614,7 +1614,7 @@
                     navUsername.textContent = me.username;
                     greetingUser.textContent = me.username;
                 } catch (e) {
-                    showToast('刷新信息失败，网络异常', '⚠️');
+                    showToast('刷新信息失败', '❌');
                 }
             }
 
@@ -1649,7 +1649,7 @@
                     });
                     ordersContainer.innerHTML = html;
                 } catch (e) {
-                    showToast('加载订单失败，网络异常', '⚠️');
+                    showToast('加载订单失败', '❌');
                 }
             }
 
@@ -1970,7 +1970,7 @@
                 if (currentUser) updateSigninUI();
             }
 
-            // ==================== 渲染线路 ====================
+            // ==================== 渲染线路（修改3B号线显示） ====================
             function renderLines() {
                 if (!lineGrid) return;
                 lineGrid.innerHTML = '';
@@ -2232,20 +2232,141 @@
                 distResult.innerHTML = html;
             }
 
-            // ==================== 途经点相关函数 ====================
+            // ==================== 购票（含途经点） ====================
+            function openTicketModal() {
+                ticketModal.classList.add('active');
+                ticketResult.innerHTML = '';
+                ticketStart.value = '';
+                ticketEnd.value = '';
+                // 清空途经点
+                waypointsContainer.innerHTML = '';
+                addWaypointBtn.disabled = false;
+                // 填充站点下拉
+                const sortedStations = [...allStations].sort((a, b) => a.localeCompare(b, 'zh'));
+                ticketStart.innerHTML = '<option value="">-- 请选择 --</option>';
+                ticketEnd.innerHTML = '<option value="">-- 请选择 --</option>';
+                sortedStations.forEach(st => {
+                    const opt1 = document.createElement('option');
+                    opt1.value = st;
+                    opt1.textContent = st;
+                    ticketStart.appendChild(opt1);
+                    const opt2 = document.createElement('option');
+                    opt2.value = st;
+                    opt2.textContent = st;
+                    ticketEnd.appendChild(opt2);
+                });
+                // 初始化已选站点集合（用于途经点过滤）
+                updateWaypointOptions();
+            }
+
+            // ===== 添加途经点（修复版） =====
+            function addWaypointRow() {
+                const count = document.querySelectorAll('.waypoint-row').length;
+                if (count >= MAX_WAYPOINTS) {
+                    showToast('最多添加 ' + MAX_WAYPOINTS + ' 个途经点', '⚠️');
+                    return;
+                }
+
+                // 安全获取站点列表
+                let stations = [];
+                if (allStations && allStations.length > 0) {
+                    stations = allStations;
+                } else {
+                    // 回退：从 ticketStart 下拉框读取
+                    const options = ticketStart.querySelectorAll('option');
+                    options.forEach(opt => {
+                        if (opt.value) stations.push(opt.value);
+                    });
+                    if (stations.length === 0) {
+                        showToast('站点数据未加载，请刷新页面', '❌');
+                        return;
+                    }
+                }
+
+                const row = document.createElement('div');
+                row.className = 'waypoint-row';
+
+                const select = document.createElement('select');
+                select.className = 'waypoint-select';
+                select.innerHTML = '<option value="">-- 请选择 --</option>';
+
+                // 填充站点
+                stations.forEach(st => {
+                    const opt = document.createElement('option');
+                    opt.value = st;
+                    opt.textContent = st;
+                    select.appendChild(opt);
+                });
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-waypoint';
+                removeBtn.textContent = '×';
+                removeBtn.title = '移除途经点';
+                removeBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    row.remove();
+                    // 重新计算按钮状态
+                    const rows = document.querySelectorAll('.waypoint-row');
+                    addWaypointBtn.disabled = rows.length >= MAX_WAYPOINTS;
+                    // 更新其他下拉选项
+                    updateWaypointOptions();
+                    // 显示提示
+                    showToast('已移除途经点', '🗑️');
+                });
+
+                select.addEventListener('change', function() {
+                    updateWaypointOptions();
+                });
+
+                row.appendChild(select);
+                row.appendChild(removeBtn);
+                waypointsContainer.appendChild(row);
+
+                // 更新所有下拉选项（排除已选）
+                updateWaypointOptions();
+
+                // 更新按钮状态
+                const rows = document.querySelectorAll('.waypoint-row');
+                addWaypointBtn.disabled = rows.length >= MAX_WAYPOINTS;
+
+                // 滚动到新添加的行
+                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            // ===== 更新途经点下拉选项（修复版） =====
             function updateWaypointOptions() {
                 const start = ticketStart.value;
                 const end = ticketEnd.value;
                 const waypointSelects = document.querySelectorAll('.waypoint-select');
+
+                // 收集已选途经点
                 const selectedWaypoints = [];
                 waypointSelects.forEach(sel => {
                     if (sel.value) selectedWaypoints.push(sel.value);
                 });
+
+                // 构建排除集合
                 const exclude = new Set([start, end, ...selectedWaypoints]);
+
+                // 获取可用的站点列表
+                let stations = [];
+                if (allStations && allStations.length > 0) {
+                    stations = allStations;
+                } else {
+                    // 回退：从 ticketStart 读取
+                    const options = ticketStart.querySelectorAll('option');
+                    options.forEach(opt => {
+                        if (opt.value) stations.push(opt.value);
+                    });
+                }
+
+                // 重新填充每个途经点下拉框
                 waypointSelects.forEach(sel => {
                     const currentVal = sel.value;
                     sel.innerHTML = '<option value="">-- 请选择 --</option>';
-                    allStations.forEach(st => {
+
+                    stations.forEach(st => {
+                        // 如果该站点未被排除，或者就是当前选中的值（保留选中状态）
                         if (!exclude.has(st) || st === currentVal) {
                             const opt = document.createElement('option');
                             opt.value = st;
@@ -2254,61 +2375,35 @@
                             sel.appendChild(opt);
                         }
                     });
+
+                    // 如果当前选中的值不在选项中，清空选择
+                    if (currentVal && !sel.querySelector(`option[value="${currentVal}"]`)) {
+                        sel.value = '';
+                    }
                 });
-                const count = document.querySelectorAll('.waypoint-row').length;
+
+                // 更新添加按钮状态
+                const count = waypointSelects.length;
                 addWaypointBtn.disabled = count >= MAX_WAYPOINTS;
             }
 
-            function addWaypointRow() {
-                const count = document.querySelectorAll('.waypoint-row').length;
-                if (count >= MAX_WAYPOINTS) {
-                    showToast('最多添加5个途经点', '⚠️');
-                    return;
-                }
-                const row = document.createElement('div');
-                row.className = 'waypoint-row';
-                const select = document.createElement('select');
-                select.className = 'waypoint-select';
-                select.innerHTML = '<option value="">-- 请选择 --</option>';
-                allStations.forEach(st => {
-                    const opt = document.createElement('option');
-                    opt.value = st;
-                    opt.textContent = st;
-                    select.appendChild(opt);
-                });
-                const removeBtn = document.createElement('button');
-                removeBtn.className = 'remove-waypoint';
-                removeBtn.textContent = '×';
-                removeBtn.title = '移除途经点';
-                removeBtn.addEventListener('click', function() {
-                    row.remove();
-                    updateWaypointOptions();
-                    const rows = document.querySelectorAll('.waypoint-row');
-                    addWaypointBtn.disabled = rows.length >= MAX_WAYPOINTS;
-                });
-                select.addEventListener('change', function() {
-                    updateWaypointOptions();
-                });
-                row.appendChild(select);
-                row.appendChild(removeBtn);
-                waypointsContainer.appendChild(row);
-                updateWaypointOptions();
-                addWaypointBtn.disabled = document.querySelectorAll('.waypoint-row').length >= MAX_WAYPOINTS;
-            }
-
+            // 获取途经点数组（去空）
             function getWaypoints() {
                 const selects = document.querySelectorAll('.waypoint-select');
                 const wps = [];
                 selects.forEach(sel => {
                     if (sel.value) wps.push(sel.value);
                 });
+                // 去重
                 return [...new Set(wps)];
             }
 
+            // 构建完整路径（分段）
             function buildFullPath(start, waypoints, end) {
-                const sequence = [start, ...waypoints, end];
-                const segments = [];
+                const fullPath = [];
                 let totalDist = 0;
+                const segments = [];
+                const sequence = [start, ...waypoints, end];
                 for (let i = 0; i < sequence.length - 1; i++) {
                     const from = sequence[i];
                     const to = sequence[i + 1];
@@ -2319,6 +2414,7 @@
                     segments.push({ from, to, path: result.path, dist: result.totalDistance });
                     totalDist += result.totalDistance;
                 }
+                // 拼接路径（去重首尾）
                 if (segments.length === 0) return { error: '无效分段' };
                 let mergedPath = [];
                 for (let i = 0; i < segments.length; i++) {
@@ -2326,13 +2422,14 @@
                     if (i === 0) {
                         mergedPath = segPath.slice();
                     } else {
+                        // 跳过第一个元素（因为与前一段末尾相同）
                         mergedPath = mergedPath.concat(segPath.slice(1));
                     }
                 }
                 return { fullPath: mergedPath, totalDistance: totalDist, segments };
             }
 
-            // ==================== 购票查询（含多方案） ====================
+            // ==================== 购票查询 ====================
             function handleTicketQuery() {
                 const start = ticketStart.value;
                 const end = ticketEnd.value;
@@ -2345,6 +2442,7 @@
                     ticketResult.innerHTML = '<p style="color:#d94a4a;">起点和终点不能相同</p>';
                     return;
                 }
+                // 检查途经点是否包含起点或终点
                 for (const wp of waypoints) {
                     if (wp === start) {
                         ticketResult.innerHTML = '<p style="color:#d94a4a;">途经点不能与起点相同</p>';
@@ -2356,7 +2454,7 @@
                     }
                 }
 
-                // 1. 计算票价（无途经点最短里程）
+                // 1. 计算票价（按无途经点最短里程）
                 const directResult = getShortestPath(start, end);
                 if (!directResult) {
                     ticketResult.innerHTML = '<p style="color:#d94a4a;">起点和终点之间不连通</p>';
@@ -2378,63 +2476,37 @@
                 const km = (totalDistance / 1000).toFixed(2);
                 const directKm = (directResult.totalDistance / 1000).toFixed(2);
 
-                // 4. 生成方案
-                let html = '';
-
-                // 方案1：当前路径（推荐）
-                let lineHtml1 = lines.map((l, idx) => {
+                // 4. 构建显示
+                let lineHtml = lines.map((l, idx) => {
                     const color = LINE_COLORS[l] || '#888';
                     const span = `<span class="line-badge" style="background:${color};">${l}</span>`;
                     if (idx < lines.length - 1) return span + '<span class="line-arrow"> → </span>';
                     return span;
                 }).join('');
-                let pathDetail1 = waypoints.length > 0 ? '途经：' + [start, ...waypoints, end].join(' → ') : '';
 
-                html += `
+                // 若有途经点，显示路径详情
+                let pathDetail = '';
+                if (waypoints.length > 0) {
+                    const sequence = [start, ...waypoints, end];
+                    pathDetail = '途经：' + sequence.join(' → ');
+                }
+
+                let html = `
                     <div class="scheme-item">
                         <div class="scheme-header">
                             <span class="scheme-label">⭐ 推荐方案</span>
                             <span class="price" style="font-weight:700;color:#d94a4a;">${fare} 元</span>
                         </div>
-                        <div class="scheme-lines">${lineHtml1}</div>
+                        <div class="scheme-lines">${lineHtml}</div>
                         <div class="scheme-info">总里程：${km} km  ·  换乘 ${transfers} 次</div>
-                        ${pathDetail1 ? `<div class="scheme-info" style="font-size:13px;color:#5a6a7a;">${pathDetail1}</div>` : ''}
+                        ${pathDetail ? `<div class="scheme-info" style="font-size:13px;color:#5a6a7a;">${pathDetail}</div>` : ''}
                         <div class="scheme-info" style="font-size:12px;color:#8a9aaa;">票价按起点→终点最短里程 (${directKm} km) 计算</div>
                         <button class="buy-btn" data-from="${start}" data-to="${end}" data-fare="${fare}" data-lines='${JSON.stringify(lines)}' data-path='${JSON.stringify(fullPath)}' data-waypoints='${JSON.stringify(waypoints)}'>立即购买</button>
                     </div>
                 `;
-
-                // 方案2：若存在不经途经点的路径，且与方案1不同，则显示
-                if (waypoints.length > 0) {
-                    const directLines = getLinesFromPath(directResult.path);
-                    const directTransfers = directLines.length - 1;
-                    const directKm2 = (directResult.totalDistance / 1000).toFixed(2);
-                    let lineHtml2 = directLines.map((l, idx) => {
-                        const color = LINE_COLORS[l] || '#888';
-                        const span = `<span class="line-badge" style="background:${color};">${l}</span>`;
-                        if (idx < directLines.length - 1) return span + '<span class="line-arrow"> → </span>';
-                        return span;
-                    }).join('');
-                    html += `
-                        <div class="scheme-item" style="margin-top:12px;">
-                            <div class="scheme-header">
-                                <span class="scheme-label">方案 2（不经途经点）</span>
-                                <span class="price" style="font-weight:700;color:#d94a4a;">${fare} 元</span>
-                            </div>
-                            <div class="scheme-lines">${lineHtml2}</div>
-                            <div class="scheme-info">总里程：${directKm2} km  ·  换乘 ${directTransfers} 次</div>
-                            <div class="scheme-info" style="font-size:12px;color:#8a9aaa;">票价相同，按最短里程计</div>
-                            <button class="buy-btn" data-from="${start}" data-to="${end}" data-fare="${fare}" data-lines='${JSON.stringify(directLines)}' data-path='${JSON.stringify(directResult.path)}' data-waypoints='[]'>立即购买</button>
-                        </div>
-                    `;
-                }
-
                 ticketResult.innerHTML = html;
-                // 绑定购买事件
-                ticketResult.querySelectorAll('.buy-btn').forEach(btn => {
-                    btn.addEventListener('click', async function() {
-                        await handleBuyTicket(this);
-                    });
+                ticketResult.querySelector('.buy-btn').addEventListener('click', async function() {
+                    await handleBuyTicket(this);
                 });
             }
 
@@ -2475,6 +2547,7 @@
                             refreshMyInfo();
                         }
                     } catch (apiError) {
+                        // 本地降级
                         const localKey = 'metro_orders_' + currentUser;
                         let orders = [];
                         const existing = localStorage.getItem(localKey);
@@ -2497,34 +2570,6 @@
                 } catch (e) {
                     showToast('购票失败: ' + e.message, '❌');
                 }
-            }
-
-            // ==================== 购票模态框打开/关闭 ====================
-            function openTicketModal() {
-                ticketModal.classList.add('active');
-                ticketResult.innerHTML = '';
-                ticketStart.value = '';
-                ticketEnd.value = '';
-                waypointsContainer.innerHTML = '';
-                addWaypointBtn.disabled = false;
-                const sortedStations = [...allStations].sort((a, b) => a.localeCompare(b, 'zh'));
-                ticketStart.innerHTML = '<option value="">-- 请选择 --</option>';
-                ticketEnd.innerHTML = '<option value="">-- 请选择 --</option>';
-                sortedStations.forEach(st => {
-                    const opt1 = document.createElement('option');
-                    opt1.value = st;
-                    opt1.textContent = st;
-                    ticketStart.appendChild(opt1);
-                    const opt2 = document.createElement('option');
-                    opt2.value = st;
-                    opt2.textContent = st;
-                    ticketEnd.appendChild(opt2);
-                });
-                updateWaypointOptions();
-            }
-
-            function closeTicketModal() {
-                ticketModal.classList.remove('active');
             }
 
             // ==================== 登录 / 登出 ====================
@@ -2554,7 +2599,6 @@
             function loginSuccess(username, balance, avatar) {
                 currentUser = username;
                 sessionStorage.setItem('metro_session_user', username);
-                localStorage.setItem('metro_user_cache', JSON.stringify({ username, balance, avatar: avatar || '' }));
                 loginPage.style.display = 'none';
                 homePage.style.display = 'flex';
                 navUsername.textContent = username;
@@ -2579,7 +2623,6 @@
             function handleLogout() {
                 currentUser = null;
                 sessionStorage.removeItem('metro_session_user');
-                localStorage.removeItem('metro_user_cache');
                 stopClock();
                 homePage.style.display = 'none';
                 loginPage.style.display = 'flex';
@@ -2713,129 +2756,176 @@
                 }
             }
 
-            // ==================== 检查登录状态（容错） ====================
+            // ==================== 检查登录状态 ====================
             async function checkSession() {
                 const username = sessionStorage.getItem('metro_session_user');
-                if (!username) return false;
-
-                try {
-                    const users = await fetchAllUsers();
-                    const me = users.find(u => u.username === username);
-                    if (me) {
-                        localStorage.setItem('metro_user_cache', JSON.stringify({
-                            username: me.username,
-                            balance: me.balance,
-                            avatar: me.avatar || ''
-                        }));
-                        return applyUserData(me);
-                    } else {
+                if (username) {
+                    try {
+                        const users = await fetchAllUsers();
+                        const me = users.find(u => u.username === username);
+                        if (me) {
+                            currentUser = username;
+                            loginPage.style.display = 'none';
+                            homePage.style.display = 'flex';
+                            navUsername.textContent = username;
+                            greetingUser.textContent = username;
+                            if (me.avatar) {
+                                updateAvatarUI(me.avatar);
+                            } else {
+                                updateAvatarUI('');
+                            }
+                            adminEntry.style.display = (username === 'admin') ? 'block' : 'none';
+                            showHomePage();
+                            updateSigninUI();
+                            renderLines();
+                            startClock();
+                            loadElderMode();
+                            refreshMyInfo();
+                            refreshOrders();
+                            return true;
+                        } else {
+                            sessionStorage.removeItem('metro_session_user');
+                            return false;
+                        }
+                    } catch (e) {
                         sessionStorage.removeItem('metro_session_user');
                         return false;
                     }
-                } catch (e) {
-                    console.warn('网络请求失败，尝试从缓存恢复:', e);
-                    const cached = localStorage.getItem('metro_user_cache');
-                    if (cached) {
-                        try {
-                            const data = JSON.parse(cached);
-                            if (data.username === username) {
-                                const fakeMe = {
-                                    username: data.username,
-                                    balance: data.balance || 0,
-                                    avatar: data.avatar || ''
-                                };
-                                return applyUserData(fakeMe);
-                            }
-                        } catch (cacheErr) {
-                            console.error('缓存解析失败:', cacheErr);
-                        }
-                    }
-                    sessionStorage.removeItem('metro_session_user');
-                    return false;
                 }
+                return false;
             }
 
-            function applyUserData(userData) {
-                currentUser = userData.username;
-                loginPage.style.display = 'none';
-                homePage.style.display = 'flex';
-                navUsername.textContent = userData.username;
-                greetingUser.textContent = userData.username;
-                if (userData.avatar) {
-                    updateAvatarUI(userData.avatar);
-                } else {
-                    updateAvatarUI('');
-                }
-                adminEntry.style.display = (userData.username === 'admin') ? 'block' : 'none';
-                showHomePage();
-                updateSigninUI();
-                renderLines();
-                startClock();
-                loadElderMode();
-                refreshMyInfo();
-                refreshOrders();
-                showToast('欢迎回来，' + userData.username + '！', '👋');
-                return true;
-            }
+            // ==================== 事件绑定 ====================
+            loginForm.addEventListener('submit', handleLogin);
+            loginPassword.addEventListener('keydown', function(e) { if (e.key === 'Enter') loginForm.dispatchEvent(new Event(
+                        'submit')); });
 
-            // ==================== 事件绑定（增强） ====================
-            // 使用 DOMContentLoaded 确保元素已加载
-            document.addEventListener('DOMContentLoaded', function() {
-                // 购票按钮
-                const addBtn = document.getElementById('addWaypointBtn');
-                const closeBtn = document.getElementById('closeTicketBtn');
-                const queryBtn = document.getElementById('ticketQueryBtn');
+            userNameClick.addEventListener('click', showMyPage);
 
-                if (addBtn) {
-                    addBtn.addEventListener('click', function(e) {
-                        console.log('添加途经点按钮被点击');
-                        addWaypointRow();
-                    });
-                } else {
-                    console.warn('未找到 addWaypointBtn');
-                }
-
-                if (closeBtn) {
-                    closeBtn.addEventListener('click', function(e) {
-                        console.log('关闭购票模态框');
-                        closeTicketModal();
-                    });
-                } else {
-                    console.warn('未找到 closeTicketBtn');
-                }
-
-                if (queryBtn) {
-                    queryBtn.addEventListener('click', function(e) {
-                        console.log('查询路线按钮被点击');
-                        handleTicketQuery();
-                    });
-                } else {
-                    console.warn('未找到 ticketQueryBtn');
-                }
-
-                // 途经点移除委托
-                const container = document.getElementById('waypointsContainer');
-                if (container) {
-                    container.addEventListener('click', function(e) {
-                        if (e.target.classList.contains('remove-waypoint')) {
-                            const row = e.target.closest('.waypoint-row');
-                            if (row) {
-                                row.remove();
-                                updateWaypointOptions();
-                                const rows = document.querySelectorAll('.waypoint-row');
-                                document.getElementById('addWaypointBtn').disabled = rows.length >= MAX_WAYPOINTS;
-                                console.log('途经点已移除');
-                            }
-                        }
-                    });
-                }
-
-                // 下拉选择变化时更新途径点选项
-                const startSel = document.getElementById('ticketStart');
-                const endSel = document.getElementById('ticketEnd');
-                if (startSel) startSel.addEventListener('change', updateWaypointOptions);
-                if (endSel) endSel.addEventListener('change', updateWaypointOptions);
+            document.querySelectorAll('.quick-action[data-action]').forEach(el => {
+                el.addEventListener('click', function() {
+                    const action = this.dataset.action;
+                    if (action === 'ticket') openTicketModal();
+                    else if (action === 'distance') openDistanceModal();
+                    else if (action === 'scenery') openSceneryViewer();
+                    else if (action === 'signin') openQuizModal();
+                    else if (action === 'admin') openAdminPanel();
+                    else if (action === 'my') showMyPage();
+                });
             });
+
+            myBackBtn.addEventListener('click', showHomePage);
+
+            avatarWrapper.addEventListener('click', function() {
+                if (!currentUser) return;
+                avatarInput.click();
+            });
+            avatarInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    handleAvatarUpload(this.files[0]);
+                }
+                this.value = '';
+            });
+
+            myLogoutBtn.addEventListener('click', handleMyLogout);
+            myDeleteAccountBtn.addEventListener('click', function() {
+                if (this.disabled) return;
+                if (deleteCountdownInterval) return;
+                if (this.textContent === '⚠️ 确认注销') {
+                    confirmDeleteAccount();
+                    return;
+                }
+                startDeleteCountdown();
+            });
+
+            elderToggle.addEventListener('click', function() {
+                const newState = !elderMode;
+                applyElderMode(newState);
+                showToast(newState ? '长者关怀已开启' : '长者关怀已关闭', newState ? '🌙' : '☀️');
+            });
+
+            // 注册
+            openRegisterBtn.addEventListener('click', openRegisterModal);
+            closeRegisterBtn.addEventListener('click', closeRegisterModal);
+            registerBtn.addEventListener('click', handleRegister);
+            registerModal.addEventListener('click', function(e) { if (e.target === this) closeRegisterModal(); });
+            regVerify.addEventListener('keydown', function(e) { if (e.key === 'Enter') registerBtn.click(); });
+
+            // 忘记密码
+            openForgotBtn.addEventListener('click', openForgotModal);
+            closeForgotBtn.addEventListener('click', closeForgotModal);
+            forgotBtn.addEventListener('click', handleForgot);
+            forgotModal.addEventListener('click', function(e) { if (e.target === this) closeForgotModal(); });
+            forgotNewPassword.addEventListener('keydown', function(e) { if (e.key === 'Enter') forgotBtn.click(); });
+
+            // 答题
+            startQuizBtn.addEventListener('click', function() {
+                timer = getTimeLimit();
+                updateTimerDisplay();
+                startQuiz();
+            });
+            answerInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.preventDefault();
+                    handleAnswer(); }
+            });
+            closeQuizBtn.addEventListener('click', closeQuizModal);
+            quizModal.addEventListener('click', function(e) { if (e.target === this) closeQuizModal(); });
+
+            // 管理
+            closeAdminBtn.addEventListener('click', closeAdminPanel);
+            adminModal.addEventListener('click', function(e) { if (e.target === this) closeAdminPanel(); });
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() { switchTab(this.dataset.tab); });
+            });
+            addSceneryBtn.addEventListener('click', function() { openEditScenery(null); });
+            closeEditSceneryBtn.addEventListener('click', closeEditScenery);
+            saveSceneryBtn.addEventListener('click', saveSceneryItem);
+            editSceneryModal.addEventListener('click', function(e) { if (e.target === this) closeEditScenery(); });
+
+            // 站距 & 购票
+            distLineSelect.addEventListener('change', handleDistLineChange);
+            closeDistBtn.addEventListener('click', closeDistanceModal);
+            distanceModal.addEventListener('click', function(e) { if (e.target === this) closeDistanceModal(); });
+            ticketQueryBtn.addEventListener('click', handleTicketQuery);
+            closeTicketBtn.addEventListener('click', closeTicketModal);
+            ticketModal.addEventListener('click', function(e) { if (e.target === this) closeTicketModal(); });
+            addWaypointBtn.addEventListener('click', addWaypointRow);
+            // 起始/终点变化时更新途经点选项
+            ticketStart.addEventListener('change', updateWaypointOptions);
+            ticketEnd.addEventListener('change', updateWaypointOptions);
+
+            loginUsername.addEventListener('focus', function() { loginError.classList.remove('show'); });
+            loginPassword.addEventListener('focus', function() { loginError.classList.remove('show'); });
+
+            // 修正 startQuiz 函数
+            const originalStartQuiz = startQuiz;
+            startQuiz = function() {
+                if (isCountingDown || quizActive) return;
+                timer = getTimeLimit();
+                updateTimerDisplay();
+                isCountingDown = true;
+                startQuizBtn.style.display = 'none';
+                countdownDisplay.style.display = 'block';
+                countdownDisplay.classList.add('active');
+                let count = 3;
+                countdownDisplay.textContent = count;
+                const cdInterval = setInterval(() => {
+                    count--;
+                    if (count <= 0) {
+                        clearInterval(cdInterval);
+                        countdownDisplay.classList.remove('active');
+                        countdownDisplay.style.display = 'none';
+                        isCountingDown = false;
+                        quizActive = true;
+                        answerInput.style.display = 'inline-block';
+                        answerInput.disabled = false;
+                        answerInput.focus();
+                        startTimer();
+                    } else {
+                        countdownDisplay.textContent = count;
+                    }
+                }, 1000);
+            };
 
             // ==================== 初始化 ====================
             (async function init() {
