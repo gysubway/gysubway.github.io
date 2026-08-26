@@ -995,7 +995,6 @@
                 const n = sts.length;
                 for (let i = 0; i < n - 1; i++) {
                     const key = [sts[i], sts[i + 1]].sort().join('|');
-                    // 若多条线路共用一段，保留一条即可（通常不会）
                     if (!edgeToLine[key]) edgeToLine[key] = lineName;
                     addEdge(sts[i], sts[i + 1], dists[i]);
                 }
@@ -1008,7 +1007,7 @@
 
             const allStations = Array.from(allStationsSet).sort((a, b) => a.localeCompare(b, 'zh'));
 
-            // ==================== Dijkstra ====================
+            // ==================== Dijkstra 算法 ====================
             function dijkstra(start, end) {
                 if (!graph[start] || !graph[end]) return null;
                 const dist = {};
@@ -1048,18 +1047,51 @@
                 return { path, totalDistance: dist[end] };
             }
 
-            // ==================== 寻找多条路径（K-最短路径简化版） ====================
-            // 使用DFS搜索，限制深度和距离，选取前几条
+            // ==================== BFS 备用（用于检查连通性并求路径） ====================
+            function bfsFindPath(start, end) {
+                if (!graph[start] || !graph[end]) return null;
+                const queue = [[start]];
+                const visited = new Set([start]);
+                while (queue.length > 0) {
+                    const path = queue.shift();
+                    const last = path[path.length - 1];
+                    if (last === end) {
+                        // 计算总距离
+                        let dist = 0;
+                        for (let i = 0; i < path.length - 1; i++) {
+                            const a = path[i],
+                                b = path[i + 1];
+                            dist += graph[a][b];
+                        }
+                        return { path, totalDistance: dist };
+                    }
+                    for (const neighbor of Object.keys(graph[last])) {
+                        if (!visited.has(neighbor)) {
+                            visited.add(neighbor);
+                            queue.push([...path, neighbor]);
+                        }
+                    }
+                }
+                return null;
+            }
+
+            // ==================== 寻找多条路径（备用） ====================
             function findAlternativePaths(start, end, maxPaths = 3) {
-                // 先找最短路径
-                const shortest = dijkstra(start, end);
-                if (!shortest) return [];
+                // 先尝试 Dijkstra
+                let shortest = dijkstra(start, end);
+                if (!shortest) {
+                    // 如果 Dijkstra 失败，尝试 BFS
+                    const bfsResult = bfsFindPath(start, end);
+                    if (bfsResult) {
+                        // 仅返回一条路径
+                        return [bfsResult];
+                    }
+                    return [];
+                }
                 const shortestDist = shortest.totalDistance;
-                // 允许的距离上浮比例（20%）
                 const maxDist = shortestDist * 1.3;
 
                 const results = [];
-                // DFS
                 const visited = new Set();
                 const path = [start];
                 let found = 0;
@@ -1072,7 +1104,7 @@
                         found++;
                         return;
                     }
-                    if (path.length > 20) return; // 防止过长
+                    if (path.length > 20) return;
                     for (const [next, w] of Object.entries(graph[current])) {
                         if (!visited.has(next)) {
                             visited.add(next);
@@ -1087,9 +1119,7 @@
 
                 visited.add(start);
                 dfs(start, 0);
-                // 按距离排序
                 results.sort((a, b) => a.totalDistance - b.totalDistance);
-                // 去除重复路径（站点序列相同）
                 const unique = [];
                 const seen = new Set();
                 for (const r of results) {
@@ -1099,7 +1129,6 @@
                         unique.push(r);
                     }
                 }
-                // 返回前maxPaths条
                 return unique.slice(0, maxPaths);
             }
 
@@ -1129,15 +1158,29 @@
                 return 5 + add;
             }
 
-            // ==================== 线路展示数据 ====================
+            // ==================== 线路展示数据（修改3B号线显示） ====================
             const lineNames = Object.keys(LINE_METRO);
-            const lineDisplay = lineNames.map(name => ({
-                id: name,
-                name: name,
-                color: LINE_COLORS[name] || '#888888',
-                stations: LINE_METRO[name].stations,
-                isLoop: LINE_METRO[name].isLoop || false
-            }));
+            const lineDisplay = lineNames.map(name => {
+                let stations = LINE_METRO[name].stations;
+                let isLoop = LINE_METRO[name].isLoop || false;
+                let extraNote = '';
+                if (name === '3B号线') {
+                    // 截取从"相府"开始到末尾
+                    const idx = stations.indexOf('相府');
+                    if (idx !== -1) {
+                        stations = stations.slice(idx);
+                        extraNote = '（与3A号线共线段从李公村至相府）';
+                    }
+                }
+                return {
+                    id: name,
+                    name: name,
+                    color: LINE_COLORS[name] || '#888888',
+                    stations: stations,
+                    isLoop: isLoop,
+                    extraNote: extraNote
+                };
+            });
 
             // ==================== 常量（签到答题等） ====================
             const VERIFY_ANSWER = 'CRH380CM-0304';
@@ -1206,7 +1249,6 @@
                 const data = await apiCall('/order', { method: 'POST', body: { username, ...orderData } });
                 return data;
             }
-            // 后端会管理订单的日期过滤，前端不需要关心清理
 
             // ==================== DOM 引用 ====================
             const loginPage = document.getElementById('loginPage');
@@ -1489,7 +1531,6 @@
                     }
                     let html = '';
                     orders.forEach(order => {
-                        // order: { from, to, fare, lines, date, id }
                         const linesArr = order.lines || [];
                         let lineHtml = linesArr.map((l, idx) => {
                             const color = LINE_COLORS[l] || '#888';
@@ -1831,7 +1872,7 @@
                 if (currentUser) updateSigninUI();
             }
 
-            // ==================== 渲染线路（真实数据） ====================
+            // ==================== 渲染线路（修改3B号线显示） ====================
             function renderLines() {
                 if (!lineGrid) return;
                 lineGrid.innerHTML = '';
@@ -1845,8 +1886,9 @@
                         }
                         return '<span class="station">' + s + arrow + '</span>';
                     }).join('');
+                    let extraHtml = line.extraNote ? `<div style="font-size:12px;color:#8a9aaa;margin-top:4px;padding-left:18px;">${line.extraNote}</div>` : '';
                     card.innerHTML =
-                        `<div class="line-header"><div class="line-color" style="background:${line.color};"></div><span class="line-name">${line.name}<span class="line-code">${line.isLoop ? '环线' : ''}</span></span></div><div class="line-stations">${stationsHtml}</div>`;
+                        `<div class="line-header"><div class="line-color" style="background:${line.color};"></div><span class="line-name">${line.name}<span class="line-code">${line.isLoop ? '环线' : ''}</span></span></div><div class="line-stations">${stationsHtml}</div>${extraHtml}`;
                     lineGrid.appendChild(card);
                 });
             }
@@ -2098,7 +2140,6 @@
                 ticketResult.innerHTML = '';
                 ticketStart.value = '';
                 ticketEnd.value = '';
-                // 填充站点下拉，按拼音排序
                 const sortedStations = [...allStations].sort((a, b) => a.localeCompare(b, 'zh'));
                 ticketStart.innerHTML = '<option value="">-- 请选择 --</option>';
                 ticketEnd.innerHTML = '<option value="">-- 请选择 --</option>';
@@ -2130,11 +2171,17 @@
                     return;
                 }
 
-                // 查找多条路径
-                const paths = findAlternativePaths(start, end, 3);
+                // 先尝试 Dijkstra
+                let paths = findAlternativePaths(start, end, 3);
+                // 如果 paths 为空，尝试 BFS 作为备选
                 if (!paths || paths.length === 0) {
-                    ticketResult.innerHTML = '<p style="color:#d94a4a;">未找到路径，可能线路不连通</p>';
-                    return;
+                    const bfsResult = bfsFindPath(start, end);
+                    if (bfsResult) {
+                        paths = [bfsResult];
+                    } else {
+                        ticketResult.innerHTML = '<p style="color:#d94a4a;">未找到路线，可能线路不连通</p>';
+                        return;
+                    }
                 }
 
                 let html = '';
@@ -2142,7 +2189,6 @@
                     const lines = getLinesFromPath(p.path);
                     const fare = calculateFare(p.totalDistance);
                     const km = (p.totalDistance / 1000).toFixed(2);
-                    // 线路徽章
                     let lineHtml = lines.map((l, li) => {
                         const color = LINE_COLORS[l] || '#888';
                         const span = `<span class="line-badge" style="background:${color};">${l}</span>`;
@@ -2165,7 +2211,6 @@
                 });
 
                 ticketResult.innerHTML = html;
-                // 绑定购买事件
                 ticketResult.querySelectorAll('.buy-btn').forEach(btn => {
                     btn.addEventListener('click', async function() {
                         await handleBuyTicket(this);
@@ -2181,7 +2226,6 @@
                 const lines = JSON.parse(btn.dataset.lines);
                 const path = JSON.parse(btn.dataset.path);
 
-                // 检查余额
                 try {
                     const users = await fetchAllUsers();
                     const me = users.find(u => u.username === currentUser);
@@ -2190,7 +2234,6 @@
                         showToast('余额不足，请先充值', '❌');
                         return;
                     }
-                    // 创建订单
                     const orderData = {
                         from,
                         to,
@@ -2203,7 +2246,6 @@
                         showToast('购票成功！请查看“我的订单”', '🎫');
                         refreshMyInfo();
                         refreshOrders();
-                        // 禁用按钮防止重复购买
                         btn.disabled = true;
                         btn.textContent = '已购买';
                         btn.style.opacity = '0.6';
