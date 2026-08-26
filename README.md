@@ -173,6 +173,56 @@
         .scheme-item .buy-btn:hover { background:#1e8449; }
         .scheme-item .buy-btn:disabled { opacity:0.6; cursor:not-allowed; }
 
+        /* 途经点样式 */
+        .waypoint-row {
+            display:flex;
+            align-items:center;
+            gap:8px;
+            margin-bottom:8px;
+        }
+        .waypoint-row select {
+            flex:1;
+            padding:10px 12px;
+            font-size:15px;
+            border:2px solid #dce3ec;
+            border-radius:10px;
+            background:#f8fafc;
+            outline:none;
+            color:#1a2a3a;
+        }
+        .waypoint-row select:focus { border-color:#1a6e9e; background:#ffffff; }
+        .waypoint-row .remove-waypoint {
+            background:#fadbd8;
+            border:none;
+            border-radius:30px;
+            width:32px;
+            height:32px;
+            font-size:18px;
+            font-weight:700;
+            color:#922b21;
+            cursor:pointer;
+            transition:background 0.2s;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            flex-shrink:0;
+        }
+        .waypoint-row .remove-waypoint:hover { background:#f5b7b1; }
+        .add-waypoint-btn {
+            background:#d4e6f1;
+            border:none;
+            border-radius:30px;
+            padding:8px 20px;
+            font-size:14px;
+            font-weight:600;
+            color:#1a4a6e;
+            cursor:pointer;
+            transition:background 0.2s;
+            margin-top:4px;
+        }
+        .add-waypoint-btn:hover { background:#b0d0e6; }
+        .add-waypoint-btn:disabled { opacity:0.5; cursor:not-allowed; }
+
         /* ===== 签到答题 ===== */
         .quiz-modal .modal-card { max-width:600px; }
         .quiz-modal .quiz-header { display:flex; justify-content:space-between; font-size:18px; font-weight:600; color:#0b2a4a; padding:0 4px 16px 4px; border-bottom:2px solid #eef2f7; }
@@ -790,7 +840,7 @@
         </div>
     </div>
 
-    <!-- ===== 购票模态框 ===== -->
+    <!-- ===== 购票模态框（含途经点） ===== -->
     <div class="modal-overlay ticket-modal" id="ticketModal">
         <div class="modal-card">
             <div class="modal-title">🎟️ 购买车票</div>
@@ -798,7 +848,14 @@
                 <label for="ticketStart">起点站</label>
                 <select id="ticketStart"><option value="">-- 请选择 --</option></select>
             </div>
-            <div class="form-group">
+
+            <!-- 途经点容器 -->
+            <div id="waypointsContainer">
+                <!-- 动态添加 -->
+            </div>
+            <button class="add-waypoint-btn" id="addWaypointBtn">+ 添加途经点</button>
+
+            <div class="form-group" style="margin-top:12px;">
                 <label for="ticketEnd">终点站</label>
                 <select id="ticketEnd"><option value="">-- 请选择 --</option></select>
             </div>
@@ -939,8 +996,8 @@
                         1920, 1940, 1460, 2420, 1220
                     ],
                     isLoop: true,
-                    mainLine: '1号线', // 主线名
-                    branches: {} // 无支线
+                    mainLine: '1号线',
+                    branches: {}
                 },
                 '2号线': {
                     stations: ['颐和山庄', '龙成', '地桥', '钟楼', '鼓楼', '红楼西', '兰清园', '工艺美术馆', '金华路', '太和门', '太和南街', '清景南街',
@@ -962,7 +1019,7 @@
                     ],
                     isLoop: false,
                     mainLine: '3号线',
-                    branch: 'A' // 支线标识
+                    branch: 'A'
                 },
                 '3B号线': {
                     stations: ['李公村', '解放路', '西市', '固原植物园', '武外甘水桥', '武定门', '武定街', '兰清西路', '兰清园', '地定门西', '地定门东',
@@ -993,13 +1050,12 @@
                 if (stations3A[i] === stations3B[i]) commonPrefixLen = i + 1;
                 else break;
             }
-            const commonStations = stations3A.slice(0, commonPrefixLen); // 到相府
+            const commonStations = stations3A.slice(0, commonPrefixLen);
 
             // ==================== 构建图 ====================
             const graph = {};
             const allStationsSet = new Set();
 
-            // 存储每条边的详细信息：主线名，支线标识（空表示主线）
             const edgeMainLine = {};
             const edgeBranch = {};
 
@@ -1026,7 +1082,6 @@
                 for (let i = 0; i < n - 1; i++) {
                     const a = sts[i],
                         b = sts[i + 1];
-                    // 如果是3A或3B，且边在共线段内，则主线为'3号线'，分支为空
                     let effectiveMain = mainLine;
                     let effectiveBranch = branch;
                     if ((lineName === '3A号线' || lineName === '3B号线') &&
@@ -1052,43 +1107,42 @@
 
             const allStations = Array.from(allStationsSet).sort((a, b) => a.localeCompare(b, 'zh'));
 
-            // ==================== 获取路径的线路显示序列（合并同主线，根据是否含支线决定显示名） ====================
+            // ==================== 获取路径的线路显示序列（修正支线拆分） ====================
             function getLinesFromPath(path) {
-    if (path.length < 2) return [];
-    const segments = [];
-    for (let i = 0; i < path.length - 1; i++) {
-        const key = [path[i], path[i + 1]].sort().join('|');
-        const main = edgeMainLine[key] || '未知';
-        const branch = edgeBranch[key] || '';
-        segments.push({ main, branch });
-    }
-    // 合并连续相同 (main, branch) 的段
-    const merged = [];
-    let current = null;
-    for (const seg of segments) {
-        if (!current || current.main !== seg.main || current.branch !== seg.branch) {
-            if (current) merged.push(current);
-            current = { main: seg.main, branch: seg.branch };
-        }
-    }
-    if (current) merged.push(current);
+                if (path.length < 2) return [];
+                const segments = [];
+                for (let i = 0; i < path.length - 1; i++) {
+                    const key = [path[i], path[i + 1]].sort().join('|');
+                    const main = edgeMainLine[key] || '未知';
+                    const branch = edgeBranch[key] || '';
+                    segments.push({ main, branch });
+                }
+                // 合并连续相同 (main, branch) 的段
+                const merged = [];
+                let current = null;
+                for (const seg of segments) {
+                    if (!current || current.main !== seg.main || current.branch !== seg.branch) {
+                        if (current) merged.push(current);
+                        current = { main: seg.main, branch: seg.branch };
+                    }
+                }
+                if (current) merged.push(current);
 
-    // 生成显示名
-    const result = [];
-    for (const item of merged) {
-        let displayName = item.main;
-        if (item.branch) {
-            // 如果主线是'3号线'且支线为A或B，显示为'3A号线'或'3B号线'
-            if (item.main === '3号线') {
-                displayName = '3' + item.branch + '号线';
-            } else {
-                displayName = item.main + ' ' + item.branch; // 备用
+                const result = [];
+                for (const item of merged) {
+                    let displayName = item.main;
+                    if (item.branch) {
+                        if (item.main === '3号线') {
+                            displayName = '3' + item.branch + '号线';
+                        } else {
+                            displayName = item.main + ' ' + item.branch;
+                        }
+                    }
+                    result.push(displayName);
+                }
+                return result;
             }
-        }
-        result.push(displayName);
-    }
-    return result;
-}
+
             // ==================== Dijkstra 算法 ====================
             function dijkstra(start, end) {
                 if (!graph[start] || !graph[end]) return null;
@@ -1156,58 +1210,14 @@
                 return null;
             }
 
-            // ==================== 多路径查找 ====================
-            function findAlternativePaths(start, end, maxPaths = 6) {
-                let shortest = dijkstra(start, end);
-                if (!shortest) {
-                    const bfsResult = bfsFindPath(start, end);
-                    if (bfsResult) return [bfsResult];
-                    return [];
-                }
-                const shortestDist = shortest.totalDistance;
-                const maxDist = shortestDist * 1.5;
-
-                const results = [];
-                const visited = new Set();
-                const path = [start];
-                let found = 0;
-
-                function dfs(current, dist) {
-                    if (found >= maxPaths) return;
-                    if (dist > maxDist) return;
-                    if (current === end) {
-                        results.push({ path: [...path], totalDistance: dist });
-                        found++;
-                        return;
-                    }
-                    if (path.length > 30) return;
-                    const neighbors = Object.keys(graph[current]);
-                    neighbors.sort((a, b) => graph[current][a] - graph[current][b]);
-                    for (const next of neighbors) {
-                        if (!visited.has(next)) {
-                            visited.add(next);
-                            path.push(next);
-                            dfs(next, dist + graph[current][next]);
-                            path.pop();
-                            visited.delete(next);
-                            if (found >= maxPaths) return;
-                        }
-                    }
-                }
-
-                visited.add(start);
-                dfs(start, 0);
-                results.sort((a, b) => a.totalDistance - b.totalDistance);
-                const unique = [];
-                const seen = new Set();
-                for (const r of results) {
-                    const key = r.path.join('|');
-                    if (!seen.has(key)) {
-                        seen.add(key);
-                        unique.push(r);
-                    }
-                }
-                return unique.slice(0, maxPaths);
+            // ==================== 单段最短路径（用于分段） ====================
+            function getShortestPath(start, end) {
+                if (!graph[start] || !graph[end]) return null;
+                // 先尝试 Dijkstra
+                const result = dijkstra(start, end);
+                if (result) return result;
+                // 备用 BFS
+                return bfsFindPath(start, end);
             }
 
             // ==================== 票价计算 ====================
@@ -1252,6 +1262,7 @@
             const TIME_LIMIT_DEFAULT = 30;
             const TIME_LIMIT_ELDER = 35;
             const PASS_SCORE = 18;
+            const MAX_WAYPOINTS = 5;
 
             // ==================== 数据操作 ====================
             async function loginUser(username, password) {
@@ -1443,6 +1454,8 @@
             const ticketResult = document.getElementById('ticketResult');
             const ticketQueryBtn = document.getElementById('ticketQueryBtn');
             const closeTicketBtn = document.getElementById('closeTicketBtn');
+            const waypointsContainer = document.getElementById('waypointsContainer');
+            const addWaypointBtn = document.getElementById('addWaypointBtn');
 
             const toastContainer = document.getElementById('toastContainer');
 
@@ -2219,12 +2232,16 @@
                 distResult.innerHTML = html;
             }
 
-            // ==================== 购票 ====================
+            // ==================== 购票（含途经点） ====================
             function openTicketModal() {
                 ticketModal.classList.add('active');
                 ticketResult.innerHTML = '';
                 ticketStart.value = '';
                 ticketEnd.value = '';
+                // 清空途经点
+                waypointsContainer.innerHTML = '';
+                addWaypointBtn.disabled = false;
+                // 填充站点下拉
                 const sortedStations = [...allStations].sort((a, b) => a.localeCompare(b, 'zh'));
                 ticketStart.innerHTML = '<option value="">-- 请选择 --</option>';
                 ticketEnd.innerHTML = '<option value="">-- 请选择 --</option>';
@@ -2238,122 +2255,195 @@
                     opt2.textContent = st;
                     ticketEnd.appendChild(opt2);
                 });
+                // 初始化已选站点集合（用于途经点过滤）
+                updateWaypointOptions();
             }
 
-            function closeTicketModal() {
-                ticketModal.classList.remove('active');
+            // 更新所有途经点下拉的可用选项（排除起点、终点及其他途经点）
+            function updateWaypointOptions() {
+                const start = ticketStart.value;
+                const end = ticketEnd.value;
+                const waypointSelects = document.querySelectorAll('.waypoint-select');
+                const selectedWaypoints = [];
+                waypointSelects.forEach(sel => {
+                    if (sel.value) selectedWaypoints.push(sel.value);
+                });
+                const exclude = new Set([start, end, ...selectedWaypoints]);
+                // 对所有途经点下拉重新填充
+                waypointSelects.forEach(sel => {
+                    const currentVal = sel.value;
+                    sel.innerHTML = '<option value="">-- 请选择 --</option>';
+                    allStations.forEach(st => {
+                        if (!exclude.has(st) || st === currentVal) {
+                            const opt = document.createElement('option');
+                            opt.value = st;
+                            opt.textContent = st;
+                            if (st === currentVal) opt.selected = true;
+                            sel.appendChild(opt);
+                        }
+                    });
+                });
+                // 更新添加按钮状态
+                const count = waypointSelects.length;
+                addWaypointBtn.disabled = count >= MAX_WAYPOINTS;
             }
 
+            // 添加途经点行
+            function addWaypointRow() {
+                const count = document.querySelectorAll('.waypoint-row').length;
+                if (count >= MAX_WAYPOINTS) return;
+                const row = document.createElement('div');
+                row.className = 'waypoint-row';
+                const select = document.createElement('select');
+                select.className = 'waypoint-select';
+                select.innerHTML = '<option value="">-- 请选择 --</option>';
+                allStations.forEach(st => {
+                    const opt = document.createElement('option');
+                    opt.value = st;
+                    opt.textContent = st;
+                    select.appendChild(opt);
+                });
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-waypoint';
+                removeBtn.textContent = '×';
+                removeBtn.title = '移除途经点';
+                removeBtn.addEventListener('click', function() {
+                    row.remove();
+                    updateWaypointOptions();
+                    // 检查添加按钮状态
+                    const rows = document.querySelectorAll('.waypoint-row');
+                    addWaypointBtn.disabled = rows.length >= MAX_WAYPOINTS;
+                });
+                select.addEventListener('change', function() {
+                    updateWaypointOptions();
+                });
+                row.appendChild(select);
+                row.appendChild(removeBtn);
+                waypointsContainer.appendChild(row);
+                updateWaypointOptions();
+                addWaypointBtn.disabled = document.querySelectorAll('.waypoint-row').length >= MAX_WAYPOINTS;
+            }
+
+            // 获取途经点数组（去空）
+            function getWaypoints() {
+                const selects = document.querySelectorAll('.waypoint-select');
+                const wps = [];
+                selects.forEach(sel => {
+                    if (sel.value) wps.push(sel.value);
+                });
+                // 去重
+                return [...new Set(wps)];
+            }
+
+            // 构建完整路径（分段）
+            function buildFullPath(start, waypoints, end) {
+                const fullPath = [];
+                let totalDist = 0;
+                const segments = [];
+                const sequence = [start, ...waypoints, end];
+                for (let i = 0; i < sequence.length - 1; i++) {
+                    const from = sequence[i];
+                    const to = sequence[i + 1];
+                    const result = getShortestPath(from, to);
+                    if (!result) {
+                        return { error: `无法从 ${from} 到达 ${to}` };
+                    }
+                    segments.push({ from, to, path: result.path, dist: result.totalDistance });
+                    totalDist += result.totalDistance;
+                }
+                // 拼接路径（去重首尾）
+                if (segments.length === 0) return { error: '无效分段' };
+                let mergedPath = [];
+                for (let i = 0; i < segments.length; i++) {
+                    const segPath = segments[i].path;
+                    if (i === 0) {
+                        mergedPath = segPath.slice();
+                    } else {
+                        // 跳过第一个元素（因为与前一段末尾相同）
+                        mergedPath = mergedPath.concat(segPath.slice(1));
+                    }
+                }
+                return { fullPath: mergedPath, totalDistance: totalDist, segments };
+            }
+
+            // ==================== 购票查询 ====================
             function handleTicketQuery() {
                 const start = ticketStart.value;
                 const end = ticketEnd.value;
+                const waypoints = getWaypoints();
                 if (!start || !end) {
                     ticketResult.innerHTML = '<p style="color:#d94a4a;">请选择起点和终点</p>';
                     return;
                 }
-                if (start === end) {
+                if (start === end && waypoints.length === 0) {
                     ticketResult.innerHTML = '<p style="color:#d94a4a;">起点和终点不能相同</p>';
                     return;
                 }
-
-                let allPaths = findAlternativePaths(start, end, 8);
-                if (!allPaths || allPaths.length === 0) {
-                    const bfsResult = bfsFindPath(start, end);
-                    if (bfsResult) {
-                        allPaths = [bfsResult];
-                    } else {
-                        ticketResult.innerHTML = '<p style="color:#d94a4a;">未找到路线，可能线路不连通</p>';
+                // 检查途经点是否包含起点或终点
+                for (const wp of waypoints) {
+                    if (wp === start) {
+                        ticketResult.innerHTML = '<p style="color:#d94a4a;">途经点不能与起点相同</p>';
+                        return;
+                    }
+                    if (wp === end) {
+                        ticketResult.innerHTML = '<p style="color:#d94a4a;">途经点不能与终点相同</p>';
                         return;
                     }
                 }
 
-                // 计算每条路径的换乘次数和里程
-                const pathsWithMeta = allPaths.map(p => {
-                    const lines = getLinesFromPath(p.path);
-                    return {
-                        ...p,
-                        lines: lines,
-                        transfers: lines.length - 1,
-                        fare: calculateFare(p.totalDistance)
-                    };
-                });
-
-                // 按里程升序排序
-                const byDist = [...pathsWithMeta].sort((a, b) => a.totalDistance - b.totalDistance);
-                // 按换乘次数升序，再按里程升序
-                const byTransfer = [...pathsWithMeta].sort((a, b) => {
-                    if (a.transfers !== b.transfers) return a.transfers - b.transfers;
-                    return a.totalDistance - b.totalDistance;
-                });
-
-                // 选取方案1：按里程最短，若里程差在5%内则选换乘最少的
-                let scheme1 = byDist[0];
-                const baseDist = scheme1.totalDistance;
-                const candidates = byDist.filter(p => Math.abs(p.totalDistance - baseDist) / baseDist < 0.05);
-                if (candidates.length > 1) {
-                    candidates.sort((a, b) => a.transfers - b.transfers);
-                    scheme1 = candidates[0];
-                }
-
-                // 方案2：换乘最少（且与方案1不同）
-                let scheme2 = byTransfer.find(p => p.path.join('|') !== scheme1.path.join('|'));
-                if (!scheme2) {
-                    scheme2 = byDist.find(p => p.path.join('|') !== scheme1.path.join('|'));
-                }
-
-                // 方案3：里程次短（且与方案1、2不同）
-                const usedPaths = new Set([scheme1.path.join('|'), scheme2 ? scheme2.path.join('|') : '']);
-                let scheme3 = byDist.find(p => !usedPaths.has(p.path.join('|')));
-                if (!scheme3) {
-                    scheme3 = byTransfer.find(p => !usedPaths.has(p.path.join('|')));
-                }
-
-                const displaySchemes = [];
-                if (scheme1) displaySchemes.push({ ...scheme1, label: '⭐ 推荐方案', isRecommended: true });
-                if (scheme2 && scheme2.path.join('|') !== scheme1.path.join('|')) {
-                    displaySchemes.push({ ...scheme2, label: '方案 2', isRecommended: false });
-                }
-                if (scheme3 && scheme3.path.join('|') !== scheme1.path.join('|') &&
-                    (scheme2 && scheme3.path.join('|') !== scheme2.path.join('|') || !scheme2)) {
-                    displaySchemes.push({ ...scheme3, label: '方案 3', isRecommended: false });
-                }
-
-                if (displaySchemes.length === 0) {
-                    ticketResult.innerHTML = '<p style="color:#d94a4a;">未找到合适路线</p>';
+                // 1. 计算票价（按无途经点最短里程）
+                const directResult = getShortestPath(start, end);
+                if (!directResult) {
+                    ticketResult.innerHTML = '<p style="color:#d94a4a;">起点和终点之间不连通</p>';
                     return;
                 }
+                const fare = calculateFare(directResult.totalDistance);
 
-                let html = '';
-                displaySchemes.forEach((p, idx) => {
-                    const lines = p.lines;
-                    const fare = p.fare;
-                    const km = (p.totalDistance / 1000).toFixed(2);
-                    let lineHtml = lines.map((l, li) => {
-                        const color = LINE_COLORS[l] || '#888';
-                        const span = `<span class="line-badge" style="background:${color};">${l}</span>`;
-                        if (li < lines.length - 1) return span + '<span class="line-arrow"> → </span>';
-                        return span;
-                    }).join('');
-                    const label = p.isRecommended ? p.label : p.label;
-                    const extra = p.isRecommended ? ' (依据里程与换乘综合推荐)' : '';
-                    html += `
-                        <div class="scheme-item">
-                            <div class="scheme-header">
-                                <span class="scheme-label">${label}${extra}</span>
-                                <span class="price" style="font-weight:700;color:#d94a4a;">${fare} 元</span>
-                            </div>
-                            <div class="scheme-lines">${lineHtml}</div>
-                            <div class="scheme-info">里程：${km} km  ·  换乘 ${p.transfers} 次</div>
-                            <button class="buy-btn" data-from="${start}" data-to="${end}" data-fare="${fare}" data-lines='${JSON.stringify(lines)}' data-path='${JSON.stringify(p.path)}'>立即购买</button>
+                // 2. 分段计算路径
+                const buildResult = buildFullPath(start, waypoints, end);
+                if (buildResult.error) {
+                    ticketResult.innerHTML = `<p style="color:#d94a4a;">${buildResult.error}</p>`;
+                    return;
+                }
+                const { fullPath, totalDistance, segments } = buildResult;
+
+                // 3. 获取线路序列
+                const lines = getLinesFromPath(fullPath);
+                const transfers = lines.length - 1;
+                const km = (totalDistance / 1000).toFixed(2);
+                const directKm = (directResult.totalDistance / 1000).toFixed(2);
+
+                // 4. 构建显示
+                let lineHtml = lines.map((l, idx) => {
+                    const color = LINE_COLORS[l] || '#888';
+                    const span = `<span class="line-badge" style="background:${color};">${l}</span>`;
+                    if (idx < lines.length - 1) return span + '<span class="line-arrow"> → </span>';
+                    return span;
+                }).join('');
+
+                // 若有途经点，显示路径详情
+                let pathDetail = '';
+                if (waypoints.length > 0) {
+                    const sequence = [start, ...waypoints, end];
+                    pathDetail = '途经：' + sequence.join(' → ');
+                }
+
+                let html = `
+                    <div class="scheme-item">
+                        <div class="scheme-header">
+                            <span class="scheme-label">⭐ 推荐方案</span>
+                            <span class="price" style="font-weight:700;color:#d94a4a;">${fare} 元</span>
                         </div>
-                    `;
-                });
-
+                        <div class="scheme-lines">${lineHtml}</div>
+                        <div class="scheme-info">总里程：${km} km  ·  换乘 ${transfers} 次</div>
+                        ${pathDetail ? `<div class="scheme-info" style="font-size:13px;color:#5a6a7a;">${pathDetail}</div>` : ''}
+                        <div class="scheme-info" style="font-size:12px;color:#8a9aaa;">票价按起点→终点最短里程 (${directKm} km) 计算</div>
+                        <button class="buy-btn" data-from="${start}" data-to="${end}" data-fare="${fare}" data-lines='${JSON.stringify(lines)}' data-path='${JSON.stringify(fullPath)}' data-waypoints='${JSON.stringify(waypoints)}'>立即购买</button>
+                    </div>
+                `;
                 ticketResult.innerHTML = html;
-                ticketResult.querySelectorAll('.buy-btn').forEach(btn => {
-                    btn.addEventListener('click', async function() {
-                        await handleBuyTicket(this);
-                    });
+                ticketResult.querySelector('.buy-btn').addEventListener('click', async function() {
+                    await handleBuyTicket(this);
                 });
             }
 
@@ -2365,6 +2455,7 @@
                 const fare = parseInt(btn.dataset.fare);
                 const lines = JSON.parse(btn.dataset.lines);
                 const path = JSON.parse(btn.dataset.path);
+                const waypoints = JSON.parse(btn.dataset.waypoints || '[]');
 
                 try {
                     const users = await fetchAllUsers();
@@ -2374,7 +2465,7 @@
                         showToast('余额不足，请先充值', '❌');
                         return;
                     }
-                    const orderData = { from, to, fare, lines, path };
+                    const orderData = { from, to, fare, lines, path, waypoints };
                     const newBalance = me.balance - fare;
                     myBalance.textContent = formatBalance(newBalance);
                     try {
@@ -2393,6 +2484,7 @@
                             refreshMyInfo();
                         }
                     } catch (apiError) {
+                        // 本地降级
                         const localKey = 'metro_orders_' + currentUser;
                         let orders = [];
                         const existing = localStorage.getItem(localKey);
@@ -2734,6 +2826,10 @@
             ticketQueryBtn.addEventListener('click', handleTicketQuery);
             closeTicketBtn.addEventListener('click', closeTicketModal);
             ticketModal.addEventListener('click', function(e) { if (e.target === this) closeTicketModal(); });
+            addWaypointBtn.addEventListener('click', addWaypointRow);
+            // 起始/终点变化时更新途经点选项
+            ticketStart.addEventListener('change', updateWaypointOptions);
+            ticketEnd.addEventListener('change', updateWaypointOptions);
 
             loginUsername.addEventListener('focus', function() { loginError.classList.remove('show'); });
             loginPassword.addEventListener('focus', function() { loginError.classList.remove('show'); });
