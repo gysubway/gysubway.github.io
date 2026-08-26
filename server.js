@@ -7,7 +7,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(bodyParser.json({ limit: '10mb' })); // 支持较大的 base64 图片
+app.use(bodyParser.json({ limit: '10mb' }));
 
 const DB_PATH = './db.json';
 
@@ -31,7 +31,8 @@ function initDB() {
                 { id: 5, icon: '🚇', name: '固原地铁 A 型车', desc: '6节编组，最高时速80km/h，采用永磁同步电机与节能空调，绿色环保，噪音更低。' },
                 { id: 6, icon: '🛤️', name: '智慧运维系统', desc: '基于大数据与AI的列车智能运维平台，实时监测车辆状态，保障运营安全可靠。' }
             ],
-            signinData: {}
+            signinData: {},
+            orders: {} // 新增：用户名 -> 订单数组
         };
         fs.writeFileSync(DB_PATH, JSON.stringify(defaultData, null, 2));
     }
@@ -48,7 +49,7 @@ function writeDB(data) {
 
 initDB();
 
-// 注册
+// ========== 用户相关 ==========
 app.post('/api/register', (req, res) => {
     const { username, password } = req.body;
     const db = readDB();
@@ -66,7 +67,6 @@ app.post('/api/register', (req, res) => {
     res.json({ success: true, message: '注册成功' });
 });
 
-// 登录
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     const db = readDB();
@@ -84,7 +84,6 @@ app.post('/api/login', (req, res) => {
     });
 });
 
-// 获取所有用户
 app.get('/api/users', (req, res) => {
     const db = readDB();
     const users = Object.keys(db.users).map(name => ({
@@ -98,7 +97,6 @@ app.get('/api/users', (req, res) => {
     res.json(users);
 });
 
-// 更新用户（支持 balance 和 avatar）
 app.put('/api/user/:username', (req, res) => {
     const { username } = req.params;
     const { balance, avatar } = req.body;
@@ -112,7 +110,6 @@ app.put('/api/user/:username', (req, res) => {
     res.json({ success: true });
 });
 
-// 重置密码（24小时限制）
 app.post('/api/user/:username/reset', (req, res) => {
     const { username } = req.params;
     const db = readDB();
@@ -139,7 +136,6 @@ app.post('/api/user/:username/reset', (req, res) => {
     res.json({ success: true, message: '密码已重置为 gy123456' });
 });
 
-// 删除用户
 app.delete('/api/user/:username', (req, res) => {
     const { username } = req.params;
     if (username === 'admin') {
@@ -150,11 +146,13 @@ app.delete('/api/user/:username', (req, res) => {
         return res.status(404).json({ success: false, message: '用户不存在' });
     }
     delete db.users[username];
+    // 同时删除该用户的订单
+    if (db.orders[username]) delete db.orders[username];
     writeDB(db);
     res.json({ success: true });
 });
 
-// 签到状态
+// ========== 签到 ==========
 app.get('/api/signin/:username', (req, res) => {
     const { username } = req.params;
     const db = readDB();
@@ -190,7 +188,7 @@ app.post('/api/signin/:username', (req, res) => {
     res.json({ success: true });
 });
 
-// 站车风采
+// ========== 站车风采 ==========
 app.get('/api/scenery', (req, res) => {
     const db = readDB();
     res.json(db.scenery);
@@ -225,6 +223,54 @@ app.delete('/api/scenery/:id', (req, res) => {
     db.scenery = db.scenery.filter(item => item.id !== parseInt(id));
     writeDB(db);
     res.json({ success: true });
+});
+
+// ========== 订单管理 ==========
+// 获取用户今日有效订单
+app.get('/api/orders/:username', (req, res) => {
+    const { username } = req.params;
+    const db = readDB();
+    if (!db.orders[username]) {
+        return res.json([]);
+    }
+    const today = new Date().toISOString().split('T')[0];
+    const validOrders = db.orders[username].filter(o => o.date === today);
+    res.json(validOrders);
+});
+
+// 创建订单
+app.post('/api/order', (req, res) => {
+    const { username, from, to, fare, lines, path } = req.body;
+    if (!username || !from || !to || fare === undefined) {
+        return res.status(400).json({ success: false, message: '参数不全' });
+    }
+    const db = readDB();
+    if (!db.users[username]) {
+        return res.status(404).json({ success: false, message: '用户不存在' });
+    }
+    // 检查余额
+    if (db.users[username].balance < fare) {
+        return res.status(400).json({ success: false, message: '余额不足' });
+    }
+    // 扣减余额
+    db.users[username].balance -= fare;
+    // 保存订单
+    const today = new Date().toISOString().split('T')[0];
+    const newOrder = {
+        id: Date.now(),
+        from,
+        to,
+        fare,
+        lines,
+        path,
+        date: today
+    };
+    if (!db.orders[username]) db.orders[username] = [];
+    db.orders[username].push(newOrder);
+    // 自动清理过期订单（保留当日）
+    db.orders[username] = db.orders[username].filter(o => o.date === today);
+    writeDB(db);
+    res.json({ success: true, message: '购票成功', order: newOrder });
 });
 
 app.listen(PORT, () => {
