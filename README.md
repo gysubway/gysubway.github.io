@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>固原地铁 · 售票系统</title>
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet" />
-    <style>
+<style>
+.quick-action.drive-action { border-color: #3498db; background: #eaf4ff; }
+.quick-action.drive-action:hover { border-color: #1a6e9e; }
         /* ===== 全局重置 ===== */
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -891,8 +893,13 @@
             <div class="card-grid" id="lineGrid"></div>
             <div class="section-title" style="margin-top:6px;">🎫 快捷功能<span class="title-line"></span></div>
             <div class="quick-actions" id="quickActions">
-                <div class="quick-action" data-action="ticket"><span class="qa-icon">🎟️</span><div class="qa-label">购票</div><div class="qa-desc">智能路径规划</div></div>
-                <div class="quick-action" data-action="distance"><span class="qa-icon">📏</span><div class="qa-label">站距查询</div><div class="qa-desc">相邻站点距离</div></div>
+    <div class="quick-action" data-action="ticket"><span class="qa-icon">🎟️</span><div class="qa-label">购票</div><div class="qa-desc">智能路径规划</div></div>
+    <div class="quick-action drive-action" data-action="drive">
+        <span class="qa-icon">🚄</span>
+        <div class="qa-label">模拟驾驶</div>
+        <div class="qa-desc">第一人称体验</div>
+    </div>
+    <div class="quick-action" data-action="distance"> <span class="qa-icon">📏</span><div class="qa-label">站距查询</div><div class="qa-desc">相邻站点距离</div></div>《》
                 <div class="quick-action" data-action="scenery"><span class="qa-icon">📸</span><div class="qa-label">站车风采</div><div class="qa-desc">点击欣赏</div></div>
                 <div class="quick-action signin-action" data-action="signin" id="signinEntry">
                     <span class="qa-icon">⌨️</span><div class="qa-label">每日签到</div>
@@ -2803,17 +2810,19 @@
             userNameClick.addEventListener('click', showMyPage);
 
             document.querySelectorAll('.quick-action[data-action]').forEach(el => {
-                el.addEventListener('click', function() {
-                    const action = this.dataset.action;
-                    if (action === 'ticket') openTicketModal();
-                    else if (action === 'distance') openDistanceModal();
-                    else if (action === 'scenery') openSceneryViewer();
-                    else if (action === 'signin') openQuizModal();
-                    else if (action === 'admin') openAdminPanel();
-                    else if (action === 'my') showMyPage();
-                });
-            });
-
+    el.addEventListener('click', function() {
+        const action = this.dataset.action;
+        if (action === 'ticket') openTicketModal();
+        else if (action === 'drive') {
+            window.location.href = 'drive.html?user=' + encodeURIComponent(currentUser || '') + '&back=index.html';
+        }
+        else if (action === 'distance') openDistanceModal();
+        else if (action === 'scenery') openSceneryViewer();
+        else if (action === 'signin') openQuizModal();
+        else if (action === 'admin') openAdminPanel();
+        else if (action === 'my') showMyPage();
+    });
+});
             myBackBtn.addEventListener('click', showHomePage);
 
             avatarWrapper.addEventListener('click', function() {
