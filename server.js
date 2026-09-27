@@ -32,7 +32,8 @@ function initDB() {
                 { id: 6, icon: '🛤️', name: '智慧运维系统', desc: '基于大数据与AI的列车智能运维平台，实时监测车辆状态，保障运营安全可靠。' }
             ],
             signinData: {},
-            orders: {} // 新增：用户名 -> 订单数组
+            orders: {},   // 用户名 -> 订单数组
+            scores: []    // 新增：模拟驾驶成绩记录
         };
         fs.writeFileSync(DB_PATH, JSON.stringify(defaultData, null, 2));
     }
@@ -40,7 +41,12 @@ function initDB() {
 
 function readDB() {
     const data = fs.readFileSync(DB_PATH);
-    return JSON.parse(data);
+    const parsed = JSON.parse(data);
+    // 向后兼容：老数据库可能没有 scores 字段
+    if (!parsed.scores) parsed.scores = [];
+    if (!parsed.orders) parsed.orders = {};
+    if (!parsed.signinData) parsed.signinData = {};
+    return parsed;
 }
 
 function writeDB(data) {
@@ -146,8 +152,9 @@ app.delete('/api/user/:username', (req, res) => {
         return res.status(404).json({ success: false, message: '用户不存在' });
     }
     delete db.users[username];
-    // 同时删除该用户的订单
+    // 同时删除该用户的订单和游戏成绩
     if (db.orders[username]) delete db.orders[username];
+    if (db.scores) db.scores = db.scores.filter(s => s.username !== username);
     writeDB(db);
     res.json({ success: true });
 });
@@ -273,6 +280,120 @@ app.post('/api/order', (req, res) => {
     res.json({ success: true, message: '购票成功', order: newOrder });
 });
 
+// ========== 模拟驾驶：成绩 / 排行榜 / 历史 ==========
+
+// 提交成绩
+app.post('/api/scores', (req, res) => {
+    const { username, map, score, elapsed, finishedAt } = req.body;
+    if (!username || !map || score === undefined || elapsed === undefined) {
+        return res.status(400).json({ success: false, message: '参数不全' });
+    }
+    if (map !== 'normal' && map !== 'express') {
+        return res.status(400).json({ success: false, message: '无效的地图类型' });
+    }
+    const db = readDB();
+    if (!db.users[username]) {
+        return res.status(404).json({ success: false, message: '用户不存在' });
+    }
+    const record = {
+        id: Date.now() + Math.floor(Math.random() * 1000),
+        username,
+        map,
+        score: Number(score),
+        elapsed: Number(elapsed),
+        finishedAt: finishedAt || new Date().toISOString(),
+        createdAt: new Date().toISOString()
+    };
+    db.scores.push(record);
+
+    // 每个用户最多保留 200 条，超出删最旧的
+    const userScores = db.scores.filter(s => s.username === username);
+    if (userScores.length > 200) {
+        userScores.sort((a, b) => new Date(a.finishedAt) - new Date(b.finishedAt));
+        const toRemove = new Set(
+            userScores.slice(0, userScores.length - 200).map(s => s.id)
+        );
+        db.scores = db.scores.filter(s => !toRemove.has(s.id));
+    }
+
+    writeDB(db);
+    res.json({ success: true, record });
+});
+
+// 排行榜：某地图前 N 名（每位玩家只保留其最高分）
+app.get('/api/leaderboard', (req, res) => {
+    const { map, limit = 20 } = req.query;
+    const db = readDB();
+    if (!db.scores || db.scores.length === 0) return res.json([]);
+
+    let scores = db.scores;
+    if (map) scores = scores.filter(s => s.map === map);
+
+    // 排序：分数降序，同分则用时短者优先
+    scores = scores.slice().sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return a.elapsed - b.elapsed;
+    });
+
+    // 每位玩家取最高分（排序后第一次出现即为最高）
+    const byUser = new Map();
+    for (const s of scores) {
+        if (!byUser.has(s.username)) byUser.set(s.username, s);
+    }
+
+    const result = Array.from(byUser.values())
+        .slice(0, Number(limit))
+        .map(s => ({
+            player: s.username,
+            score: s.score,
+            elapsed: s.elapsed,
+            finishedAt: s.finishedAt,
+            map: s.map
+        }));
+
+    res.json(result);
+});
+
+// 个人历史记录：最近 N 条（按完成时间倒序）
+app.get('/api/history', (req, res) => {
+    const { username, limit = 30 } = req.query;
+    if (!username) return res.json([]);
+    const db = readDB();
+    if (!db.scores || db.scores.length === 0) return res.json([]);
+
+    const userScores = db.scores
+        .filter(s => s.username === username)
+        .sort((a, b) => new Date(b.finishedAt) - new Date(a.finishedAt));
+
+    const result = userScores.slice(0, Number(limit)).map(s => ({
+        map: s.map,
+        score: s.score,
+        elapsed: s.elapsed,
+        finishedAt: s.finishedAt
+    }));
+
+    res.json(result);
+});
+
+// ========== 启动 ==========
 app.listen(PORT, () => {
     console.log(`🚇 固原地铁后端已启动，端口 ${PORT}`);
+    console.log(`   接口列表：`);
+    console.log(`     POST   /api/register`);
+    console.log(`     POST   /api/login`);
+    console.log(`     GET    /api/users`);
+    console.log(`     PUT    /api/user/:username`);
+    console.log(`     POST   /api/user/:username/reset`);
+    console.log(`     DELETE /api/user/:username`);
+    console.log(`     GET    /api/signin/:username`);
+    console.log(`     POST   /api/signin/:username`);
+    console.log(`     GET    /api/scenery`);
+    console.log(`     POST   /api/scenery`);
+    console.log(`     PUT    /api/scenery/:id`);
+    console.log(`     DELETE /api/scenery/:id`);
+    console.log(`     GET    /api/orders/:username`);
+    console.log(`     POST   /api/order`);
+    console.log(`     POST   /api/scores         ← 模拟驾驶提交成绩`);
+    console.log(`     GET    /api/leaderboard    ← 排行榜`);
+    console.log(`     GET    /api/history        ← 个人历史`);
 });
