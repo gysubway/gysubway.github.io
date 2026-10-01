@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "固原地铁售票系统后端",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-  "@supabase/supabase-js": "^2.45.0"
+    "@supabase/supabase-js": "^2.45.0"
   }
 }
