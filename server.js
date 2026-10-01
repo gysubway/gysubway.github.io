@@ -1,4 +1,4 @@
-const { createClient } = require('@supabase/supabase-js');
+import { createClient } from '@supabase/supabase-js';
 
 // 辅助函数：统一返回 JSON 并处理 CORS
 const corsHeaders = {
