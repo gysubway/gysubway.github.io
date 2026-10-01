@@ -1,399 +1,259 @@
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const fs = require('fs');
+const { createClient } = require('@supabase/supabase-js');
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+// 辅助函数：统一返回 JSON 并处理 CORS
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
 
-app.use(cors());
-app.use(bodyParser.json({ limit: '10mb' }));
-
-const DB_PATH = './db.json';
-
-function initDB() {
-    if (!fs.existsSync(DB_PATH)) {
-        const defaultData = {
-            users: {
-                admin: {
-                    password: 'gysubway2026',
-                    balance: 1000000,
-                    lastLogin: null,
-                    lastResetTime: null,
-                    avatar: ''
-                }
-            },
-            scenery: [
-                { id: 1, icon: '🏛️', name: '固原站', desc: '固原地铁1号线起点站，集交通、商业、文化于一体的综合枢纽，日均客流量超10万人次。' },
-                { id: 2, icon: '🏙️', name: '人民广场站', desc: '位于城市核心区，2号线与3号线换乘站，毗邻市政府与商业中心，是城市最繁忙的站点之一。' },
-                { id: 3, icon: '🌳', name: '古雁岭站', desc: '4号线站点，毗邻古雁岭生态公园，车站设计融入自然元素，被誉为"最美地铁站"。' },
-                { id: 4, icon: '🎙️', name: '丹尼尔模仿器', desc: '在部分站点设有丹尼尔低音炮模仿器，AI根据声音、动作、着装多方面评定相似度。' },
-                { id: 5, icon: '🚇', name: '固原地铁 A 型车', desc: '6节编组，最高时速80km/h，采用永磁同步电机与节能空调，绿色环保，噪音更低。' },
-                { id: 6, icon: '🛤️', name: '智慧运维系统', desc: '基于大数据与AI的列车智能运维平台，实时监测车辆状态，保障运营安全可靠。' }
-            ],
-            signinData: {},
-            orders: {},   // 用户名 -> 订单数组
-            scores: []    // 新增：模拟驾驶成绩记录
-        };
-        fs.writeFileSync(DB_PATH, JSON.stringify(defaultData, null, 2));
-    }
+function jsonResponse(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
 }
 
-function readDB() {
-    const data = fs.readFileSync(DB_PATH);
-    const parsed = JSON.parse(data);
-    // 向后兼容：老数据库可能没有 scores 字段
-    if (!parsed.scores) parsed.scores = [];
-    if (!parsed.orders) parsed.orders = {};
-    if (!parsed.signinData) parsed.signinData = {};
-    return parsed;
-}
-
-function writeDB(data) {
-    fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
-}
-
-initDB();
-
-// ========== 用户相关 ==========
-app.post('/api/register', (req, res) => {
-    const { username, password } = req.body;
-    const db = readDB();
-    if (db.users[username]) {
-        return res.status(400).json({ success: false, message: '用户已存在' });
+// ========== Worker 入口 ==========
+export default {
+  async fetch(request, env, ctx) {
+    // 1. 处理跨域预检请求
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { headers: corsHeaders });
     }
-    db.users[username] = {
-        password,
-        balance: 0,
-        lastLogin: null,
-        lastResetTime: null,
-        avatar: ''
-    };
-    writeDB(db);
-    res.json({ success: true, message: '注册成功' });
-});
 
-app.post('/api/login', (req, res) => {
-    const { username, password } = req.body;
-    const db = readDB();
-    const user = db.users[username];
-    if (!user || user.password !== password) {
-        return res.status(401).json({ success: false, message: '账号或密码错误' });
-    }
-    user.lastLogin = new Date().toISOString();
-    writeDB(db);
-    res.json({
-        success: true,
-        username,
-        balance: user.balance,
-        avatar: user.avatar || ''
-    });
-});
+    const url = new URL(request.url);
+    const path = url.pathname;
+    const method = request.method;
+    const parts = path.split('/').filter(Boolean); // 例如 /api/user/admin -> ['api', 'user', 'admin']
 
-app.get('/api/users', (req, res) => {
-    const db = readDB();
-    const users = Object.keys(db.users).map(name => ({
-        username: name,
-        password: db.users[name].password,
-        balance: db.users[name].balance,
-        lastLogin: db.users[name].lastLogin || null,
-        lastResetTime: db.users[name].lastResetTime || null,
-        avatar: db.users[name].avatar || ''
-    }));
-    res.json(users);
-});
+    // 2. 初始化 Supabase（从环境变量读取）
+    const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
 
-app.put('/api/user/:username', (req, res) => {
-    const { username } = req.params;
-    const { balance, avatar } = req.body;
-    const db = readDB();
-    if (!db.users[username]) {
-        return res.status(404).json({ success: false, message: '用户不存在' });
-    }
-    if (balance !== undefined) db.users[username].balance = balance;
-    if (avatar !== undefined) db.users[username].avatar = avatar;
-    writeDB(db);
-    res.json({ success: true });
-});
+    try {
+      // ========== 用户相关 ==========
+      if (path === '/api/register' && method === 'POST') {
+        const { username, password } = await request.json();
+        // 检查是否存在
+        const { data: exist } = await supabase.from('users').select('username').eq('username', username).single();
+        if (exist) return jsonResponse({ success: false, message: '用户已存在' }, 400);
+        
+        const { error } = await supabase.from('users').insert({ username, password, balance: 0 });
+        if (error) throw error;
+        return jsonResponse({ success: true, message: '注册成功' });
+      }
 
-app.post('/api/user/:username/reset', (req, res) => {
-    const { username } = req.params;
-    const db = readDB();
-    if (!db.users[username]) {
-        return res.status(404).json({ success: false, message: '用户不存在' });
-    }
-    if (username === 'admin') {
-        return res.status(403).json({ success: false, message: '不能重置管理员密码' });
-    }
-    const now = new Date();
-    const lastReset = db.users[username].lastResetTime;
-    if (lastReset) {
-        const diff = now - new Date(lastReset);
-        if (diff < 24 * 60 * 60 * 1000) {
-            return res.status(429).json({
-                success: false,
-                message: '该用户24小时内已被重置过，请稍后再试'
-            });
+      if (path === '/api/login' && method === 'POST') {
+        const { username, password } = await request.json();
+        const { data: user, error } = await supabase.from('users').select('*').eq('username', username).single();
+        if (error || !user || user.password !== password) {
+          return jsonResponse({ success: false, message: '账号或密码错误' }, 401);
         }
-    }
-    db.users[username].password = 'gy123456';
-    db.users[username].lastResetTime = now.toISOString();
-    writeDB(db);
-    res.json({ success: true, message: '密码已重置为 gy123456' });
-});
+        await supabase.from('users').update({ last_login: new Date().toISOString() }).eq('username', username);
+        return jsonResponse({ success: true, username, balance: user.balance, avatar: user.avatar || '' });
+      }
 
-app.delete('/api/user/:username', (req, res) => {
-    const { username } = req.params;
-    if (username === 'admin') {
-        return res.status(403).json({ success: false, message: '不能删除管理员' });
-    }
-    const db = readDB();
-    if (!db.users[username]) {
-        return res.status(404).json({ success: false, message: '用户不存在' });
-    }
-    delete db.users[username];
-    // 同时删除该用户的订单和游戏成绩
-    if (db.orders[username]) delete db.orders[username];
-    if (db.scores) db.scores = db.scores.filter(s => s.username !== username);
-    writeDB(db);
-    res.json({ success: true });
-});
-
-// ========== 签到 ==========
-app.get('/api/signin/:username', (req, res) => {
-    const { username } = req.params;
-    const db = readDB();
-    const today = new Date().toISOString().split('T')[0];
-    if (!db.signinData[username]) {
-        db.signinData[username] = { date: today, attempts: 2, signed: false };
-        writeDB(db);
-    }
-    const data = db.signinData[username];
-    if (data.date !== today) {
-        data.date = today;
-        data.attempts = 2;
-        data.signed = false;
-        writeDB(db);
-    }
-    res.json(data);
-});
-
-app.post('/api/signin/:username', (req, res) => {
-    const { username } = req.params;
-    const { attempts, signed } = req.body;
-    const db = readDB();
-    const today = new Date().toISOString().split('T')[0];
-    if (!db.signinData[username]) {
-        db.signinData[username] = { date: today, attempts: 2, signed: false };
-    }
-    if (db.signinData[username].date !== today) {
-        db.signinData[username] = { date: today, attempts: 2, signed: false };
-    }
-    if (attempts !== undefined) db.signinData[username].attempts = attempts;
-    if (signed !== undefined) db.signinData[username].signed = signed;
-    writeDB(db);
-    res.json({ success: true });
-});
-
-// ========== 站车风采 ==========
-app.get('/api/scenery', (req, res) => {
-    const db = readDB();
-    res.json(db.scenery);
-});
-
-app.post('/api/scenery', (req, res) => {
-    const { icon, name, desc } = req.body;
-    const db = readDB();
-    const maxId = db.scenery.reduce((max, item) => Math.max(max, item.id), 0);
-    const newItem = { id: maxId + 1, icon, name, desc };
-    db.scenery.push(newItem);
-    writeDB(db);
-    res.json({ success: true, item: newItem });
-});
-
-app.put('/api/scenery/:id', (req, res) => {
-    const { id } = req.params;
-    const { icon, name, desc } = req.body;
-    const db = readDB();
-    const idx = db.scenery.findIndex(item => item.id === parseInt(id));
-    if (idx === -1) {
-        return res.status(404).json({ success: false, message: '未找到' });
-    }
-    db.scenery[idx] = { ...db.scenery[idx], icon, name, desc };
-    writeDB(db);
-    res.json({ success: true });
-});
-
-app.delete('/api/scenery/:id', (req, res) => {
-    const { id } = req.params;
-    const db = readDB();
-    db.scenery = db.scenery.filter(item => item.id !== parseInt(id));
-    writeDB(db);
-    res.json({ success: true });
-});
-
-// ========== 订单管理 ==========
-// 获取用户今日有效订单
-app.get('/api/orders/:username', (req, res) => {
-    const { username } = req.params;
-    const db = readDB();
-    if (!db.orders[username]) {
-        return res.json([]);
-    }
-    const today = new Date().toISOString().split('T')[0];
-    const validOrders = db.orders[username].filter(o => o.date === today);
-    res.json(validOrders);
-});
-
-// 创建订单
-app.post('/api/order', (req, res) => {
-    const { username, from, to, fare, lines, path } = req.body;
-    if (!username || !from || !to || fare === undefined) {
-        return res.status(400).json({ success: false, message: '参数不全' });
-    }
-    const db = readDB();
-    if (!db.users[username]) {
-        return res.status(404).json({ success: false, message: '用户不存在' });
-    }
-    // 检查余额
-    if (db.users[username].balance < fare) {
-        return res.status(400).json({ success: false, message: '余额不足' });
-    }
-    // 扣减余额
-    db.users[username].balance -= fare;
-    // 保存订单
-    const today = new Date().toISOString().split('T')[0];
-    const newOrder = {
-        id: Date.now(),
-        from,
-        to,
-        fare,
-        lines,
-        path,
-        date: today
-    };
-    if (!db.orders[username]) db.orders[username] = [];
-    db.orders[username].push(newOrder);
-    // 自动清理过期订单（保留当日）
-    db.orders[username] = db.orders[username].filter(o => o.date === today);
-    writeDB(db);
-    res.json({ success: true, message: '购票成功', order: newOrder });
-});
-
-// ========== 模拟驾驶：成绩 / 排行榜 / 历史 ==========
-
-// 提交成绩
-app.post('/api/scores', (req, res) => {
-    const { username, map, score, elapsed, finishedAt } = req.body;
-    if (!username || !map || score === undefined || elapsed === undefined) {
-        return res.status(400).json({ success: false, message: '参数不全' });
-    }
-    if (map !== 'normal' && map !== 'express') {
-        return res.status(400).json({ success: false, message: '无效的地图类型' });
-    }
-    const db = readDB();
-    if (!db.users[username]) {
-        return res.status(404).json({ success: false, message: '用户不存在' });
-    }
-    const record = {
-        id: Date.now() + Math.floor(Math.random() * 1000),
-        username,
-        map,
-        score: Number(score),
-        elapsed: Number(elapsed),
-        finishedAt: finishedAt || new Date().toISOString(),
-        createdAt: new Date().toISOString()
-    };
-    db.scores.push(record);
-
-    // 每个用户最多保留 200 条，超出删最旧的
-    const userScores = db.scores.filter(s => s.username === username);
-    if (userScores.length > 200) {
-        userScores.sort((a, b) => new Date(a.finishedAt) - new Date(b.finishedAt));
-        const toRemove = new Set(
-            userScores.slice(0, userScores.length - 200).map(s => s.id)
-        );
-        db.scores = db.scores.filter(s => !toRemove.has(s.id));
-    }
-
-    writeDB(db);
-    res.json({ success: true, record });
-});
-
-// 排行榜：某地图前 N 名（每位玩家只保留其最高分）
-app.get('/api/leaderboard', (req, res) => {
-    const { map, limit = 20 } = req.query;
-    const db = readDB();
-    if (!db.scores || db.scores.length === 0) return res.json([]);
-
-    let scores = db.scores;
-    if (map) scores = scores.filter(s => s.map === map);
-
-    // 排序：分数降序，同分则用时短者优先
-    scores = scores.slice().sort((a, b) => {
-        if (b.score !== a.score) return b.score - a.score;
-        return a.elapsed - b.elapsed;
-    });
-
-    // 每位玩家取最高分（排序后第一次出现即为最高）
-    const byUser = new Map();
-    for (const s of scores) {
-        if (!byUser.has(s.username)) byUser.set(s.username, s);
-    }
-
-    const result = Array.from(byUser.values())
-        .slice(0, Number(limit))
-        .map(s => ({
-            player: s.username,
-            score: s.score,
-            elapsed: s.elapsed,
-            finishedAt: s.finishedAt,
-            map: s.map
+      if (path === '/api/users' && method === 'GET') {
+        const { data: users, error } = await supabase.from('users').select('*');
+        if (error) throw error;
+        const result = users.map(u => ({
+          username: u.username,
+          password: u.password,
+          balance: u.balance,
+          lastLogin: u.last_login,
+          lastResetTime: u.last_reset_time,
+          avatar: u.avatar || ''
         }));
+        return jsonResponse(result);
+      }
 
-    res.json(result);
-});
+      // 匹配 /api/user/:username (PUT)
+      if (parts[1] === 'user' && parts[2] && method === 'PUT') {
+        const username = parts[2];
+        const body = await request.json();
+        const updates = {};
+        if (body.balance !== undefined) updates.balance = body.balance;
+        if (body.avatar !== undefined) updates.avatar = body.avatar;
+        
+        const { error } = await supabase.from('users').update(updates).eq('username', username);
+        if (error) throw error;
+        return jsonResponse({ success: true });
+      }
 
-// 个人历史记录：最近 N 条（按完成时间倒序）
-app.get('/api/history', (req, res) => {
-    const { username, limit = 30 } = req.query;
-    if (!username) return res.json([]);
-    const db = readDB();
-    if (!db.scores || db.scores.length === 0) return res.json([]);
+      // 匹配 /api/user/:username/reset (POST)
+      if (parts[1] === 'user' && parts[2] && parts[3] === 'reset' && method === 'POST') {
+        const username = parts[2];
+        if (username === 'admin') return jsonResponse({ success: false, message: '不能重置管理员密码' }, 403);
+        
+        const { data: user } = await supabase.from('users').select('last_reset_time').eq('username', username).single();
+        if (!user) return jsonResponse({ success: false, message: '用户不存在' }, 404);
+        
+        if (user.last_reset_time) {
+          const diff = new Date() - new Date(user.last_reset_time);
+          if (diff < 24 * 60 * 60 * 1000) {
+            return jsonResponse({ success: false, message: '该用户24小时内已被重置过，请稍后再试' }, 429);
+          }
+        }
+        await supabase.from('users').update({ password: 'gy123456', last_reset_time: new Date().toISOString() }).eq('username', username);
+        return jsonResponse({ success: true, message: '密码已重置为 gy123456' });
+      }
 
-    const userScores = db.scores
-        .filter(s => s.username === username)
-        .sort((a, b) => new Date(b.finishedAt) - new Date(a.finishedAt));
+      // 匹配 /api/user/:username (DELETE)
+      if (parts[1] === 'user' && parts[2] && method === 'DELETE') {
+        const username = parts[2];
+        if (username === 'admin') return jsonResponse({ success: false, message: '不能删除管理员' }, 403);
+        await supabase.from('users').delete().eq('username', username);
+        return jsonResponse({ success: true });
+      }
 
-    const result = userScores.slice(0, Number(limit)).map(s => ({
-        map: s.map,
-        score: s.score,
-        elapsed: s.elapsed,
-        finishedAt: s.finishedAt
-    }));
+      // ========== 签到 ==========
+      if (parts[1] === 'signin' && parts[2]) {
+        const username = parts[2];
+        const today = new Date().toISOString().split('T')[0];
+        
+        if (method === 'GET') {
+          let { data: record } = await supabase.from('signin').select('*').eq('username', username).single();
+          if (!record) {
+            await supabase.from('signin').insert({ username, date: today, attempts: 2, signed: false });
+            return jsonResponse({ date: today, attempts: 2, signed: false });
+          }
+          if (record.date !== today) {
+            await supabase.from('signin').update({ date: today, attempts: 2, signed: false }).eq('username', username);
+            return jsonResponse({ date: today, attempts: 2, signed: false });
+          }
+          return jsonResponse(record);
+        }
+        
+        if (method === 'POST') {
+          const body = await request.json();
+          const updates = {};
+          if (body.attempts !== undefined) updates.attempts = body.attempts;
+          if (body.signed !== undefined) updates.signed = body.signed;
+          // 确保日期更新
+          updates.date = today;
+          await supabase.from('signin').upsert({ username, ...updates, date: today });
+          return jsonResponse({ success: true });
+        }
+      }
 
-    res.json(result);
-});
+      // ========== 站车风采 ==========
+      if (path === '/api/scenery') {
+        if (method === 'GET') {
+          const { data, error } = await supabase.from('scenery').select('*').order('id');
+          if (error) throw error;
+          return jsonResponse(data);
+        }
+        if (method === 'POST') {
+          const { icon, name, desc } = await request.json();
+          const { data, error } = await supabase.from('scenery').insert({ icon, name, desc }).select().single();
+          if (error) throw error;
+          return jsonResponse({ success: true, item: data });
+        }
+      }
 
-// ========== 启动 ==========
-app.listen(PORT, () => {
-    console.log(`🚇 固原地铁后端已启动，端口 ${PORT}`);
-    console.log(`   接口列表：`);
-    console.log(`     POST   /api/register`);
-    console.log(`     POST   /api/login`);
-    console.log(`     GET    /api/users`);
-    console.log(`     PUT    /api/user/:username`);
-    console.log(`     POST   /api/user/:username/reset`);
-    console.log(`     DELETE /api/user/:username`);
-    console.log(`     GET    /api/signin/:username`);
-    console.log(`     POST   /api/signin/:username`);
-    console.log(`     GET    /api/scenery`);
-    console.log(`     POST   /api/scenery`);
-    console.log(`     PUT    /api/scenery/:id`);
-    console.log(`     DELETE /api/scenery/:id`);
-    console.log(`     GET    /api/orders/:username`);
-    console.log(`     POST   /api/order`);
-    console.log(`     POST   /api/scores         ← 模拟驾驶提交成绩`);
-    console.log(`     GET    /api/leaderboard    ← 排行榜`);
-    console.log(`     GET    /api/history        ← 个人历史`);
-});
+      if (parts[1] === 'scenery' && parts[2]) {
+        const id = parseInt(parts[2]);
+        if (method === 'PUT') {
+          const { icon, name, desc } = await request.json();
+          const { error } = await supabase.from('scenery').update({ icon, name, desc }).eq('id', id);
+          if (error) throw error;
+          return jsonResponse({ success: true });
+        }
+        if (method === 'DELETE') {
+          const { error } = await supabase.from('scenery').delete().eq('id', id);
+          if (error) throw error;
+          return jsonResponse({ success: true });
+        }
+      }
+
+      // ========== 订单管理 ==========
+      if (parts[1] === 'orders' && parts[2] && method === 'GET') {
+        const username = parts[2];
+        const today = new Date().toISOString().split('T')[0];
+        const { data, error } = await supabase.from('orders').select('*').eq('username', username).eq('date', today);
+        if (error) throw error;
+        return jsonResponse(data);
+      }
+
+      if (path === '/api/order' && method === 'POST') {
+        const { username, from, to, fare, lines, path: orderPath } = await request.json();
+        if (!username || !from || !to || fare === undefined) return jsonResponse({ success: false, message: '参数不全' }, 400);
+        
+        const { data: user } = await supabase.from('users').select('balance').eq('username', username).single();
+        if (!user) return jsonResponse({ success: false, message: '用户不存在' }, 404);
+        if (user.balance < fare) return jsonResponse({ success: false, message: '余额不足' }, 400);
+
+        // 扣减余额
+        await supabase.from('users').update({ balance: user.balance - fare }).eq('username', username);
+        
+        // 清理今日之前的旧订单
+        const today = new Date().toISOString().split('T')[0];
+        await supabase.from('orders').delete().eq('username', username).neq('date', today);
+
+        // 插入新订单
+        const newOrder = { id: Date.now(), username, from, to, fare, lines, path: orderPath, date: today };
+        const { error } = await supabase.from('orders').insert(newOrder);
+        if (error) throw error;
+        return jsonResponse({ success: true, message: '购票成功', order: newOrder });
+      }
+
+      // ========== 模拟驾驶 ==========
+      if (path === '/api/scores' && method === 'POST') {
+        const { username, map, score, elapsed, finishedAt } = await request.json();
+        if (!username || !map || score === undefined || elapsed === undefined) return jsonResponse({ success: false, message: '参数不全' }, 400);
+        if (map !== 'normal' && map !== 'express') return jsonResponse({ success: false, message: '无效的地图类型' }, 400);
+        
+        const record = {
+          id: Date.now() + Math.floor(Math.random() * 1000),
+          username, map, score: Number(score), elapsed: Number(elapsed),
+          finished_at: finishedAt || new Date().toISOString(), created_at: new Date().toISOString()
+        };
+        await supabase.from('scores').insert(record);
+        
+        // 限制每用户 200 条（删除最旧的）
+        const { data: userScores } = await supabase.from('scores').select('id').eq('username', username).order('finished_at', { ascending: false });
+        if (userScores && userScores.length > 200) {
+          const toDelete = userScores.slice(200).map(s => s.id);
+          await supabase.from('scores').delete().in('id', toDelete);
+        }
+        return jsonResponse({ success: true, record });
+      }
+
+      if (path === '/api/leaderboard' && method === 'GET') {
+        const map = url.searchParams.get('map');
+        const limit = parseInt(url.searchParams.get('limit') || '20');
+        let query = supabase.from('scores').select('*');
+        if (map) query = query.eq('map', map);
+        const { data: scores, error } = await query;
+        if (error) throw error;
+        
+        // 排序：分数降序，同分用时短优先
+        scores.sort((a, b) => b.score !== a.score ? b.score - a.score : a.elapsed - b.elapsed);
+        const byUser = new Map();
+        for (const s of scores) {
+          if (!byUser.has(s.username)) byUser.set(s.username, s);
+        }
+        const result = Array.from(byUser.values()).slice(0, limit).map(s => ({
+          player: s.username, score: s.score, elapsed: s.elapsed, finishedAt: s.finished_at, map: s.map
+        }));
+        return jsonResponse(result);
+      }
+
+      if (path === '/api/history' && method === 'GET') {
+        const username = url.searchParams.get('username');
+        const limit = parseInt(url.searchParams.get('limit') || '30');
+        if (!username) return jsonResponse([]);
+        const { data, error } = await supabase.from('scores').select('*').eq('username', username).order('finished_at', { ascending: false }).limit(limit);
+        if (error) throw error;
+        const result = data.map(s => ({ map: s.map, score: s.score, elapsed: s.elapsed, finishedAt: s.finished_at }));
+        return jsonResponse(result);
+      }
+
+      // 404
+      return jsonResponse({ error: 'Not Found' }, 404);
+    } catch (err) {
+      console.error('Server Error:', err);
+      return jsonResponse({ error: err.message || 'Internal Server Error' }, 500);
+    }
+  }
+};
