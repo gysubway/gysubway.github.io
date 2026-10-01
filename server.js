@@ -17,7 +17,7 @@ function jsonResponse(data, status = 200) {
 // ========== Worker 入口 ==========
 export default {
   async fetch(request, env, ctx) {
-    // 1. 处理跨域预检请求
+    // 1. 处理跨域预检请求 (OPTIONS)
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders });
     }
@@ -27,10 +27,15 @@ export default {
     const method = request.method;
     const parts = path.split('/').filter(Boolean); // 例如 /api/user/admin -> ['api', 'user', 'admin']
 
-    // 2. 初始化 Supabase（从环境变量读取）
-    const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
-
     try {
+      // 2. 检查环境变量是否配置
+      if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) {
+        throw new Error("环境变量缺失：请检查 Cloudflare 的 SUPABASE_URL 和 SUPABASE_ANON_KEY 是否配置正确！");
+      }
+
+      // 3. 在 try 块内部初始化 Supabase（防止因环境变量未读到导致整个 Worker 崩溃）
+      const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
+
       // ========== 用户相关 ==========
       if (path === '/api/register' && method === 'POST') {
         const { username, password } = await request.json();
@@ -129,7 +134,6 @@ export default {
           const updates = {};
           if (body.attempts !== undefined) updates.attempts = body.attempts;
           if (body.signed !== undefined) updates.signed = body.signed;
-          // 确保日期更新
           updates.date = today;
           await supabase.from('signin').upsert({ username, ...updates, date: today });
           return jsonResponse({ success: true });
@@ -183,14 +187,11 @@ export default {
         if (!user) return jsonResponse({ success: false, message: '用户不存在' }, 404);
         if (user.balance < fare) return jsonResponse({ success: false, message: '余额不足' }, 400);
 
-        // 扣减余额
         await supabase.from('users').update({ balance: user.balance - fare }).eq('username', username);
         
-        // 清理今日之前的旧订单
         const today = new Date().toISOString().split('T')[0];
         await supabase.from('orders').delete().eq('username', username).neq('date', today);
 
-        // 插入新订单
         const newOrder = { id: Date.now(), username, from, to, fare, lines, path: orderPath, date: today };
         const { error } = await supabase.from('orders').insert(newOrder);
         if (error) throw error;
@@ -210,7 +211,6 @@ export default {
         };
         await supabase.from('scores').insert(record);
         
-        // 限制每用户 200 条（删除最旧的）
         const { data: userScores } = await supabase.from('scores').select('id').eq('username', username).order('finished_at', { ascending: false });
         if (userScores && userScores.length > 200) {
           const toDelete = userScores.slice(200).map(s => s.id);
@@ -227,7 +227,6 @@ export default {
         const { data: scores, error } = await query;
         if (error) throw error;
         
-        // 排序：分数降序，同分用时短优先
         scores.sort((a, b) => b.score !== a.score ? b.score - a.score : a.elapsed - b.elapsed);
         const byUser = new Map();
         for (const s of scores) {
@@ -253,7 +252,11 @@ export default {
       return jsonResponse({ error: 'Not Found' }, 404);
     } catch (err) {
       console.error('Server Error:', err);
-      return jsonResponse({ error: err.message || 'Internal Server Error' }, 500);
+      // 把详细错误信息返回给前端，方便调试
+      return jsonResponse({ 
+        error: err.message || 'Internal Server Error',
+        details: String(err)
+      }, 500);
     }
   }
 };
