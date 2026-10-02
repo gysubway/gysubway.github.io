@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-
+// 10.2强制部署
 // 辅助函数：统一返回 JSON 并处理 CORS
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
