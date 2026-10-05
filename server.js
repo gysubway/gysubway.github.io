@@ -28,15 +28,12 @@ export default {
     const parts = path.split('/').filter(Boolean); // 例如 /api/user/admin -> ['api', 'user', 'admin']
 
     try {
-      // 2. 检查环境变量是否配置
-      console.log('当前环境变量键名:', Object.keys(env));
-      if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) {
-        throw new Error("环境变量缺失：请检查 Cloudflare 的 SUPABASE_URL 和 SUPABASE_ANON_KEY 是否配置正确！");
-      }
+      // ⚠️ 临时硬编码，跳过 Cloudflare 环境变量（等跑通后再改回 env 方式）
+const SUPABASE_URL = "https://jnixrglxlasdukjvwyra.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_8HJN4GMPZ4ZhrHtcepqwhQ_ZpG4pzIF";
 
-      // 3. 在 try 块内部初始化 Supabase（防止因环境变量未读到导致整个 Worker 崩溃）
-      const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
-
+// 初始化 Supabase
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       // ========== 用户相关 ==========
       if (path === '/api/register' && method === 'POST') {
         const { username, password } = await request.json();
