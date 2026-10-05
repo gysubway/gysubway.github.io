@@ -29,6 +29,7 @@ export default {
 
     try {
       // 2. 检查环境变量是否配置
+      console.log('当前环境变量键名:', Object.keys(env));
       if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) {
         throw new Error("环境变量缺失：请检查 Cloudflare 的 SUPABASE_URL 和 SUPABASE_ANON_KEY 是否配置正确！");
       }
